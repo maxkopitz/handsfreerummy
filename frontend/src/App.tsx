@@ -1,10 +1,9 @@
 import React from "react";
-import "./App.css";
-import Board from "./Board";
+import Board from "./ui/game/Board";
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <Board />
     </div>
   );
