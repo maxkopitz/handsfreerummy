@@ -1,13 +1,27 @@
-# Setup
+# About
+Frontend code for Handsfreerummy
+
+### Setup
 
 1. Change dir to frontend
+```sh 
+cd ./frontend
+```
 
-### `cd frontend`
+2. Install [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating)
 
-2. Install dependencies
+3. Install correct node version (see `.nvmrc`)
 
-### `npm install`
+```sh
+nvm use
+```
 
-3. Start the development server
+4. Install packages
+```sh 
+npm install
+```
 
-### `npm start`
+5. Start the development server
+```sh 
+npm start
+```
