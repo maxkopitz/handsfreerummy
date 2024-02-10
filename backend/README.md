@@ -1,6 +1,6 @@
 ## Setup
 
-1. Python3 virtaul venv
+1. Python3 virtual venv
    `python3 -m venv env`
 
 2. Source the virtual environment
