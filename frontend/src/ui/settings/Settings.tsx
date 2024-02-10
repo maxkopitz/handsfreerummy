@@ -1,8 +1,10 @@
+import Container from "../components/Container";
+
 const Settings = () => {
   return (
-    <div>
+    <Container>
       <h1>Settings</h1>
-    </div>
+    </Container>
   );
 };
 

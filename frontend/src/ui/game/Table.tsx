@@ -1,17 +1,16 @@
+import Container from "../components/Container";
 import Board from "./Board";
-import Card from "./Card";
 import Hand from "./Hand";
 
 const Table = () => {
   return (
-    <div>
-      {" "}
+    <Container>
       <Hand />
       <Hand />
       <Hand />
       <Hand />
       <Board />
-    </div>
+    </Container>
   );
 };
 
