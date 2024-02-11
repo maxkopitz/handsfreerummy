@@ -8,3 +8,6 @@
 
 3. Install the requirements
    `pip install -r requirements.txt`
+
+4. Install the requirements
+   `pip install -e .`

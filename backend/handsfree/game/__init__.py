@@ -1,0 +1,1 @@
+from handsfree.game.game import *
