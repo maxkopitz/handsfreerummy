@@ -1,4 +1,6 @@
+from __future__ import annotations
 from random import shuffle
+
 
 class Card:
     def __init__(self, value: int, suit: str):
@@ -109,7 +111,6 @@ class Game:
 
     # initialize the board and run through each turn until someone runs out of cards     
     def runGame(self):
-        print(type(self.players[0]), "t3")
         self.board = Board(self, self.players)
 
     # player draws the card from the pile returned from the socket
@@ -185,7 +186,7 @@ for i in game.players:
 game1 = Game(2, ["one", "two"])
 print(game1.id, type(game1.numPlayers))
 game1.print()
-
+game1.runGame()
 for i in game1.players:
     print(i.id, "Hand :")
     i.printHand()
