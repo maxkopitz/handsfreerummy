@@ -1,7 +1,12 @@
+import { socket } from "./socket";
 import Button from "./ui/components/Button";
 import Container from "./ui/components/Container";
 
 const MainMenu = () => {
+    const handleCreateGame = () => {
+        console.log('test');
+        //socket.emit("create-game");
+    }
     return (
         <Container>
             <div className="flex flex-col justify-center items-center">
@@ -14,7 +19,7 @@ const MainMenu = () => {
                     </div>
                 </div>
                 <div>
-                    <Button text={"Create Game"} link={"game"} />
+                    <Button text={"Create Game"} onClick={handleCreateGame} />
                 </div>
                 <div>
                     <Button text={"Settings"} link={"settings"} />

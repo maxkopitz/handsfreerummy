@@ -9,23 +9,24 @@ interface BoardProps {
 }
 const Board = ({ discard, playedRuns }: BoardProps) => {
   return (
-    <div className="grid grid">
-      <div>
+    <div className="grid grid-rows-4">
+      <div className="col-start-1">
         <h1>Discard pile</h1>
         <Card card={discard} />
       </div>
-
       <div>
         <h1>Pickup Pile</h1>
         <CardBack />
       </div>
-
+{/*
       <div>
         <h1>Played Cards</h1>
         {playedRuns.map((run, i) =>
           run.map((card, j) => <Card key={`${i}-${j}`} card={card} />)
         )}
       </div>
+    */}
+
     </div>
   );
 };
