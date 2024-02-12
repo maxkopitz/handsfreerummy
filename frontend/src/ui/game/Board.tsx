@@ -12,13 +12,13 @@ const Board = ({ discard, playedRuns }: BoardProps) => {
     <div className="grid grid-rows-4">
       <div className="col-start-1">
         <h1>Discard pile</h1>
-        <Card card={discard} />
+        <Card card={discard} direction="across" />
       </div>
       <div>
         <h1>Pickup Pile</h1>
-        <CardBack />
+        <Card card={discard} direction="across" isBack={true} />
       </div>
-{/*
+      {/*
       <div>
         <h1>Played Cards</h1>
         {playedRuns.map((run, i) =>
@@ -26,7 +26,6 @@ const Board = ({ discard, playedRuns }: BoardProps) => {
         )}
       </div>
     */}
-
     </div>
   );
 };

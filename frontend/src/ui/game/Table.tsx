@@ -40,30 +40,23 @@ const Table = () => {
     <Container>
       <div className="grid grid-cols-5">
         <div className="row-span-3 row-start-2">
-          <Hand isPlayer={false} playerId={1} hand={[]} />
+          <Hand isPlayer={false} playerId={1} direction={"next-to"} hand={[]} />
         </div>
         <div className="col-span-3 col-start-2">
-          <Hand isPlayer={false} playerId={2} hand={[]} />
+          <Hand isPlayer={false} playerId={2} direction={"across"} hand={[]} />
         </div>
         <div className="col-span-3">
           <Board
             playedRuns={dummyRuns}
-            discard={{ value: Value.Six, suit: Suit.C }}
+            discard={{ value: Value.Six, suit: Suit.H }}
           />
         </div>
         <div className="row-span-3">
-          <Hand isPlayer={false} playerId={3} hand={[]} />
-          di
+          <Hand isPlayer={false} playerId={3} direction={"next-to"} hand={[]} />
         </div>
         <div className="col-span-3">
-          <Hand isPlayer={true} playerId={4} hand={[]} />
+          <Hand isPlayer={true} playerId={4} direction={"across"} hand={[]} />
         </div>
-        {/* <div>
-          <Board
-            playedRuns={dummyRuns}
-            discard={{ value: Value.Six, suit: Suit.C }}
-          />
-        </div> */}
       </div>
     </Container>
   );

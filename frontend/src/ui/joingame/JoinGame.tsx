@@ -1,5 +1,6 @@
 import { LobbyGame } from "../../Type";
 import Game from "./Game";
+
 interface JoinGameProps {
   games: LobbyGame[];
 }

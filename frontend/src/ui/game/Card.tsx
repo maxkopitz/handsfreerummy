@@ -1,24 +1,33 @@
+import classNames from "classnames";
 import { CardType, Suit } from "../../Type";
 import { useProfile } from "../../providers/Profile";
 
 //Pick Card Design
 interface CardProps {
   card: CardType;
+  direction: string;
+  isBack?: boolean;
 }
 
-const Card = ({ card }: CardProps) => {
+const Card = ({ card, direction, isBack }: CardProps) => {
   const { profile } = useProfile();
-  const style = {
-    width: "100px",
-    height: "150px",
-    border: "2px solid black",
-    display: "flex",
-    alignItems: "center",
-    padding: "10px",
-    color: profile.color,
-  };
+  let classes = classNames(
+    "w-24 h-32 border-2 rounded-md text-3xl text-center",
+    {
+      "text-red-500 border-red-500 hover:bg-red-500 hover:text-white":
+        card.suit === Suit.H || card.suit === Suit.D,
+    },
+    {
+      "text-black-500 border-slate-950 hover:bg-neutral-950 hover:text-white":
+        card.suit === Suit.S || card.suit === Suit.C,
+    }
+  );
 
-  console.log(profile.color);
+  let classesBack = classNames(
+    "w-24 h-32 border-2 rounded-md text-3xl text-center",
+    "text-black-500 border-blue-500 bg-blue-500"
+  );
+
   // ['♠', '♣', '♥', '♦']
   let suitSymbol = "";
   if (card.suit === Suit.S) {
@@ -30,13 +39,21 @@ const Card = ({ card }: CardProps) => {
   } else if (card.suit === Suit.D) {
     suitSymbol = "♦";
   }
-  return (
-    <>
-      <div style={style}>
-        {card.value} {suitSymbol}
-      </div>
-    </>
-  );
+
+  // return front of card
+  if (!isBack) {
+    return (
+      <>
+        <div className={classes}>
+          <div>{card.value}</div>
+          <div>{suitSymbol}</div>
+        </div>
+      </>
+    );
+  } else {
+    // return back of card
+    return <div className={classesBack}> </div>;
+  }
 };
 
 export default Card;

@@ -20,11 +20,11 @@ export enum Value {
   K = "King",
 }
 
-export enum Color {
-  black = "Black",
-  blue = "Blue",
-  red = "Red",
-}
+// export enum Color {
+//   black = "Black",
+//   blue = "Blue",
+//   red = "Red",
+// }
 
 export interface CardType {
   suit: Suit;

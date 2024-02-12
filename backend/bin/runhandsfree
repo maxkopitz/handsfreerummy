@@ -1,0 +1,3 @@
+#!/bin/sh
+source ./env/bin/activate
+flask --app handsfree --debug run --host 0.0.0.0 --port 4000

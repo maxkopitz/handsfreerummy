@@ -58,9 +58,13 @@ class Player:
     def pickup(self, card: Card):
         self.hand.append(card)
 
+    def printHand(self):
+        for i in self.hand:
+            print(i.retCard())
+
 class Board:
 
-    def __init__(self, numPlayers: int, players: list[Player]):
+    def __init__(self, game, players):
         
 
         self.stockPile = Deck() # the pile that the players draw from
@@ -71,41 +75,42 @@ class Board:
         # each receives seven cards; when five or six play, each receives six cards
         if game.numPlayers == 2:
             for i in range(10):
-                players[0].hand.append(self.stockPile.draw())
-                players[1].hand.append(self.stockPile.draw())
+                for player in players:
+                    player.pickup(self.stockPile.draw())
         elif game.numPlayers < 5:
             for i in range(7):
-                for player in range(game.numPlayers):
-                    players[player].hand.append(self.stockPile.draw())
+                for player in players:
+                    player.pickup(self.stockPile.draw())
         else:
             for i in range(6):
-                for player in range(game.numPlayers):
-                    players[player].hand.append(self.stockPile.draw())
+                for player in game.players:
+                    player.pickup(self.stockPile.draw())
             
-    def print(self):
-        for i in self.game.players:
-            print("Player ", i.id, ":")
-            for j in i.hand:
-                print(j.retCard())
+    
 class Game:
 
     gameId = 0
     def __init__(self, numPlayers: int, playerIDs: list[str]) -> None:
         # initialize the players array with their ids
         self.numPlayers = numPlayers
-        self.players = [Player]
+        self.players = []
         for i in range(numPlayers):
             self.players.append(Player(playerIDs[i]))
         self.id = Game.gameId
         Game.gameId += 1
 
+    def print(self):
+        for i in self.players:
+            print("Player ", i.id, ":")
+            for j in i.hand:
+                print(j.retCard())
 
-    # join game / add players to the game function
-        
+    # join game / add players to the game function 
 
+    # initialize the board and run through each turn until someone runs out of cards     
     def runGame(self):
-        self.board = Board(self.numPlayers, self.players)
-
+        print(type(self.players[0]), "t3")
+        self.board = Board(self, self.players)
 
     # player draws the card from the pile returned from the socket
     def drawCard(self, playerID: str, drawType: str):
@@ -169,8 +174,18 @@ def isValidMeld(matchedSet: list[Card]) -> bool:
 # 2. Sequences of 3 or more
 playerIDs = []
 
-game = Board(Game(4, ["one", "two", "three", "four"]))
-print(game.game.id)
-game1 = Board(Game(4, ["one", "two", "three", "four"]))
-print(game1.game.id)
+# board = Board(4, [Player("one"), Player("two"), Player("three"), Player("four")])
 
+game = Game(4, ["one", "two", "three", "four"])
+print(game.id)
+game.runGame()
+for i in game.players:
+    print(i.id, "Hand :")
+    i.printHand()
+game1 = Game(2, ["one", "two"])
+print(game1.id, type(game1.numPlayers))
+game1.print()
+
+for i in game1.players:
+    print(i.id, "Hand :")
+    i.printHand()
