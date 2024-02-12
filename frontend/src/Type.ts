@@ -20,7 +20,19 @@ export enum Value {
   K = "King",
 }
 
+export enum Color {
+  black = "Black",
+  blue = "Blue",
+  red = "Red",
+}
+
 export interface CardType {
   suit: Suit;
   value: Value;
+}
+
+export interface LobbyGame {
+  id: string;
+  players: number;
+  state: string;
 }

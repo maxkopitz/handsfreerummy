@@ -1,4 +1,5 @@
 import { CardType, Suit } from "../../Type";
+import { useProfile } from "../../providers/Profile";
 
 //Pick Card Design
 interface CardProps {
@@ -6,6 +7,7 @@ interface CardProps {
 }
 
 const Card = ({ card }: CardProps) => {
+  const { profile } = useProfile();
   const style = {
     width: "100px",
     height: "150px",
@@ -13,8 +15,10 @@ const Card = ({ card }: CardProps) => {
     display: "flex",
     alignItems: "center",
     padding: "10px",
+    color: profile.color,
   };
 
+  console.log(profile.color);
   // ['♠', '♣', '♥', '♦']
   let suitSymbol = "";
   if (card.suit === Suit.S) {
