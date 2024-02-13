@@ -1,7 +1,7 @@
 import { SocketEvents, socket } from '../socket'
 import JoinGame from './joingame/JoinGame'
-import Button from './components/Button'
-import Container from './components/Container'
+import Button from './ui/Button'
+import Container from './ui/Container'
 import { useEffect, useState } from 'react'
 import { LobbyGame } from '../Type'
 

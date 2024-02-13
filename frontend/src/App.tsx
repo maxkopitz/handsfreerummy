@@ -1,9 +1,9 @@
-import MainMenu from './ui/MainMenu'
-import Table from './ui/game/Table'
-import Settings from './ui/settings/Settings'
-import About from './ui/About'
+import MainMenu from './components/MainMenu'
+import Table from './components/game/Table'
+import Settings from './components/settings/Settings'
+import About from './components/About'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { ProfileProvider } from './providers/Profile'
+import { ProfileProvider } from './hooks/Profile'
 
 const router = createBrowserRouter([
     {

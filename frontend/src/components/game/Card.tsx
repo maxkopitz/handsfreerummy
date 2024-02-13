@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import { CardType, Suit } from '../../Type'
-import { useProfile } from '../../providers/Profile'
+import { useProfile } from '../../hooks/Profile'
 
 //Pick Card Design
 interface CardProps {

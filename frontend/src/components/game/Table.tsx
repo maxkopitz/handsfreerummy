@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Container from '../components/Container'
+import Container from '../ui/Container'
 import Board from './Board'
 import Hand from './Hand'
 import { socket } from '../../socket'

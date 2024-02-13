@@ -14,7 +14,7 @@ const GameContext = createContext<{
 }>({ game: initialState, dispatch: () => null })
 
 export const GameProvider = ({ children }: any) => {
-    const [game, dispatch] = useReducer(profileReducer, initialState)
+    const [game, dispatch] = useReducer(gameReducer, initialState)
     return (
         <GameContext.Provider value={{ game, dispatch }}>
             {children}
@@ -31,7 +31,7 @@ export const GAMEACTION = {
     START_GAME: 'start-game',
 }
 
-const profileReducer = (state: Game, action: Action) => {
+const gameReducer = (state: Game, action: Action) => {
     switch (action.type) {
         case 'setTurn':
             return { ...state, isTurn: !state.isTurn }

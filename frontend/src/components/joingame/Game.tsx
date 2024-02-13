@@ -1,7 +1,7 @@
 import { redirect } from 'react-router-dom'
 import { LobbyGame } from '../../Type'
 import { socket } from '../../socket'
-import Button from '../components/Button'
+import Button from '../ui/Button'
 
 interface GameProps {
     game: LobbyGame

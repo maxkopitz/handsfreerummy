@@ -1,5 +1,5 @@
-import Container from '../components/Container'
-import { useProfile } from '../../providers/Profile'
+import Container from '../ui/Container'
+import { useProfile } from '../../hooks/Profile'
 
 const Settings = () => {
     const { profile, dispatch } = useProfile()
