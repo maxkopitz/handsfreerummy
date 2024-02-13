@@ -1,7 +1,7 @@
 import React, { createContext, useReducer, useContext } from 'react'
 
 interface Game {
-    isTurn: boolean; 
+    isTurn: boolean
 }
 
 const initialState: Game = {
@@ -25,8 +25,7 @@ export const GameProvider = ({ children }: any) => {
 export const useGame = () => {
     return useContext(GameContext)
 }
-type Action =
-    | { type: 'setTurn' }
+type Action = { type: 'setTurn' }
 
 export const GAMEACTION = {
     START_GAME: 'start-game',
@@ -35,7 +34,7 @@ export const GAMEACTION = {
 const profileReducer = (state: Game, action: Action) => {
     switch (action.type) {
         case 'setTurn':
-            return { ...state, isTurn:!state.isTurn }
+            return { ...state, isTurn: !state.isTurn }
         default:
             return state
     }

@@ -1,10 +1,12 @@
 # About
+
 Frontend code for Handsfreerummy
 
 ### Setup
 
 1. Change dir to frontend
-```sh 
+
+```sh
 cd ./frontend
 ```
 
@@ -17,11 +19,13 @@ nvm use
 ```
 
 4. Install packages
-```sh 
+
+```sh
 npm install
 ```
 
 5. Start the development server
-```sh 
+
+```sh
 npm start
 ```
