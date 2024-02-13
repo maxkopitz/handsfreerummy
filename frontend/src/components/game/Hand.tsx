@@ -3,8 +3,6 @@ import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
 
-// import CardBack from "./CardBack";
-
 interface HandProps {
     playerId?: number
     isPlayer: boolean
@@ -22,26 +20,43 @@ const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
     return (
         <div className={classes}>
             <h1>Hand {playerId} </h1>
-            <Card
-                card={{ value: Value.A, suit: Suit.C }}
-                direction={direction}
-                isBack={!isPlayer}
-            />
-            <Card
-                card={{ value: Value.A, suit: Suit.C }}
-                direction={direction}
-                isBack={!isPlayer}
-            />
-            <Card
-                card={{ value: Value.A, suit: Suit.C }}
-                direction={direction}
-                isBack={!isPlayer}
-            />
-            <Card
-                card={{ value: Value.A, suit: Suit.C }}
-                direction={direction}
-                isBack={!isPlayer}
-            />
+            <div className="m-2">
+                <Card
+                    card={{ value: Value.A, suit: Suit.C }}
+                    direction={direction}
+                    isBack={!isPlayer}
+                />
+            </div>
+
+            <div className="m-2">
+                <Card
+                    card={{ value: Value.A, suit: Suit.H }}
+                    direction={direction}
+                    isBack={!isPlayer}
+                />
+            </div>
+
+            <div className="m-2">
+                <Card
+                    card={{ value: Value.A, suit: Suit.S }}
+                    direction={direction}
+                    isBack={!isPlayer}
+                />
+            </div>
+            <div className="m-2">
+                <Card
+                    card={{ value: Value.A, suit: Suit.D }}
+                    direction={direction}
+                    isBack={!isPlayer}
+                />
+            </div>
+            <div className="m-2">
+                <Card
+                    card={{ value: Value.A, suit: Suit.C }}
+                    direction={direction}
+                    isBack={!isPlayer}
+                />
+            </div>
         </div>
     )
 }
