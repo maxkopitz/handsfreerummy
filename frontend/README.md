@@ -13,6 +13,9 @@ cd ./frontend
 2. Install [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating)
 
 3. Install correct node version (see `.nvmrc`)
+```sh
+nvm use
+```
 
 ```sh
 nvm use
