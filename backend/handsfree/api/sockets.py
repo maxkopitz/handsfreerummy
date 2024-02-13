@@ -4,7 +4,7 @@ from handsfree.game import Game
 
 games = []
 @handsfree.socketio.on('connect')
-def handle_message():
+def handle_connect(data):
     game = {
         'id': '123',
         'players': 0,
