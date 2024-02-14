@@ -21,9 +21,7 @@ const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
 
     return (
         <div className={classes}>
-            <h1>
-                Player {playerId}: {handSize}{' '}
-            </h1>
+            <h1>Player {playerId}: 5 cards </h1>
             <div className="m-2">
                 <Card
                     card={{ value: Value.A, suit: Suit.C }}
