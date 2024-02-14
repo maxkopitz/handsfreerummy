@@ -6,22 +6,13 @@ import { useEffect, useState } from 'react'
 import { LobbyGame } from '../Type'
 
 const MainMenu = () => {
-    const [games, setGames] = useState<LobbyGame[]>([])
     const handleCreateGame = () => {
         console.log('test')
         socket.emit('create-game')
     }
 
     useEffect(() => {
-        const onNewGame = (data: any) => {
-            console.log('new game', data)
-            setGames([...games, data])
-        }
-        socket.on('connect', () => {
-            console.log(socket.connected) // true
-            console.log(socket.id)
-        })
-        socket.on(SocketEvents.NEW_GAMES, onNewGame)
+        socket.on('connect', () => {})
     }, [])
 
     return (
@@ -32,7 +23,7 @@ const MainMenu = () => {
                         Handsfree Rummy
                     </h1>
                 </div>
-                <JoinGame games={games} />
+                <JoinGame />
                 <div>
                     <Button text={'Create Game'} onClick={handleCreateGame} />
                 </div>
@@ -41,6 +32,9 @@ const MainMenu = () => {
                 </div>
                 <div>
                     <Button text={'About'} link={'about'} />
+                </div>
+                <div>
+                    <Button text={'Demo Board'} link={'game'} />
                 </div>
             </div>
         </Container>

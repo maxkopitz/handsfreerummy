@@ -4,6 +4,7 @@ import Board from './Board'
 import Hand from './Hand'
 import { socket } from '../../socket'
 import { Suit, Value } from '../../Type'
+import Button from '../ui/Button'
 
 const Table = () => {
     const [isConnected, setIsConnected] = useState(socket.connected)
@@ -39,6 +40,14 @@ const Table = () => {
     return (
         <Container>
             <div className="grid grid-cols-5">
+                <div>
+                    <div>
+                        <Button text={'Back to Main Menu'} link={'/'} />
+                    </div>
+                    <div>
+                        <Button text={'Settings'} link={'/settings'} />
+                    </div>
+                </div>
                 <div className="row-span-3 row-start-2">
                     <Hand
                         isPlayer={false}

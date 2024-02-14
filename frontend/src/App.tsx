@@ -4,6 +4,7 @@ import Settings from './components/settings/Settings'
 import About from './components/About'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProfileProvider } from './hooks/Profile'
+import { GameProvider } from './hooks/Game'
 
 const router = createBrowserRouter([
     {
@@ -24,10 +25,11 @@ const router = createBrowserRouter([
     },
 ])
 const App = () => {
-    // const [profile, dispatch] = useReducer(reducer, initialState);
     return (
         <ProfileProvider>
-            <RouterProvider router={router} />
+            <GameProvider>
+                <RouterProvider router={router} />
+            </GameProvider>
         </ProfileProvider>
     )
 }

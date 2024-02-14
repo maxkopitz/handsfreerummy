@@ -10,8 +10,7 @@ def handle_connect(data):
         'players': 0,
         'state': 'waiting'
     }
-    print(request.sid)
-    handsfree.socketio.emit('new-games', data=game)
+    handsfree.socketio.emit('new-games', data=game, to=request.sid)
 
 @handsfree.socketio.on('create-game')
 def handle_create(data):

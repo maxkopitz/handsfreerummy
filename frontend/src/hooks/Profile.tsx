@@ -2,12 +2,14 @@ import React, { createContext, useReducer, useContext } from 'react'
 
 interface Profile {
     color: string
-    fontSize: number
+    cardSize: number
+    cardFontWeight: number
 }
 
 const initialState: Profile = {
     color: 'black',
-    fontSize: 16,
+    cardSize: 2,
+    cardFontWeight: 1,
 }
 
 const ProfileContext = createContext<{
@@ -28,16 +30,16 @@ export const useProfile = () => {
     return useContext(ProfileContext)
 }
 type Action =
-    | { type: 'increaseFontSize' }
-    | { type: 'decreaseFontSize' }
+    | { type: 'changeCardSize'; size: number }
     | { type: 'changeColor'; color: string }
+    | { type: 'changeCardFontWeight'; size: number }
 
 const profileReducer = (state: any, action: Action) => {
     switch (action.type) {
-        case 'increaseFontSize':
-            return { ...state, fontSize: state.fontSize + 1 }
-        case 'decreaseFontSize':
-            return { ...state, fontSize: state.fontSize - 1 }
+        case 'changeCardSize':
+            return { ...state, cardSize: action.size }
+        case 'changeCardFontWeight':
+            return { ...state, cardFontWeight: action.size }
         case 'changeColor':
             return { ...state, color: action.color }
         default:

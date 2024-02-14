@@ -7,26 +7,20 @@ import { Suit, Value } from '../../Type'
 const Settings = () => {
     const { profile, dispatch } = useProfile()
 
-    const buttonStyle = {
-        padding: '10px 20px',
-        fontSize: '20px',
-        margin: '10px',
-        cursor: 'pointer',
-        border: 'black',
+    // const buttonStyle = {
+    //     padding: '10px 20px',
+    //     fontSize: '20px',
+    //     margin: '10px',
+    //     cursor: 'pointer',
+    //     border: 'black',
+    // }
+
+    const handleChangeCardSize = (size: number) => {
+        dispatch({ type: 'changeCardSize', size })
     }
-
-    const handleIncreaseFont = () => {
-        dispatch({ type: 'increaseFontSize' })
+    const handleChangeFontWeight = (size: number) => {
+        dispatch({ type: 'changeCardFontWeight', size })
     }
-
-    const handleDecreaseFont = () => {
-        dispatch({ type: 'decreaseFontSize' })
-    }
-
-    //   const handleSetColor = (color: string) => {
-    //     dispatch({ type: "changeColor", color });
-    //   };
-
     return (
         <Container>
             <div className="flex flex-col justify-center items-center">
@@ -42,15 +36,57 @@ const Settings = () => {
                         isBack={false}
                     />
                 </div>
-                <div>
-                    <h1>Current Font Size: {profile.fontSize} </h1>
-                    <h1>Change Font Size</h1>
-                    <button onClick={handleDecreaseFont} style={buttonStyle}>
-                        -
-                    </button>
-                    <button onClick={handleIncreaseFont} style={buttonStyle}>
-                        +
-                    </button>
+                <div className="justify-center">
+                    <h2 className="text-xl">Change Card Size</h2>
+                    <div className="flex flex-row">
+                        <Button
+                            text={'Small'}
+                            onClick={() => {
+                                handleChangeCardSize(1)
+                            }}
+                            isActive={profile.cardSize === 1}
+                        />
+                        <Button
+                            text={'Medium'}
+                            onClick={() => {
+                                handleChangeCardSize(2)
+                            }}
+                            isActive={profile.cardSize === 2}
+                        />
+                        <Button
+                            text={'Large'}
+                            onClick={() => {
+                                handleChangeCardSize(3)
+                            }}
+                            isActive={profile.cardSize === 3}
+                        />
+                    </div>
+                </div>
+                <div className="justify-center">
+                    <h2 className="text-xl">Change Card Font Weight</h2>
+                    <div className="flex flex-row">
+                        <Button
+                            text={'Normal'}
+                            onClick={() => {
+                                handleChangeFontWeight(1)
+                            }}
+                            isActive={profile.cardFontWeight === 1}
+                        />
+                        <Button
+                            text={'Semi-Bold'}
+                            onClick={() => {
+                                handleChangeFontWeight(2)
+                            }}
+                            isActive={profile.cardFontWeight === 2}
+                        />
+                        <Button
+                            text={'Bold'}
+                            onClick={() => {
+                                handleChangeFontWeight(3)
+                            }}
+                            isActive={profile.cardFontWeight === 3}
+                        />
+                    </div>
                 </div>
                 <div>
                     <Button text={'Back to Main Menu'} link={'/'} />

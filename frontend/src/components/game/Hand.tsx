@@ -17,9 +17,13 @@ const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
         { 'flex-col': !isPlayer && direction === 'next-to' }
     )
 
+    const handSize = hand.length
+
     return (
         <div className={classes}>
-            <h1>Hand {playerId} </h1>
+            <h1>
+                Player {playerId}: {handSize}{' '}
+            </h1>
             <div className="m-2">
                 <Card
                     card={{ value: Value.A, suit: Suit.C }}
@@ -38,7 +42,7 @@ const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
 
             <div className="m-2">
                 <Card
-                    card={{ value: Value.A, suit: Suit.S }}
+                    card={{ value: Value.Q, suit: Suit.S }}
                     direction={direction}
                     isBack={!isPlayer}
                 />
@@ -52,7 +56,7 @@ const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
             </div>
             <div className="m-2">
                 <Card
-                    card={{ value: Value.A, suit: Suit.C }}
+                    card={{ value: Value.K, suit: Suit.C }}
                     direction={direction}
                     isBack={!isPlayer}
                 />

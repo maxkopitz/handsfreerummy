@@ -100,31 +100,70 @@ class Game:
             self.players.append(Player(playerIDs[i]))
         self.id = Game.gameId
         Game.gameId += 1
+        self.turnCounter = 0
+        self.melds = []
 
     def print(self):
         for i in self.players:
             print("Player ", i.id, ":")
             for j in i.hand:
                 print(j.retCard())
+            print("")
 
     # join game / add players to the game function 
-
+    def addPlayer(self, playerID: str):
+        self.players.append(Player(playerID))
+    
     # initialize the board and run through each turn until someone runs out of cards     
     def runGame(self):
         self.board = Board(self, self.players)
+        # while True:
+        #     self.takeTurn(self.players[self.turnCounter % self.numPlayers].id)
+        #     self.turnCounter += 1
+
+    def takeTurn(self, playerID: str):
+        # Send message of Player's turn
+
+        # Receive message of what pile player draws from
+        drawType = 'stock' # or discard
+        
+        # send message of what card player received / execute drawing
+        cardDrawn = self.drawCard(playerID, drawType)
+        
+        # receive message of what cards to lay off (meld forming)
+        # send message of valid play / execute play
+        message = []
+        if isValidMeld(message):
+            self.melds.append(Meld(message))
+        else:            
+            print("bad Meld")
+        # receive a message of which meld to add to and which card(s)
+        # send message of valid play / execute play
+        
+        # receive message of which card to discard
+
+        # execute discarding of card and send message that turn is over
+        
 
     # player draws the card from the pile returned from the socket
-    def drawCard(self, playerID: str, drawType: str):
+    def drawCard(self, playerID: str, drawType: str) -> Card:
 
         if drawType == 'stock':
+            #if self.stockPile.order.empty():
+                #self.stockPile
+            #else
             for i in self.players:
                 if i.id == playerID:
-                    i.pickup(self.board.stockPile.draw())
+                    card = self.board.stockPile.draw()
+                    i.pickup(card)
+                    return card
 
         elif drawType == 'discard':
             for i in self.players:
                 if i.id == playerID:
-                    i.pickup(self.board.discardPile.pop())
+                    card = self.board.discardPile.pop()
+                    i.pickup(card)
+                    return card
 
     # player discards a card returned from the socket
     def discard(self, playerID: str, victim: Card):
@@ -132,6 +171,8 @@ class Game:
                 if i.id == playerID:
                     i.discard(victim)
                     self.board.discardPile.append(victim)
+
+    # meld formation 
         
 
 
@@ -170,23 +211,3 @@ def isValidMeld(matchedSet: list[Card]) -> bool:
 # 3. discard pile (top card faceup) (stack implementation) ✓*1/2
 # 4. melds / matched sets ✓*1/2
                 
-# Thoughts: class for the melds
-# 1. 3 or 4 of a kind
-# 2. Sequences of 3 or more
-playerIDs = []
-
-# board = Board(4, [Player("one"), Player("two"), Player("three"), Player("four")])
-
-game = Game(4, ["one", "two", "three", "four"])
-print(game.id)
-game.runGame()
-for i in game.players:
-    print(i.id, "Hand :")
-    i.printHand()
-game1 = Game(2, ["one", "two"])
-print(game1.id, type(game1.numPlayers))
-game1.print()
-game1.runGame()
-for i in game1.players:
-    print(i.id, "Hand :")
-    i.printHand()

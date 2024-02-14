@@ -6,7 +6,7 @@ export enum Suit {
 }
 
 export enum Value {
-    A = 'ace',
+    A = 'A',
     Two = '2',
     Three = '3',
     Four = '4',
@@ -15,9 +15,9 @@ export enum Value {
     Seven = '7',
     Eight = '8',
     Nine = '9',
-    J = 'Jack',
-    Q = 'Queen',
-    K = 'King',
+    J = 'J',
+    Q = 'Q',
+    K = 'K',
 }
 
 // export enum Color {
@@ -28,7 +28,7 @@ export enum Value {
 
 export interface CardType {
     suit: Suit
-    value: Value
+    value: Value | number
 }
 
 export interface LobbyGame {

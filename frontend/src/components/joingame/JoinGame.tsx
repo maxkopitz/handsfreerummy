@@ -1,10 +1,19 @@
+import { useEffect } from 'react'
 import { LobbyGame } from '../../Type'
+import { useGame } from '../../hooks/Game'
+import { SocketEvents, socket } from '../../socket'
 import Game from './Game'
 
-interface JoinGameProps {
-    games: LobbyGame[]
-}
-const JoinGame = ({ games }: JoinGameProps) => {
+const JoinGame = () => {
+    const { game, dispatch } = useGame()
+
+    useEffect(() => {
+        const onNewGame = (data: any) => {
+            console.log('new game', data)
+            dispatch({ type: 'add-lobby-game', game: data })
+        }
+        socket.on(SocketEvents.NEW_GAMES, onNewGame)
+    }, [dispatch])
     return (
         <div className="flex flex-col justify-center items-center">
             <h2>Join Game</h2>
@@ -16,7 +25,7 @@ const JoinGame = ({ games }: JoinGameProps) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {games.map((game) => (
+                    {game.lobbyGames.map((game) => (
                         <Game key={game.id} game={game} />
                     ))}
                 </tbody>

@@ -14,4 +14,4 @@ dependencies = [
 requires-python = ">=3.8"
 
 [tool.setuptools]
-packages = ["insta485"]
+packages = ["handsfree"]
