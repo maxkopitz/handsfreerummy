@@ -1,4 +1,5 @@
 import Container from './ui/Container'
+import Button from './ui/Button'
 
 const About = () => {
     return (
@@ -21,8 +22,12 @@ const About = () => {
                     .
                 </p>
                 <p>
-                    Start a game or join a game to play with up to four players!
+                    Start a game or join a game to play with up to Six players!
                 </p>
+            </div>
+
+            <div>
+                <Button text={'Back to Main Menu'} link={'/'} />
             </div>
         </Container>
     )
