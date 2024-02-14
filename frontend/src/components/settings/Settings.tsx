@@ -29,7 +29,7 @@ const Settings = () => {
                         Settings
                     </h1>
                 </div>
-                <div>
+                <div className="h-44">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
                         direction={'across'}
