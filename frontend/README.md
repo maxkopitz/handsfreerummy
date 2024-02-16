@@ -27,7 +27,12 @@ nvm use
 npm install
 ```
 
-5. Start the development server
+5. Create copy of env example
+```
+cp ~/.env.example ~/.env
+```
+
+6. Start the development server
 
 ```sh
 npm start
