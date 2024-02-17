@@ -1,13 +1,12 @@
-import { SocketEvents, socket } from '../socket'
+import { socket } from '../socket'
 import JoinGame from './joingame/JoinGame'
 import Button from './ui/Button'
 import Container from './ui/Container'
-import { useEffect, useState } from 'react'
-import { LobbyGame } from '../Type'
-import { MainApi } from '../api/HandsFreeApi'
+import { useEffect } from 'react'
+import { API_URL } from '../config'
+import axios from 'axios'
 
 const MainMenu = () => {
-    const mainApi = MainApi().getInstance()
     const handleCreateGame = () => {
         console.log('test')
         socket.emit('create-game')
@@ -15,10 +14,9 @@ const MainMenu = () => {
 
     useEffect(() => {
         socket.on('connect', () => {})
-        mainApi.getUsers().then((res) => {
-            console.log(res);
-        })
-
+        axios.get(API_URL + '/').then((res) => {
+            console.log(res.data)
+        });
     }, [])
 
     return (
