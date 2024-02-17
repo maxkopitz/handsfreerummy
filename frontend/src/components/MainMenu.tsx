@@ -4,8 +4,10 @@ import Button from './ui/Button'
 import Container from './ui/Container'
 import { useEffect, useState } from 'react'
 import { LobbyGame } from '../Type'
+import { MainApi } from '../api/HandsFreeApi'
 
 const MainMenu = () => {
+    const mainApi = MainApi().getInstance()
     const handleCreateGame = () => {
         console.log('test')
         socket.emit('create-game')
@@ -13,6 +15,10 @@ const MainMenu = () => {
 
     useEffect(() => {
         socket.on('connect', () => {})
+        mainApi.getUsers().then((res) => {
+            console.log(res);
+        })
+
     }, [])
 
     return (
