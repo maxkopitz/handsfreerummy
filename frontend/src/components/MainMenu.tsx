@@ -10,11 +10,12 @@ import Settings from './settings/Settings'
 import Modal from './ui/Modal'
 
 const MainMenu = () => {
-    const { dispatch } = useModal();
+    const { dispatch } = useModal()
     const handleCreateGame = () => {
         console.log('test')
         socket.emit('create-game')
     }
+
     return (
         <Container>
             <Modal />
@@ -29,11 +30,18 @@ const MainMenu = () => {
                     <Button text={'Create Game'} onClick={handleCreateGame} />
                 </div>
                 <div>
-                    <Button text={'Settings'} onClick={() => dispatch(
-                        {
-                            type: 'showModal', modal:
-                                { title: "Settings", component: <Settings /> }
-                        })} />
+                    <Button
+                        text={'Settings'}
+                        onClick={() =>
+                            dispatch({
+                                type: 'showModal',
+                                modal: {
+                                    title: 'Settings',
+                                    component: <Settings />,
+                                },
+                            })
+                        }
+                    />
                 </div>
                 <div>
                     <Button text={'About'} link={'about'} />
