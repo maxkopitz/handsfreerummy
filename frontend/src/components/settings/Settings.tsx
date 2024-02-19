@@ -83,9 +83,6 @@ const Settings = () => {
                         />
                     </div>
                 </div>
-                <div>
-                    <Button text={'Back to Main Menu'} link={'/'} />
-                </div>
             </div>
             {/* <h1>
         Current Color:
