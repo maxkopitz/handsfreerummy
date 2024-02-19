@@ -6,7 +6,10 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(
+        app,
+        manage_session=False,
+        cors_allowed_origins="http://localhost:3000")
 # Read settings from config module (handsfree/config.py)
 app.config.from_object('handsfree.config')
 
