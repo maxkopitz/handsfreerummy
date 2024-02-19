@@ -1,33 +1,14 @@
-import { useEffect, useState } from 'react'
 import Container from '../ui/Container'
 import Board from './Board'
 import Hand from './Hand'
-import { socket } from '../../socket'
 import { Suit, Value } from '../../Type'
 import Button from '../ui/Button'
+import Modal from '../ui/Modal'
+import { useModal } from '../../hooks/Modal'
+import Settings from '../settings/Settings'
 
 const Table = () => {
-    const [isConnected, setIsConnected] = useState(socket.connected)
-    useEffect(() => {
-        console.log('initilized')
-        function onConnect() {
-            console.log(socket.connected)
-            setIsConnected(true)
-        }
-
-        function onDisconnect() {
-            setIsConnected(false)
-        }
-        socket.on('connect', onConnect)
-        socket.on('disconnect', onDisconnect)
-
-        return () => {
-            console.log('goodbye')
-            socket.disconnect()
-            socket.off('connect', onConnect)
-            socket.off('disconnect', onDisconnect)
-        }
-    }, [])
+    const { dispatch } = useModal();
 
     const dummyRuns = [
         [
@@ -39,13 +20,20 @@ const Table = () => {
     ]
     return (
         <Container>
+            <Modal />
             <div className="grid grid-cols-5">
+
                 <div>
                     <div>
                         <Button text={'Back to Main Menu'} link={'/'} />
                     </div>
+
                     <div>
-                        <Button text={'Settings'} link={'/settings'} />
+                        <Button text={'Settings'} onClick={() => dispatch(
+                            {
+                                type: 'showModal', modal:
+                                    { title: "Settings", component: <Settings /> }
+                            })} />
                     </div>
                 </div>
                 <div className="row-span-3 row-start-2">

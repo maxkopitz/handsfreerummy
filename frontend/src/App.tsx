@@ -5,6 +5,8 @@ import About from './components/About'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProfileProvider } from './hooks/Profile'
 import { GameProvider } from './hooks/Game'
+import { ModalProvider } from './hooks/Modal'
+import Modal from './components/ui/Modal'
 
 const router = createBrowserRouter([
     {
@@ -16,10 +18,6 @@ const router = createBrowserRouter([
         element: <Table />,
     },
     {
-        path: 'settings',
-        element: <Settings />,
-    },
-    {
         path: 'about',
         element: <About />,
     },
@@ -28,7 +26,9 @@ const App = () => {
     return (
         <ProfileProvider>
             <GameProvider>
-                <RouterProvider router={router} />
+                <ModalProvider >
+                    <RouterProvider router={router} />
+                </ModalProvider>
             </GameProvider>
         </ProfileProvider>
     )
