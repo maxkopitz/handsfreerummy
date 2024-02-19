@@ -8,9 +8,10 @@ interface CardProps {
     direction: string
     isBack?: boolean
     cardSize?: number
+    num?: number
 }
 
-const Card = ({ card, direction, isBack }: CardProps) => {
+const Card = ({ card, direction, isBack, num }: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg',
@@ -54,8 +55,10 @@ const Card = ({ card, direction, isBack }: CardProps) => {
                     </>
                 )}
             </div>
+            
         </>
     )
+
 }
 
 export default Card
