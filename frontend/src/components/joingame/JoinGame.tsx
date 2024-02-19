@@ -8,11 +8,11 @@ const JoinGame = () => {
     const { game, dispatch } = useGame()
 
     useEffect(() => {
-        const onNewGame = (data: any) => {
+        /*const onNewGame = (data: any) => {
             console.log('new game', data)
             dispatch({ type: 'add-lobby-game', game: data })
         }
-        socket.on(SocketEvents.NEW_GAMES, onNewGame)
+        socket.on(SocketEvents.NEW_GAMES, onNewGame)*/
     }, [dispatch])
     return (
         <div className="flex flex-col justify-center items-center">

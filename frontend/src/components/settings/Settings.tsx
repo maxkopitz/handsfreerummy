@@ -24,11 +24,6 @@ const Settings = () => {
     return (
         <Container>
             <div className="flex flex-col justify-center items-center">
-                <div className="mb-10 border-b border-gray-300 p-2">
-                    <h1 className="text-slate-500 text-5xl font-bold">
-                        Settings
-                    </h1>
-                </div>
                 <div className="h-44">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
