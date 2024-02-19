@@ -4,14 +4,14 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+app.config.from_object('handsfree.config')
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": app.config['CLIENT_URL']}})
 
 socketio = SocketIO(
         app,
         manage_session=False,
-        cors_allowed_origins="http://localhost:3000")
+        cors_allowed_origins=app.config['CLIENT_URL'])
 # Read settings from config module (handsfree/config.py)
-app.config.from_object('handsfree.config')
 
 # Overlay settings read from a Python file whose path is set in the environment
 # variable INSTA485_SETTINGS. Setting this environment variable is optional.

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { LobbyGame } from '../../Type'
 import { useGame } from '../../hooks/Game'
-import { SocketEvents, socket } from '../../socket'
+import { SocketEvents, socket } from '../../api/socket'
 import Game from './Game'
 
 const JoinGame = () => {

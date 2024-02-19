@@ -1,15 +1,27 @@
 from handsfree import app
-from flask import request, session
+from flask import session
+from uuid import uuid4
+
 
 @app.before_request
 def make_session_permanent():
     session.permanent = True
 
+
 @app.route('/', methods=['GET'])
 def api():
-    session['username'] = 'test'
-    return {"message": session}
+    return {"response": session}
+
+
+@app.route('/register', methods=['GET'])
+def register():
+    if session.get('uuid') is None:
+        session['uuid'] = uuid4()
+    return {"uuid": session.get('uuid')}
+
 
 @app.route('/games', methods=['GET'])
 def get_games():
-    return {"games": session}
+    if session.get('uuid') is None:
+        return {"error": {"message": "You are not logged in"}}
+    return {"games": session.get('games')}

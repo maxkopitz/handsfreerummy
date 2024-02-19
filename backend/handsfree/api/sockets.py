@@ -10,6 +10,7 @@ def handle_connect(data):
         'players': 0,
         'state': 'waiting'
     }
+    print("connected: ", session)
     handsfree.socketio.emit('new-games', data=game, to=request.sid)
 
 @handsfree.socketio.on('disconnect')

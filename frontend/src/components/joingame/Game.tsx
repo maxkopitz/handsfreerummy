@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { LobbyGame } from '../../Type'
-import { socket } from '../../socket'
 import Button from '../ui/Button'
 
 interface GameProps {
