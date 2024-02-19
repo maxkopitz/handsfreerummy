@@ -17,10 +17,6 @@ cd ./frontend
 nvm use
 ```
 
-```sh
-nvm use
-```
-
 4. Install packages
 
 ```sh
