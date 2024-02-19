@@ -88,20 +88,20 @@ class Board:
                 for player in game.players:
                     player.pickup(self.stockPile.draw())
             
-    
+# numPlayers, players, id, turnCounter, melds, gameState, board
 class Game:
-
     gameId = 0
     def __init__(self, numPlayers: int, playerIDs: list[str]) -> None:
         # initialize the players array with their ids
         self.numPlayers = numPlayers
         self.players = []
-        for i in range(numPlayers):
+        for i in range(len(playerIDs)):
             self.players.append(Player(playerIDs[i]))
         self.id = Game.gameId
         Game.gameId += 1
         self.turnCounter = 0
         self.melds = []
+        self.gameState = "lobby"
 
     def print(self):
         for i in self.players:
@@ -112,10 +112,22 @@ class Game:
 
     # join game / add players to the game function 
     def addPlayer(self, playerID: str):
-        self.players.append(Player(playerID))
+        if self.numPlayers == len(self.players):
+            #print("can't add a player")
+            self.players.pop(0)
+            self.players.append(Player(playerID))
+        else:
+            self.players.append(Player(playerID))
+
+        # self.numPlayers += 1
     
     # initialize the board and run through each turn until someone runs out of cards     
     def runGame(self):
+        if len(self.players) < 2:
+            print("not enough players")
+            return
+        self.numPlayers = len(self.players)
+        self.gameState = "inGame"
         self.board = Board(self, self.players)
         # while True:
         #     self.takeTurn(self.players[self.turnCounter % self.numPlayers].id)
@@ -129,6 +141,7 @@ class Game:
         
         # send message of what card player received / execute drawing
         cardDrawn = self.drawCard(playerID, drawType)
+        print(cardDrawn.retCard())
         
         # receive message of what cards to lay off (meld forming)
         # send message of valid play / execute play
