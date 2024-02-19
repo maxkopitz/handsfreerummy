@@ -4,9 +4,10 @@ import Button from '../ui/Button'
 
 interface GameProps {
     game: LobbyGame
+    className: string
 }
 
-const Game = ({ game }: GameProps) => {
+    const Game = ({ game, className }: GameProps) => {
     const navigate = useNavigate()
     const handleJoinGame = () => {
         navigate('/game')
@@ -15,8 +16,8 @@ const Game = ({ game }: GameProps) => {
     }
     return (
         <tr>
-            <td className="border boarder-slate-700">0/4</td>
-            <td className="border boarder-slate-700">
+            <td className={className}>{game.players}</td>
+            <td className={className}>
                 <Button text={'join'} onClick={handleJoinGame} />
             </td>
         </tr>

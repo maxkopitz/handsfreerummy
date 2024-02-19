@@ -8,12 +8,10 @@ import { useModal } from '../hooks/Modal'
 import Settings from './settings/Settings'
 import Modal from './ui/Modal'
 import axiosInstance from '../api/axiosConfig'
+import CreateGame from './game/CreateGame'
 
 const MainMenu = () => {
     const { dispatch } = useModal();
-    const handleCreateGame = () => {
-        socket.emit('create-game')
-    }
     useEffect(() => {
         axiosInstance.get(`${API_URL}/register`).then((res) => {
             console.log(res.data)
@@ -30,7 +28,12 @@ const MainMenu = () => {
                 </div>
                 <JoinGame />
                 <div>
-                    <Button text={'Create Game'} onClick={handleCreateGame} />
+                    <Button text={'Create Game'} onClick={() => dispatch(
+                        {
+                            type: 'showModal', modal:
+                                { title: "Create Game", component: <CreateGame /> }
+                        })} />
+
                 </div>
                 <div>
                     <Button text={'Settings'} onClick={() => dispatch(
