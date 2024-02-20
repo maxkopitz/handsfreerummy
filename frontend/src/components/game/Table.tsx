@@ -6,9 +6,12 @@ import Button from '../ui/Button'
 import Modal from '../ui/Modal'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
+import { useEffect } from 'react'
+import { socket } from '../../socket'
+import { API_URL } from '../../config'
 
 const Table = () => {
-    const { dispatch } = useModal();
+    const { dispatch } = useModal()
 
     const dummyRuns = [
         [
@@ -18,22 +21,29 @@ const Table = () => {
         [{ value: Value.K, suit: Suit.D }],
         [{ value: Value.J, suit: Suit.C }],
     ]
+
     return (
         <Container>
             <Modal />
             <div className="grid grid-cols-5">
-
                 <div>
                     <div>
                         <Button text={'Back to Main Menu'} link={'/'} />
                     </div>
 
                     <div>
-                        <Button text={'Settings'} onClick={() => dispatch(
-                            {
-                                type: 'showModal', modal:
-                                    { title: "Settings", component: <Settings /> }
-                            })} />
+                        <Button
+                            text={'Settings'}
+                            onClick={() =>
+                                dispatch({
+                                    type: 'showModal',
+                                    modal: {
+                                        title: 'Settings',
+                                        component: <Settings />,
+                                    },
+                                })
+                            }
+                        />
                     </div>
                 </div>
                 <div className="row-span-3 row-start-2">

@@ -36,11 +36,18 @@ const MainMenu = () => {
 
                 </div>
                 <div>
-                    <Button text={'Settings'} onClick={() => dispatch(
-                        {
-                            type: 'showModal', modal:
-                                { title: "Settings", component: <Settings /> }
-                        })} />
+                    <Button
+                        text={'Settings'}
+                        onClick={() =>
+                            dispatch({
+                                type: 'showModal',
+                                modal: {
+                                    title: 'Settings',
+                                    component: <Settings />,
+                                },
+                            })
+                        }
+                    />
                 </div>
                 <div>
                     <Button text={'About'} link={'about'} />
