@@ -8,10 +8,11 @@ interface CardProps {
     direction: string
     isBack?: boolean
     cardSize?: number
-    num?: number
+    num?: number // number of cards in hand
+    isDiscard?: boolean // false if not discard
 }
 
-const Card = ({ card, direction, isBack, num }: CardProps) => {
+const Card = ({ card, direction, isBack, num, isDiscard }: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg',
@@ -44,7 +45,27 @@ const Card = ({ card, direction, isBack, num }: CardProps) => {
         suitSymbol = '♦'
     }
 
-    // return front of card
+
+    // isBack is true = back of card
+    //card is back and not part of discard pile
+    if (isBack && !isDiscard){ 
+        return (
+            <>
+            <div className={classes}>
+                {(
+                    <>
+                        <div>num</div>
+                    </>
+                )}
+            </div>
+            
+        </>
+
+        )
+    }
+
+
+    // return front of card if !isBack, otherwise return empty card for discard pile
     return (
         <>
             <div className={classes}>

@@ -8,7 +8,6 @@ import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
 import { useEffect } from 'react'
 import { socket } from '../../socket'
-import axios from 'axios'
 import { API_URL } from '../../config'
 
 const Table = () => {

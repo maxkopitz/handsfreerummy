@@ -18,7 +18,8 @@ const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
     )
 
     const handSize = hand.length
-    // if not player
+
+    // if not player - print one card with the number of cards in hand
     if (!isPlayer) {
         return (
             <div className={classes}>
@@ -31,12 +32,14 @@ const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
                         direction={direction}
                         isBack={!isPlayer}
                         num={handSize}
+                        isDiscard={false}
                     />
                 </div>
             </div>
         )
     }
-
+    
+    // if player - print all players cards in hand:
     return (
         <div className={classes}>
             <h1>
