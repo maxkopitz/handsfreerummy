@@ -1,33 +1,42 @@
 import { useEffect } from 'react'
-import { LobbyGame } from '../../Type'
+import { socket, SocketEvents } from '../../api/socket';
 import { useGame } from '../../hooks/Game'
-import { SocketEvents, socket } from '../../socket'
 import Game from './Game'
 
+const tableHeaders = ["Players", ""];
 const JoinGame = () => {
     const { game, dispatch } = useGame()
 
     useEffect(() => {
-        /*const onNewGame = (data: any) => {
+        const onNewGame = (data: any) => {
             console.log('new game', data)
             dispatch({ type: 'add-lobby-game', game: data })
         }
-        socket.on(SocketEvents.NEW_GAMES, onNewGame)*/
+        //socket.on(SocketEvents.NEW_GAMES, onNewGame)
     }, [dispatch])
     return (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col w-1/2 justify-center items-center">
             <h2>Join Game</h2>
-            <table className="table-auto w-full min-h-48 min-w-96 border-4 rounded-sm border-green-500">
+            <table className="table-auto w-full w-min-max text-left border-4 rounded-sm">
                 <thead>
                     <tr>
-                        <th className="border border-slate-600">Players</th>
-                        <th className="border border-slate-600"></th>
+                        {tableHeaders.map((header, index) => (
+                            <th className="border-b border-blue-gray-100 bg-blue-gray-50 p-4" key={index}>{header}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {game.lobbyGames.map((game) => (
-                        <Game key={game.id} game={game} />
-                    ))}
+                    {game.lobbyGames.length === 0 && (
+                        <tr>
+                            <td className="p-4">No games available</td>
+                        </tr>
+                    )}
+                    {game.lobbyGames.map((item, index) => {
+                        const isLast = index === game.lobbyGames.length - 1;
+                        const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
+                        return (
+                            <Game key={item.id} game={item} className={classes} />)
+                    })}
                 </tbody>
             </table>
         </div>

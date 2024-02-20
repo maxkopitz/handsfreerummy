@@ -1,12 +1,10 @@
 import MainMenu from './components/MainMenu'
 import Table from './components/game/Table'
-import Settings from './components/settings/Settings'
 import About from './components/About'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProfileProvider } from './hooks/Profile'
 import { GameProvider } from './hooks/Game'
 import { ModalProvider } from './hooks/Modal'
-import Modal from './components/ui/Modal'
 
 const router = createBrowserRouter([
     {

@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, session
 import handsfree
 from handsfree.game import Game
 
@@ -10,7 +10,12 @@ def handle_connect(data):
         'players': 0,
         'state': 'waiting'
     }
+    print("connected: ", session)
     handsfree.socketio.emit('new-games', data=game, to=request.sid)
+
+@handsfree.socketio.on('disconnect')
+def handle_disconnect():
+    print("session:", session)
 
 @handsfree.socketio.on('create-game')
 def handle_create(data):
@@ -24,7 +29,7 @@ def handle_join(data):
     gameID = data['id']
     games[gameID].players += 1
     games[gameID].playerIDs.append(request.sid)
- 
+
     handsfree.socketio.emit('joined-game', data=games[gameID], to=request.sid)
 
 @handsfree.socketio.on('start-game')
