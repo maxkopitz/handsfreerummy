@@ -1,15 +1,20 @@
-import React, { createContext, useReducer, useContext } from 'react'
+import React, { createContext, useReducer, useContext, useEffect } from 'react'
 
-interface Profile {
+interface Settings {
     color: string
     cardSize: number
     cardFontWeight: number
 }
+interface Profile {
+    settings: Settings
+}
 
 const initialState: Profile = {
-    color: 'black',
-    cardSize: 2,
-    cardFontWeight: 1,
+    settings: {
+        color: 'black',
+        cardSize: 2,
+        cardFontWeight: 1,
+    }
 }
 
 const ProfileContext = createContext<{
@@ -17,8 +22,19 @@ const ProfileContext = createContext<{
     dispatch: React.Dispatch<Action>
 }>({ profile: initialState, dispatch: () => null })
 
+export const initializer = (initialValue = initialState) => {
+    if (localStorage.getItem("profile") !== null) {
+
+        return JSON.parse(localStorage.getItem("profile") || '');
+    }
+    return initialValue;
+}
+
 export const ProfileProvider = ({ children }: any) => {
-    const [profile, dispatch] = useReducer(profileReducer, initialState)
+    const [profile, dispatch] = useReducer(profileReducer, initialState, initializer)
+    useEffect(() => {
+        localStorage.setItem('profile', JSON.stringify(profile))
+    }, [profile])
     return (
         <ProfileContext.Provider value={{ profile, dispatch }}>
             {children}
@@ -37,11 +53,11 @@ type Action =
 const profileReducer = (state: any, action: Action) => {
     switch (action.type) {
         case 'changeCardSize':
-            return { ...state, cardSize: action.size }
+            return { ...state, settings: { ...state.settings, cardSize: action.size } }
         case 'changeCardFontWeight':
-            return { ...state, cardFontWeight: action.size }
+            return { ...state, settings: { ...state.settings, cardFontWeight: action.size } }
         case 'changeColor':
-            return { ...state, color: action.color }
+            return { ...state, settings: { ...state.settings, color: action.color } }
         default:
             return state
     }

@@ -38,21 +38,21 @@ const Settings = () => {
                             onClick={() => {
                                 handleChangeCardSize(1)
                             }}
-                            isActive={profile.cardSize === 1}
+                            isActive={profile.settings.cardSize === 1}
                         />
                         <Button
                             text={'Medium'}
                             onClick={() => {
                                 handleChangeCardSize(2)
                             }}
-                            isActive={profile.cardSize === 2}
+                            isActive={profile.settings.cardSize === 2}
                         />
                         <Button
                             text={'Large'}
                             onClick={() => {
                                 handleChangeCardSize(3)
                             }}
-                            isActive={profile.cardSize === 3}
+                            isActive={profile.settings.cardSize === 3}
                         />
                     </div>
                 </div>
@@ -64,36 +64,25 @@ const Settings = () => {
                             onClick={() => {
                                 handleChangeFontWeight(1)
                             }}
-                            isActive={profile.cardFontWeight === 1}
+                            isActive={profile.settings.cardFontWeight === 1}
                         />
                         <Button
                             text={'Semi-Bold'}
                             onClick={() => {
                                 handleChangeFontWeight(2)
                             }}
-                            isActive={profile.cardFontWeight === 2}
+                            isActive={profile.settings.cardFontWeight === 2}
                         />
                         <Button
                             text={'Bold'}
                             onClick={() => {
                                 handleChangeFontWeight(3)
                             }}
-                            isActive={profile.cardFontWeight === 3}
+                            isActive={profile.settings.cardFontWeight === 3}
                         />
                     </div>
                 </div>
             </div>
-            {/* <h1>
-        Current Color:
-        <select
-          onChange={(e) => handleSetColor(e.target.value)}
-          value={profile.color}
-        >
-          <option value="black">Black</option>
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
-        </select>
-      </h1> */}
         </Container>
     )
 }
