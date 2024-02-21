@@ -1,5 +1,6 @@
 from __future__ import annotations
 from random import shuffle
+from json import JSONEncoder
 
 
 class Card:
@@ -9,6 +10,22 @@ class Card:
 
     def retCard(self):
         return (self.value, self.suit)
+
+    def retEnum(self) -> int:
+        enum = 0
+        match self.suit:
+            case "hearts":
+                enum += 0
+            case "diamonds":
+                enum += 13
+            case "spades":
+                enum += 26
+            case "clubs":
+                enum += 39
+        return enum + self.value - 1
+    
+    def __str__(self):
+        return '(' + self.suit + ', ' + str(self.value) + ')'
 
 
 class Deck:
@@ -44,6 +61,16 @@ class Deck:
             return self.spades[valueNum]
         else:
             return self.clubs[valueNum]
+    
+    # if the stock pile is empty, the discard pile will be turn upside down and then it becomes the
+    # stock pile.
+    def reverseDiscard(self, discardPile: list[Card]):
+        
+        while discardPile: # while the discard pile is not empty
+            # append the enumeration of the discard pile in queue order (reverse stack)
+            card = discardPile.pop(0)
+            self.order.append(card.retEnum())
+    
 
 
 class Meld:
@@ -62,6 +89,12 @@ class Player:
 
     def pickup(self, card: Card):
         self.hand.append(card)
+
+    def sortHandValue(self):
+        self.hand.sort(key=lambda x: (x.value, x.suit))
+
+    def sortHandSuit(self):
+        self.hand.sort(key=lambda x: (x.suit, x.value))
 
     def printHand(self):
         for i in self.hand:
@@ -154,19 +187,21 @@ class Game:
             print("bad Meld")
         # receive a message of which meld to add to and which card(s)
         # send message of valid play / execute play
+            
+        # check if player won
 
         # receive message of which card to discard
 
         # execute discarding of card and send message that turn is over
 
     # player draws the card from the pile returned from the socket
-
     def drawCard(self, playerID: str, drawType: str) -> Card:
 
         if drawType == 'stock':
-            # if self.stockPile.order.empty():
-            # self.stockPile
-            # else
+            
+            if not self.board.stockPile.order:
+               self.board.stockPile.reverseDiscard(self.board.discardPile)
+            
             for i in self.players:
                 if i.id == playerID:
                     card = self.board.stockPile.draw()
@@ -174,6 +209,8 @@ class Game:
                     return card
 
         elif drawType == 'discard':
+            if not self.board.discardPile:
+                raise Exception("No discard Pile")
             for i in self.players:
                 if i.id == playerID:
                     card = self.board.discardPile.pop()
@@ -181,12 +218,45 @@ class Game:
                     return card
 
     # player discards a card returned from the socket
-    def discard(self, playerID: str, victim: Card): for i in self.players:
+    def discard(self, playerID: str, victim: Card): 
+        for i in self.players:
             if i.id == playerID:
                 i.discard(victim)
                 self.board.discardPile.append(victim)
 
     # meld formation
+    def formMeld(self, playerID: str, matchedSet: list[Card]):
+        
+        if isValidMeld(matchedSet):
+            self.melds.append(matchedSet)
+            for i in self.players:
+                if i.id == playerID:
+                    for card in matchedSet:
+                        i.discard(card)
+        
+        else:
+            print("invalid meld")
+
+    # player adds another card or couple of cards to a meld that has been played already
+    def addToMeld(self, playerID: str, matchedSet: list[Card], meldIndex: int):
+
+        tempMeld = self.melds[meldIndex] + matchedSet
+        if isValidMeld(tempMeld):
+            self.melds[meldIndex] += matchedSet
+            self.melds[meldIndex].sort(key=lambda x: (x.value, x.suit))
+            for i in self.players:
+                if i.id == playerID:
+                    for card in matchedSet:
+                        i.discard(card)
+
+        else:
+            print("cards cannot be added to selected meld")
+        
+
+
+
+
+
 
 
 # function to determine valid melds
@@ -196,7 +266,7 @@ def isValidMeld(matchedSet: list[Card]) -> bool:
         return False
 
     # sort the proposed meld
-    matchedSet = sorted(matchedSet, key=lambda x: x.value)
+    matchedSet.sort(key=lambda x: x.value)
 
     sequence = True
     pair = True
@@ -222,3 +292,19 @@ def isValidMeld(matchedSet: list[Card]) -> bool:
 # 2. stock/pickup pile ✓
 # 3. discard pile (top card faceup) (stack implementation) ✓*1/2
 # 4. melds / matched sets ✓*1/2
+
+class GameEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Card):
+            return o.retCard()
+        if isinstance(o, Deck):
+            return o.order
+        if isinstance(o, Meld):
+            return o.set
+        if isinstance(o, Player):
+            return o.__dict__
+        if isinstance(o, Game):
+            return o.__dict__
+        if isinstance(o, Board):
+            return o.__dict__
+        return JSONEncoder.default(self, o)

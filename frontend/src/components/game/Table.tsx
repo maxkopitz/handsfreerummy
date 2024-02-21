@@ -6,8 +6,6 @@ import Button from '../ui/Button'
 import Modal from '../ui/Modal'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
-import { useEffect } from 'react'
-import { socket } from '../../socket'
 import { API_URL } from '../../config'
 
 const Table = () => {
@@ -30,7 +28,6 @@ const Table = () => {
                     <div>
                         <Button text={'Back to Main Menu'} link={'/'} />
                     </div>
-
                     <div>
                         <Button
                             text={'Settings'}
@@ -46,21 +43,14 @@ const Table = () => {
                         />
                     </div>
                 </div>
-                <div className="row-span-3 row-start-2">
-                    <Hand
-                        isPlayer={false}
-                        playerId={1}
-                        direction={'next-to'}
-                        hand={[]}
-                    />
+                <div className="col-start-2">
+                    <Hand isPlayer={false} playerId={1} hand={[]} />
                 </div>
-                <div className="col-span-3 col-start-2">
-                    <Hand
-                        isPlayer={false}
-                        playerId={2}
-                        direction={'across'}
-                        hand={[]}
-                    />
+                <div className="col-start-3">
+                    <Hand isPlayer={false} playerId={2} hand={[]} />
+                </div>
+                <div className="col-start-4">
+                    <Hand isPlayer={false} playerId={3} hand={[]} />
                 </div>
                 <div className="col-span-3">
                     <Board
@@ -68,21 +58,11 @@ const Table = () => {
                         discard={{ value: Value.Six, suit: Suit.H }}
                     />
                 </div>
-                <div className="row-span-3">
-                    <Hand
-                        isPlayer={false}
-                        playerId={3}
-                        direction={'next-to'}
-                        hand={[]}
-                    />
+                <div className="col-start-2">
+                    <h1>Melds</h1>
                 </div>
-                <div className="col-span-3">
-                    <Hand
-                        isPlayer={true}
-                        playerId={4}
-                        direction={'across'}
-                        hand={[]}
-                    />
+                <div className="col-start-2 col-span-3">
+                    <Hand isPlayer={true} playerId={4} hand={[]} />
                 </div>
             </div>
         </Container>

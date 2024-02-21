@@ -6,81 +6,84 @@ import classNames from 'classnames'
 interface HandProps {
     playerId?: number
     isPlayer: boolean
-    direction: string
     hand: CardType[]
 }
 
-const Hand = ({ playerId, isPlayer, direction, hand }: HandProps) => {
-    const classes = classNames(
-        'flex',
-        { 'flex-row': isPlayer || direction === 'across' },
-        { 'flex-col': !isPlayer && direction === 'next-to' }
-    )
+const Hand = ({ playerId, isPlayer, hand }: HandProps) => {
+    const cardClasses = classNames('flex flex-row justify-center items-center')
 
     const handSize = hand.length
 
     // if not player - print one card with the number of cards in hand
     if (!isPlayer) {
         return (
-            <div className={classes}>
-                <h1>
-                    Player {playerId}: {handSize} cards{' '}
-                </h1>
-                <div>
+            <div className="flex flex-col justify-center item-center w-max">
+                <div className="flex flex-col items-center justify-center">
+                    <h1>Player {playerId} </h1>
+                </div>
+                <div className={cardClasses}>
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
-                        direction={direction}
                         isBack={!isPlayer}
                         num={handSize}
-                        isDiscard={false}
+                        isPickup={false}
                     />
                 </div>
             </div>
         )
     }
-    
+
     // if player - print all players cards in hand:
     return (
-        <div className={classes}>
-            <h1>
-                Player {playerId}: {handSize} cards{' '}
-            </h1>
-            <div className="m-2">
-                <Card
-                    card={{ value: Value.A, suit: Suit.C }}
-                    direction={direction}
-                    isBack={!isPlayer}
-                />
+        <div className="flex flex-col justify-center item-center w-max">
+            <div>
+                <h1>
+                    Player {playerId}: {handSize} cards{' '}
+                </h1>
             </div>
-
-            <div className="m-2">
-                <Card
-                    card={{ value: Value.A, suit: Suit.H }}
-                    direction={direction}
-                    isBack={!isPlayer}
-                />
-            </div>
-
-            <div className="m-2">
-                <Card
-                    card={{ value: Value.Q, suit: Suit.S }}
-                    direction={direction}
-                    isBack={!isPlayer}
-                />
-            </div>
-            <div className="m-2">
-                <Card
-                    card={{ value: Value.A, suit: Suit.D }}
-                    direction={direction}
-                    isBack={!isPlayer}
-                />
-            </div>
-            <div className="m-2">
-                <Card
-                    card={{ value: Value.K, suit: Suit.C }}
-                    direction={direction}
-                    isBack={!isPlayer}
-                />
+            <div className={cardClasses}>
+                <div className="m-2">
+                    <Card
+                        card={{ value: Value.A, suit: Suit.C }}
+                        isBack={!isPlayer}
+                    />
+                </div>
+                <div className="m-2">
+                    <Card
+                        card={{ value: Value.A, suit: Suit.H }}
+                        isBack={!isPlayer}
+                    />
+                </div>
+                <div className="m-2">
+                    <Card
+                        card={{ value: Value.A, suit: Suit.H }}
+                        isBack={!isPlayer}
+                    />
+                </div>
+                <div className="m-2">
+                    <Card
+                        card={{ value: Value.A, suit: Suit.H }}
+                        isBack={!isPlayer}
+                    />
+                </div>
+                <div className="m-2">
+                    <Card
+                        card={{ value: Value.Q, suit: Suit.S }}
+                        isBack={!isPlayer}
+                    />
+                </div>
+                <div className="m-2">
+                    <Card
+                        card={{ value: Value.A, suit: Suit.D }}
+                        isBack={!isPlayer}
+                    />
+                </div>
+                <div className="m-2">
+                    <Card
+                        card={{ value: Value.K, suit: Suit.C }}
+                        isBack={!isPlayer}
+                    />
+                </div>
             </div>
         </div>
     )

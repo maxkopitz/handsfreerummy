@@ -5,32 +5,37 @@ import { useProfile } from '../../hooks/Profile'
 //Pick Card Design
 interface CardProps {
     card: CardType
-    direction: string
     isBack?: boolean
     cardSize?: number
     num?: number // number of cards in hand
-    isDiscard?: boolean // false if not discard
+    isPickup?: boolean // false if not discard
 }
 
-const Card = ({ card, direction, isBack, num, isDiscard }: CardProps) => {
+const Card = ({ card, isBack, num, isPickup }: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg',
+        { 'bg-white': !isBack },
         {
-            'text-red-500 border-red-500 hover:bg-red-500 hover:text-white':
+            'text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex flex-col items-center justify-center':
                 (card.suit === Suit.H || card.suit === Suit.D) && !isBack,
         },
         {
-            'text-black-500 border-slate-950 hover:bg-neutral-950 hover:text-white':
+            'text-black-500 border-slate-950 hover:bg-neutral-950 hover:text-white flex flex-col items-center justify-center':
                 (card.suit === Suit.S || card.suit === Suit.C) && !isBack,
         },
         { 'text-2xl w-20 h-28': profile.cardSize === 1 },
         { 'text-4xl w-28 h-36': profile.cardSize === 2 },
         { 'text-6xl w-36 h-44': profile.cardSize === 3 },
-        { 'text-normal border-2': profile.cardFontWeight === 1 },
-        { 'text-bold border-4': profile.cardFontWeight === 2 },
-        { 'text-extrabold border-8': profile.cardFontWeight === 3 },
-        { 'text-green-800 border-green-800 bg-green-800': isBack }
+        { 'font-normal border-2': profile.cardFontWeight === 1 },
+        { 'font-bold border-4': profile.cardFontWeight === 2 },
+        { 'font-extrabold border-8': profile.cardFontWeight === 3 },
+        { 'border-green-800 bg-green-800': isBack },
+        { 'text-green-800': isBack && isPickup },
+        {
+            'bg-lime-700 border-lime-700 text-6xl text-white shadow-2xl flex items-center justify-center':
+                isBack && !isPickup,
+        }
     )
 
     // ['♠', '♣', '♥', '♦']
@@ -45,25 +50,21 @@ const Card = ({ card, direction, isBack, num, isDiscard }: CardProps) => {
         suitSymbol = '♦'
     }
 
-
     // isBack is true = back of card
     //card is back and not part of discard pile
-    if (isBack && !isDiscard){ 
+    if (isBack && !isPickup) {
         return (
             <>
-            <div className={classes}>
-                {(
-                    <>
-                        <div>num</div>
-                    </>
-                )}
-            </div>
-            
-        </>
-
+                <div className={classes}>
+                    {
+                        <>
+                            <div>{num}</div>
+                        </>
+                    }
+                </div>
+            </>
         )
     }
-
 
     // return front of card if !isBack, otherwise return empty card for discard pile
     return (
@@ -71,15 +72,14 @@ const Card = ({ card, direction, isBack, num, isDiscard }: CardProps) => {
             <div className={classes}>
                 {!isBack && (
                     <>
+                        <div>{suitSymbol}</div>
                         <div>{card.value}</div>
                         <div>{suitSymbol}</div>
                     </>
                 )}
             </div>
-            
         </>
     )
-
 }
 
 export default Card

@@ -8,14 +8,14 @@ interface BoardProps {
 }
 const Board = ({ discard, playedRuns }: BoardProps) => {
     return (
-        <div className="grid grid-rows-4">
-            <div className="col-start-2">
-                <h1>Discard pile</h1>
-                <Card card={discard} direction="across" />
+        <div className="grid grid-cols-subgrid justify-center items-center">
+            <div className="col-start-3 flex flex-col items-center justify-center">
+                <h1>Discard</h1>
+                <Card card={discard} />
             </div>
-            <div className="col-start-3">
-                <h1>Pickup Pile</h1>
-                <Card card={discard} direction="across" isBack={true} />
+            <div className="col-start-4 flex flex-col items-center justify-center">
+                <h1>Pickup</h1>
+                <Card card={discard} isBack={true} isPickup={true} />
             </div>
         </div>
     )

@@ -2,10 +2,13 @@
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
+from handsfree.game import Game
 
 app = Flask(__name__)
 app.config.from_object('handsfree.config')
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": app.config['CLIENT_URL']}})
+
+games = Game(4, playerIDs=[])
 
 socketio = SocketIO(
         app,

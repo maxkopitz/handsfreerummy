@@ -17,12 +17,6 @@ def handle_connect(data):
 def handle_disconnect():
     print("session:", session)
 
-@handsfree.socketio.on('create-game')
-def handle_create(data):
-    game = Game(1, playerIDs=[request.sid])
-    games.append(game)
-    handsfree.socketio.emit('created-game', data=game, to=request.sid)
-    #handsfree.socketio.emit('new-games', data=game)
 
 @handsfree.socketio.on('join-game')
 def handle_join(data):

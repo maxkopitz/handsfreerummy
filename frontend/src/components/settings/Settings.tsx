@@ -27,7 +27,6 @@ const Settings = () => {
                 <div className="h-44">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
-                        direction={'across'}
                         isBack={false}
                     />
                 </div>
