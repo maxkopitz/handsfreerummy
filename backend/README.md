@@ -1,13 +1,26 @@
 ## Setup
+1. Change dir to backend
 
-1. Python3 virtual venv
-   `python3 -m venv env`
+```sh
+cd ./backend
+```
 
-2. Source the virtual environment
-   `source env/bin/activate`
+2. Python3 virtual venv
+```sh
+python3 -m venv env
+```
 
-3. Install the requirements
-   `pip install -r requirements.txt`
+3. Source the virtual environment
+```sh
+source env/bin/activate
+```
 
 4. Install the requirements
-   `pip install -e .`
+```sh
+pip install -r requirements.txt
+```
+
+5. Install the requirements
+```sh
+pip install -e .
+```
