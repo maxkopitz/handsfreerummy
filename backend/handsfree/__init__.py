@@ -1,14 +1,23 @@
 """Handsfree Rummy Backend"""
 from flask import Flask
 from flask_socketio import SocketIO
+from flask_redis import FlaskRedis
+from flask_session import Session
 from flask_cors import CORS
-from handsfree.game import Game
+
 
 app = Flask(__name__)
+
+redis_client = FlaskRedis(app)
+
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = redis_client.from_url('redis://127.0.0.1:6379')
+
+sess = Session()
+sess.init_app(app)
+
 app.config.from_object('handsfree.config')
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": app.config['CLIENT_URL']}})
-
-games = Game(4, playerIDs=[])
 
 socketio = SocketIO(
         app,

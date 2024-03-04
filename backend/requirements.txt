@@ -2,3 +2,6 @@ Flask
 eventlet
 Flask-Cors
 flask-socketio
+flask-redis
+"redis[hiredis]"
+Flask-Session
