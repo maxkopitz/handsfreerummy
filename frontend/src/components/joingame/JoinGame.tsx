@@ -1,19 +1,23 @@
-import { useEffect } from 'react'
-import { socket, SocketEvents } from '../../api/socket';
-import { useGame } from '../../hooks/Game'
+import { useEffect, useState } from 'react'
+import { LobbyGame } from '../../Type';
 import Game from './Game'
 
 const tableHeaders = ["Players", ""];
-const JoinGame = () => {
-    const { game, dispatch } = useGame()
 
+const initalGames: LobbyGame[] = [
+    {
+        id: "1",
+        players: 0,
+        state: "lobby"
+    }
+]
+const JoinGame = () => {
+    const [games, setGames] = useState<LobbyGame[]>([]);
     useEffect(() => {
-        const onNewGame = (data: any) => {
-            console.log('new game', data)
-            dispatch({ type: 'add-lobby-game', game: data })
-        }
-        //socket.on(SocketEvents.NEW_GAMES, onNewGame)
-    }, [dispatch])
+        /* TODO: Socket to listen for new games*/
+        setGames(initalGames);
+    }, []);
+
     return (
         <div className="flex flex-col w-1/2 justify-center items-center">
             <h2>Join Game</h2>
@@ -26,13 +30,13 @@ const JoinGame = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {game.lobbyGames.length === 0 && (
+                    {games.length === 0 && (
                         <tr>
                             <td className="p-4">No games available</td>
                         </tr>
                     )}
-                    {game.lobbyGames.map((item, index) => {
-                        const isLast = index === game.lobbyGames.length - 1;
+                    {games.map((item, index) => {
+                        const isLast = index === games.length - 1;
                         const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
                         return (
                             <Game key={item.id} game={item} className={classes} />)

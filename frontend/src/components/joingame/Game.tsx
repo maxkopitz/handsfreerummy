@@ -7,18 +7,16 @@ interface GameProps {
     className: string
 }
 
-    const Game = ({ game, className }: GameProps) => {
+const Game = ({ game, className }: GameProps) => {
     const navigate = useNavigate()
     const handleJoinGame = () => {
         navigate('/game')
-        console.log('join game')
-        //socket.emit('join-game', game.id, (data: any) => {})
     }
     return (
         <tr>
             <td className={className}>{game.players}</td>
             <td className={className}>
-                <Button text={'join'} onClick={handleJoinGame} />
+                <Button text={'Join Game'} onClick={handleJoinGame} />
             </td>
         </tr>
     )

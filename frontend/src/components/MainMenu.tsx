@@ -15,7 +15,7 @@ const MainMenu = () => {
     useEffect(() => {
         axiosInstance.get(`${API_URL}/register`).then((res) => {
             console.log(res.data)
-        })
+        });
     }, [])
     return (
         <Container>
@@ -51,9 +51,6 @@ const MainMenu = () => {
                 </div>
                 <div>
                     <Button text={'About'} link={'about'} />
-                </div>
-                <div>
-                    <Button text={'Demo Board'} link={'game'} />
                 </div>
             </div>
         </Container>
