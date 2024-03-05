@@ -8,7 +8,9 @@ interface Game {
 
 const initialState: Game = {
     isTurn: false,
-    lobbyGames: [],
+    lobbyGames: [
+
+    ],
 }
 
 const GameContext = createContext<{

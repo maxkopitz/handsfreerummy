@@ -1,6 +1,6 @@
 from __future__ import annotations
 from random import shuffle
-from json import JSONEncoder
+import json
 
 
 class Card:
@@ -23,7 +23,7 @@ class Card:
             case "clubs":
                 enum += 39
         return enum + self.value - 1
-    
+
     def __str__(self):
         return '(' + self.suit + ', ' + str(self.value) + ')'
 
@@ -61,16 +61,15 @@ class Deck:
             return self.spades[valueNum]
         else:
             return self.clubs[valueNum]
-    
+
     # if the stock pile is empty, the discard pile will be turn upside down and then it becomes the
     # stock pile.
     def reverseDiscard(self, discardPile: list[Card]):
-        
-        while discardPile: # while the discard pile is not empty
+
+        while discardPile:  # while the discard pile is not empty
             # append the enumeration of the discard pile in queue order (reverse stack)
             card = discardPile.pop(0)
             self.order.append(card.retEnum())
-    
 
 
 class Meld:
@@ -124,36 +123,42 @@ class Board:
                 for player in game.players:
                     player.pickup(self.stockPile.draw())
 # numPlayers, players, id, turnCounter, melds, gameState, board
-class Game:
-    gameId = 0
 
-    def __init__(self, numPlayers: int, playerIDs: list[str]) -> None:
-        # initialize the players array with their ids
+
+class Game:
+    gameId = 1
+
+    def __init__(self,
+                 numPlayers=4,
+                 players=[],
+                 gameId=-1,
+                 turnCounter=0,
+                 melds=[],
+                 gameState="lobby"
+                 ):
         self.numPlayers = numPlayers
-        self.players = []
-        for i in range(len(playerIDs)):
-            self.players.append(Player(playerIDs[i]))
-        self.id = Game.gameId
-        Game.gameId += 1
-        self.turnCounter = 0
-        self.melds = []
-        self.gameState = "lobby"
+        self.players = players
+        if gameId == -1:
+            self.gameId = Game.gameId
+            Game.gameId += 1
+        else:
+            self.gameId = gameId
+        self.turnCounter = turnCounter
+        self.melds = melds
+        self.gameState = gameState
 
     def print(self):
         for i in self.players:
-            print("Player ", i.id, ":")
-            for j in i.hand:
-                print(j.retCard())
-            print("")
+            print(i)
 
     # join game / add players to the game function
     def addPlayer(self, playerID: str):
         if self.numPlayers == len(self.players):
-            #print("can't add a player")
+            # print("can't add a player")
             self.players.pop(0)
             self.players.append(Player(playerID))
         else:
-            self.players.append(Player(playerID))
+            self.players.append(Player(str(playerID)))
 
         # self.numPlayers += 1
 
@@ -187,27 +192,23 @@ class Game:
             print("bad Meld")
         # receive a message of which meld to add to and which card(s)
         # send message of valid play / execute play
-            
+
         # check if player won
 
         # receive message of which card to discard
 
         # execute discarding of card and send message that turn is over
 
-    # player draws the card from the pile returned from the socket
     def drawCard(self, playerID: str, drawType: str) -> Card:
-
+        """player draws the card from the pile returned from the socket."""
         if drawType == 'stock':
-            
             if not self.board.stockPile.order:
-               self.board.stockPile.reverseDiscard(self.board.discardPile)
-            
+                self.board.stockPile.reverseDiscard(self.board.discardPile)
             for i in self.players:
                 if i.id == playerID:
                     card = self.board.stockPile.draw()
                     i.pickup(card)
                     return card
-
         elif drawType == 'discard':
             if not self.board.discardPile:
                 raise Exception("No discard Pile")
@@ -217,29 +218,27 @@ class Game:
                     i.pickup(card)
                     return card
 
-    # player discards a card returned from the socket
-    def discard(self, playerID: str, victim: Card): 
+    def discard(self, playerID: str, victim: Card):
+        """player discards a card returned from the socket."""
         for i in self.players:
             if i.id == playerID:
                 i.discard(victim)
                 self.board.discardPile.append(victim)
 
-    # meld formation
     def formMeld(self, playerID: str, matchedSet: list[Card]):
-        
+        """meld formation"""
         if isValidMeld(matchedSet):
             self.melds.append(matchedSet)
             for i in self.players:
                 if i.id == playerID:
                     for card in matchedSet:
                         i.discard(card)
-        
         else:
             print("invalid meld")
 
-    # player adds another card or couple of cards to a meld that has been played already
     def addToMeld(self, playerID: str, matchedSet: list[Card], meldIndex: int):
-
+        """player adds another card or couple of cards to a meld that has been
+        played already."""
         tempMeld = self.melds[meldIndex] + matchedSet
         if isValidMeld(tempMeld):
             self.melds[meldIndex] += matchedSet
@@ -248,20 +247,18 @@ class Game:
                 if i.id == playerID:
                     for card in matchedSet:
                         i.discard(card)
-
         else:
             print("cards cannot be added to selected meld")
-        
+
+    @classmethod
+    def from_json(cls, json_string):
+        """Convert json to class."""
+        json_dict = json.loads(json_string)
+        return cls(**json_dict)
 
 
-
-
-
-
-
-# function to determine valid melds
-# sorts the proposed set too
 def isValidMeld(matchedSet: list[Card]) -> bool:
+    """function to determine valid melds sorts the proposed set too."""
     if len(matchedSet) < 3:
         return False
 
@@ -293,7 +290,8 @@ def isValidMeld(matchedSet: list[Card]) -> bool:
 # 3. discard pile (top card faceup) (stack implementation) ✓*1/2
 # 4. melds / matched sets ✓*1/2
 
-class GameEncoder(JSONEncoder):
+
+class GameEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Card):
             return o.retCard()
@@ -307,4 +305,4 @@ class GameEncoder(JSONEncoder):
             return o.__dict__
         if isinstance(o, Board):
             return o.__dict__
-        return JSONEncoder.default(self, o)
+        return json.JSONEncoder.default(self, o)

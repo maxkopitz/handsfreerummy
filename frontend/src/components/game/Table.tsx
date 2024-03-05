@@ -6,11 +6,29 @@ import Button from '../ui/Button'
 import Modal from '../ui/Modal'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
-import { API_URL } from '../../config'
+import { useEffect, useState } from 'react'
+import axiosInstance from '../../api/axiosConfig'
+import { useNavigate } from 'react-router-dom'
+import { AxiosError } from 'axios'
+import { socket, SocketEvents } from '../../api/socket'
+
+interface RummyGame {
+    gameId: string
+    players: string[]
+    gameState: string
+}
+
+const defaultGame: RummyGame = {
+    gameId: "-1",
+    players: [],
+    gameState: "lobby"
+}
 
 const Table = () => {
-    const { dispatch } = useModal()
-
+    const { dispatch: dispatchModal } = useModal()
+    const navigate = useNavigate();
+    const [game, setGame] = useState<RummyGame>(defaultGame)
+    const [isConnected, setIsConnected] = useState(socket.connected);
     const dummyRuns = [
         [
             { value: Value.A, suit: Suit.C },
@@ -20,6 +38,43 @@ const Table = () => {
         [{ value: Value.J, suit: Suit.C }],
     ]
 
+    useEffect(() => {
+        const connect = () => {
+            setIsConnected(true)
+        }
+        const disconnect = () => {
+            setIsConnected(false)
+        }
+        axiosInstance.post<any>('/games/1')
+            .catch((error: AxiosError) => {
+                console.log(error)
+                navigate('/');
+            }).then((res: any) => {
+                const { data } = res;
+                console.log(data.game);
+                setGame({
+                    gameId: data.game.gameId,
+                    players: data.game.players,
+                    gameState: data.game.gameState
+                })
+                socket.connect()
+            });
+        socket.on('connect', connect)
+        socket.on('disconenct', disconnect)
+
+        return () => {
+            socket.disconnect()
+
+        }
+
+    }, [navigate]);
+
+    const handleStartGame = () => {
+        if (isConnected) {
+            socket.emit(SocketEvents.GAME_START)
+        }
+
+    }
     return (
         <Container>
             <Modal />
@@ -32,7 +87,7 @@ const Table = () => {
                         <Button
                             text={'Settings'}
                             onClick={() =>
-                                dispatch({
+                                dispatchModal({
                                     type: 'showModal',
                                     modal: {
                                         title: 'Settings',
@@ -41,6 +96,15 @@ const Table = () => {
                                 })
                             }
                         />
+                    </div>
+                    <div>
+                        <h1>Socket Connected: {isConnected ? "true" : "false"}</h1>
+                        <h1>GameId: {game.gameId}</h1>
+                        <h1>Players</h1>
+                        <ul>
+                            {game.players.map((item, key) => <li key={key}>{item}</li>)}
+                        </ul>
+                        <Button text={'Start Game'} onClick={handleStartGame} />
                     </div>
                 </div>
                 <div className="col-start-2">

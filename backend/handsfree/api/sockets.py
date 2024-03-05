@@ -1,50 +1,31 @@
 from flask import request, session
-import handsfree
-from handsfree.game import Game
+from handsfree import app, redis_client, socketio
+from handsfree.game import Game, GameEncoder
+from flask_socketio import ConnectionRefusedError
+import json
 
-games = []
-@handsfree.socketio.on('connect')
+
+@socketio.on('connect')
 def handle_connect(data):
-    game = {
-        'id': '123',
-        'players': 0,
-        'state': 'waiting'
-    }
-    print("connected: ", session)
-    handsfree.socketio.emit('new-games', data=game, to=request.sid)
 
-@handsfree.socketio.on('disconnect')
+    game_key = f"game:{session.get('game_id')}"
+    if not redis_client.hexists(game_key, 'game'):
+        raise ConnectionRefusedError('Not in game')
+
+    result = redis_client.hget(game_key, 'game').decode('utf-8')
+    game = Game().from_json(result)
+    print(game)
+
+
+@socketio.on('disconnect')
 def handle_disconnect():
-    print("session:", session)
+    print('disconnect')
 
 
-@handsfree.socketio.on('join-game')
-def handle_join(data):
-    gameID = data['id']
-    games[gameID].players += 1
-    games[gameID].playerIDs.append(request.sid)
-
-    handsfree.socketio.emit('joined-game', data=games[gameID], to=request.sid)
-
-@handsfree.socketio.on('start-game')
-def handle_start(data):
-    gameID = data['id']
-    games[gameID].runGame()
-
-    # Also want to know who started and discard card
-    for player in games[gameID].players:
-        handsfree.socketio.emit('game-started', data=player.hand, to=player.id)
-
-@handsfree.socketio.on('draw-card')
-def handle_draw_card(data):
-    gameID = data['id']
-    drawType = data['drawType'] # discard or stock
-    games[gameID].drawCard(request.sid, drawType)
-    handsfree.socketio.emit('card-drawn', data=data)
-
-@handsfree.socketio.on('discard')
-def handle_draw_card(data):
-    gameID = data['id']
-    card = data['card']
-    games[gameID].drawCard(request.sid, card)
-    handsfree.socketio.emit('card-discarded', data=data)
+@socketio.on('game-start')
+def handle_start():
+    print(session.get('uuid'), 'requested to start game', session.get('game_id'))
+    game_key = f"game:{session.get('game_id')}"
+    result = redis_client.hget(game_key, 'game').decode('utf-8')
+    game = Game().from_json(result)
+    print(game.gameId)

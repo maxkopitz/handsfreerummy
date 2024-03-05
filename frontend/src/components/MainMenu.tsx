@@ -1,9 +1,7 @@
-import { socket } from '../api/socket'
 import JoinGame from './joingame/JoinGame'
 import Button from './ui/Button'
 import Container from './ui/Container'
 import { useEffect } from 'react'
-import { API_URL } from '../config'
 import { useModal } from '../hooks/Modal'
 import Settings from './settings/Settings'
 import Modal from './ui/Modal'
@@ -13,7 +11,7 @@ import CreateGame from './game/CreateGame'
 const MainMenu = () => {
     const { dispatch } = useModal();
     useEffect(() => {
-        axiosInstance.get(`${API_URL}/register`).then((res) => {
+        axiosInstance.get(`register`).then((res) => {
             console.log(res.data)
         });
     }, [])
