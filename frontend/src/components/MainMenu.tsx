@@ -19,7 +19,7 @@ const MainMenu = () => {
         <Container>
             <Modal />
             <div className="flex flex-col justify-center items-center">
-                <div className="mb-20">
+                <div className="mb-20 mt-20">
                     <h1 className="text-slate-500 text-5xl font-bold">
                         Handsfree Rummy
                     </h1>

@@ -24,7 +24,7 @@ const Settings = () => {
     return (
         <Container>
             <div className="flex flex-col justify-center items-center">
-                <div className="h-44">
+                <div className="h-44 mb-10">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
                         isBack={false}

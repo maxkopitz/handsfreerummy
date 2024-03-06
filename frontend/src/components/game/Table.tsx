@@ -32,7 +32,7 @@ const Table = () => {
         [{ value: Value.J, suit: Suit.C }],
     ]
 
-    useEffect(() => {
+/*    useEffect(() => {
         const connect = () => {
             setIsConnected(true)
         }
@@ -62,14 +62,14 @@ const Table = () => {
             socket.disconnect()
         }
     }, [navigate])
-
+*/
     return (
         <Container>
             <Modal />
             <div className="grid grid-cols-5">
                 <div>
                     <div>
-                        <Button text={'Back to Main Menu'} link={'/'} />
+                        <Button text={'Main Menu'} link={'/'} />
                     </div>
                     <div>
                         <Button
@@ -95,14 +95,14 @@ const Table = () => {
                 <div className="col-start-4">
                     <Hand isPlayer={false} playerId={3} hand={[]} />
                 </div>
-                <div className="col-span-3">
+                <div className="mb-20 mt-20 col-span-3">
                     <Board
                         playedRuns={dummyRuns}
                         discard={{ value: Value.Six, suit: Suit.H }}
                     />
                 </div>
                 <div className="col-start-2">
-                    <h1>Melds</h1>
+                    <h2 className="text-lg font-semibold">Melds</h2>
                 </div>
                 <div className="col-start-2 col-span-3">
                     <Hand isPlayer={true} playerId={4} hand={[]} />

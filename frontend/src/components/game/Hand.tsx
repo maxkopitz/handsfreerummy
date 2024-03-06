@@ -12,14 +12,14 @@ interface HandProps {
 const Hand = ({ playerId, isPlayer, hand }: HandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
 
-    const handSize = hand.length
+    const handSize = 7
 
     // if not player - print one card with the number of cards in hand
     if (!isPlayer) {
         return (
             <div className="flex flex-col justify-center item-center w-max">
                 <div className="flex flex-col items-center justify-center">
-                    <h1>Player {playerId} </h1>
+                    <h1 className="text-xl font-bold">Player {playerId} </h1>
                 </div>
                 <div className={cardClasses}>
                     <Card
@@ -37,7 +37,7 @@ const Hand = ({ playerId, isPlayer, hand }: HandProps) => {
     return (
         <div className="flex flex-col justify-center item-center w-max">
             <div>
-                <h1>
+                <h1 className="text-xl font-bold">
                     Player {playerId}: {handSize} cards{' '}
                 </h1>
             </div>
@@ -56,13 +56,13 @@ const Hand = ({ playerId, isPlayer, hand }: HandProps) => {
                 </div>
                 <div className="m-2">
                     <Card
-                        card={{ value: Value.A, suit: Suit.H }}
+                        card={{ value: Value.A, suit: Suit.S }}
                         isBack={!isPlayer}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={{ value: Value.A, suit: Suit.H }}
+                        card={{ value: Value.A, suit: Suit.D }}
                         isBack={!isPlayer}
                     />
                 </div>
