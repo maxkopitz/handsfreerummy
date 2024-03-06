@@ -36,3 +36,8 @@ export interface LobbyGame {
     players: number
     state: string
 }
+export interface RummyGame {
+    gameId: string
+    players: string[]
+    gameState: string
+}

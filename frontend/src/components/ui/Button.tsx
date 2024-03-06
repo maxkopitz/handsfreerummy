@@ -10,7 +10,7 @@ interface ButtonProps {
 }
 const Button = (props: ButtonProps) => {
     const classes = classNames(
-        'bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 m-1 rounded shadow-md hover:shadow-lg outline-none block',
+        'bg-blue-500 hover:bg-blue-700 text-white text-2xl font-bold py-3 px-8 m-1 rounded shadow-md hover:shadow-lg outline-none block',
         { 'bg-green-700': props.isActive }
     )
 

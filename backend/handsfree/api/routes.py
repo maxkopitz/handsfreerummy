@@ -55,6 +55,11 @@ def get_game(game_id):
     if not redis_client.exists(game_key):
         return {"error": {"message": "Game does not exist"}}
 
+    game = {
+        "game": {
+            "gameId": 1
+        }
+    }
     result = redis_client.hget(game_key, 'game').decode('utf-8')
     game = Game().from_json(result)
     return jsonify({"game": {
@@ -82,7 +87,7 @@ def join_game(game_id):
     game = Game().from_json(result)
 
     if not session.get('game_id'):
-        game.addPlayer(session.get('uuid'))
+        game.addPlayer(str(session.get('uuid')))
         json_game = json.dumps(game, cls=GameEncoder)
         redis_client.hset(game_key, mapping={"game": json_game})
         session['game_id'] = str(game.gameId)
@@ -91,7 +96,7 @@ def join_game(game_id):
     players = []
     for p in game.players:
         print(p)
-        players.append(p.get('id'))
+        #players.append(p.get('id'))
 
     return {"game": {
         "gameId": game.gameId,
