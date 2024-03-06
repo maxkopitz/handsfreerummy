@@ -5,7 +5,7 @@
       src="https://img.shields.io/github/languages/code-size/maxkopitz/handsfreerummy"
       alt="Repository code size" />
   </a>
-  <a href="https://github.com/maxkopitz/nvim-config/">
+  <a href="https://github.com/maxkopitz/handsfree/">
     <img
       src="https://img.shields.io/github/issues/maxkopitz/handsfreerummy"
       alt="Respository count of issues open" />
