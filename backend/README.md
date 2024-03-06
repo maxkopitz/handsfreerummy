@@ -1,26 +1,26 @@
-## Setup
-1. Change dir to backend
-
+# Backend Setup
+1. Create Python3 virtual [venv](https://docs.python.org/3.10/library/venv.html)
 ```sh
-cd ./backend
+python3 -m venv backend/env
+```
+2. Source the virtual environment
+```sh
+source backend/env/bin/activate
 ```
 
-2. Python3 virtual venv
+3. Install the requirements
 ```sh
-python3 -m venv env
+pip install -r backend/requirements.txt
 ```
-
-3. Source the virtual environment
-```sh
-source env/bin/activate
-```
-
 4. Install the requirements
 ```sh
-pip install -r requirements.txt
+pip install -e backend/
 ```
-
-5. Install the requirements
+5. In a seperate terminal, run redis stack using Docker Compose
 ```sh
-pip install -e .
+docker compose up
+```
+6. Run the backed on port 4000
+```sh
+flask --app handsfree --debug run --host 0.0.0.0 --port 4000
 ```
