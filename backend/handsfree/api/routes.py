@@ -55,19 +55,7 @@ def get_game(game_id):
     if not redis_client.exists(game_key):
         return {"error": {"message": "Game does not exist"}}
 
-    game = {
-        "game": {
-            "gameId": 1
-        }
-    }
-    result = redis_client.hget(game_key, 'game').decode('utf-8')
-    game = Game().from_json(result)
-    return jsonify({"game": {
-        "game_id": game.gameId,
-        "numPlayers": game.numPlayers,
-        "players": game.players,
-    }})
-
+    return {"game": "hi"}
 
 @app.route('/games/<game_id>', methods=['POST'])
 def join_game(game_id):
