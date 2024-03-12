@@ -1,26 +1,14 @@
 # Backend Setup
-1. Create Python3 virtual [venv](https://docs.python.org/3.10/library/venv.html)
-```sh
-python3 -m venv backend/env
-```
-2. Source the virtual environment
-```sh
-source backend/env/bin/activate
-```
 
-3. Install the requirements
+1. Copy `secret_config.py.example`
 ```sh
-pip install -r backend/requirements.txt
+cp backend/handsfree/secret_config.py.example back/handsfree/secret_config.py
 ```
-4. Install the requirements
+2. Build containers
 ```sh
-pip install -e backend/
+docker compose build .
 ```
-5. In a seperate terminal, run redis stack using Docker Compose
+3. Run containers
 ```sh
 docker compose up
-```
-6. Run the backed on port 4000
-```sh
-flask --app handsfree --debug run --host 0.0.0.0 --port 4000
 ```
