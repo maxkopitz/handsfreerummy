@@ -4,3 +4,19 @@ services:
     ports:
       - '6379:6379'
       - '8001:8001'
+  backend:
+    build:
+      context: backend
+      target: builder
+    # flask requires SIGINT to stop gracefully
+    # (default stop signal from Compose is SIGTERM)
+    stop_signal: SIGINT
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./backend:/code
+    environment:
+      REDIS_URL: 'redis://redis:6379'
+      HANDSFREE_SETTINGS: 'secret_config.py'
+    depends_on:
+        - redis
