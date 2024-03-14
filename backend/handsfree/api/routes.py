@@ -1,8 +1,7 @@
 """Handsfree Routes."""
-
 from handsfree import app, redis_client
-from handsfree.game import Game, GameEncoder
-from flask import session, request, jsonify
+from handsfree.game import Game, GameEncoder, utils
+from flask import session
 from uuid import uuid4
 import json
 
@@ -24,8 +23,8 @@ def get_games():
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 
-    res = []
-    return {"games": res}
+    games = redis_client.json().get('game:1')
+    return {"games": games}
 
 
 @app.route('/games/', methods=['POST'])
@@ -33,15 +32,14 @@ def create_game():
     """Create a rummy game."""
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
-    game = Game()
-    game.addPlayer(session.get('uuid'))
+    if session.get('game_id'):
+        result = redis_client.json().get('game:%d' % session.get('game_id'))
+        print(result)
+        return {"error": {"message": "Already in game"}}, 409
 
-    game_id = game.gameId
-    game_key = f"game:{game_id}"
-    json_game = json.dumps(game, cls=GameEncoder)
-    redis_client.hset(game_key, mapping={"game": json_game})
-    result = {"game_id": game_id}
-    return result
+    game = utils.create_game(session.get('uuid'))
+
+    return game
 
 
 @app.route('/games/<game_id>', methods=['GET'])
@@ -56,6 +54,7 @@ def get_game(game_id):
         return {"error": {"message": "Game does not exist"}}
 
     return {"game": "hi"}
+
 
 @app.route('/games/<game_id>', methods=['POST'])
 def join_game(game_id):
@@ -84,7 +83,7 @@ def join_game(game_id):
     players = []
     for p in game.players:
         print(p)
-        #players.append(p.get('id'))
+        # players.append(p.get('id'))
 
     return {"game": {
         "gameId": game.gameId,
