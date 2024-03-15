@@ -64,32 +64,31 @@ def join_game(game_id):
 
     game_key = f"game:{game_id}"
 
-    if not redis_client.hexists(game_key, 'game'):
+    if not redis_client.exists(game_key, 'game'):
         return {"error": {"message": "Game does not exist"}}, 404
 
     if session.get("in_game") and session.get('game_id') != game_id:
         return {"error": {"message": "Already in game"}}, 404
 
-    result = redis_client.hget(game_key, 'game').decode('utf-8')
-    game = Game().from_json(result)
+    result = utils.join_game(game_key)
 
-    if not session.get('game_id'):
-        game.addPlayer(str(session.get('uuid')))
-        json_game = json.dumps(game, cls=GameEncoder)
-        redis_client.hset(game_key, mapping={"game": json_game})
-        session['game_id'] = str(game.gameId)
-        session['game_player_postion'] = len(game.players) - 1
+    return {result}
 
-    players = []
-    for p in game.players:
-        print(p)
-        # players.append(p.get('id'))
 
-    return {"game": {
-        "gameId": game.gameId,
-        "players": players,
-        "gameState": game.gameState}}
+@app.route('/games/<game_id>', methods=['DELETE'])
+def leave_game(game_id):
+    if session.get('uuid') is None:
+        return {"error": {"message": "You are not logged in"}}
 
+    session['game_id'] = None
+    game_key = f"game:{game_id}"
+    if not redis_client.exists(game_key, 'game'):
+        session['game_id'] = None
+        return {"error": {"message": "Game does not exist"}}, 404
+
+    result = utils.leave_game(game_key)
+
+    return {result}
 
 @app.route('/users/', methods=['GET'])
 def get_user():

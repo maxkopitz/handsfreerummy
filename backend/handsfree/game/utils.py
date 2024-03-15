@@ -26,7 +26,6 @@ def create_game():
     }
 
     # Update user session, assuming this is handled
-    session["game_id"] = index
     redis_client.json().set("game:%d" % index, Path.root_path(), game)
     return game
 
@@ -34,11 +33,20 @@ def create_game():
 def join_game(game_id):
     """Join Rummy Game."""
     game = redis_client.json().get("game:%d" % game_id)
-    game["players"].append({
-        "uuid": "",
+    session["game_id"] = game_id
+    game["players"]["uuid"] = {
         "sid": "",
         "hand": []
-    })
+    }
+    redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
+    return game
+
+
+def leave_game(game_id):
+    """Leave Rummy Game."""
+    game = redis_client.json().get("game:%d" % game_id)
+    session["game_id"] = None
+    game["players"]["uuid"] = None
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
     return game
 
