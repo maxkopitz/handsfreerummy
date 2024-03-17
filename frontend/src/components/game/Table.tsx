@@ -30,8 +30,6 @@ const Table = () => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
     const [game, setGame] = useState<RummyGame>(defaultGame)
-    const [isConnected, setIsConnected] = useState(socket.connected)
-
 
     useEffect(() => {
         const data = JSON.stringify({

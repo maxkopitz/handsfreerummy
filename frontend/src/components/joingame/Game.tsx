@@ -14,6 +14,7 @@ const Game = ({ game, className }: GameProps) => {
     }
     return (
         <tr>
+            <td className={className}>{game.id}</td>
             <td className={className}>{game.players}</td>
             <td className={className}>
                 <Button text={'Join Game'} onClick={handleJoinGame} />
