@@ -1,9 +1,8 @@
 """Handsfree Routes."""
 from handsfree import app, redis_client
 from handsfree.game import Game, GameEncoder, utils
-from flask import session
+from flask import session, request
 from uuid import uuid4
-import json
 
 
 @app.route('/', methods=['GET'])
@@ -11,14 +10,14 @@ def api():
     return {"response": session}
 
 
-@app.route('/register', methods=['GET'])
+@app.route('/register/', methods=['GET'])
 def register():
     if session.get('uuid') is None:
         session['uuid'] = uuid4()
     return {"uuid": session.get('uuid')}
 
 
-@app.route('/games', methods=['GET'])
+@app.route('/games/', methods=['GET'])
 def get_games():
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
@@ -32,51 +31,70 @@ def create_game():
     """Create a rummy game."""
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
+    if request.json.get('action') is None:
+        return {"error": {"message": "Incorrect format"}}
+
     if session.get('game_id'):
         result = redis_client.json().get('game:%d' % session.get('game_id'))
         print(result)
         return {"error": {"message": "Already in game"}}, 409
 
-    game = utils.create_game(session.get('uuid'))
+    game = utils.create_game()
 
     return game
 
 
-@app.route('/games/<game_id>', methods=['GET'])
+@app.route('/games/<game_id>/', methods=['GET'])
 def get_game(game_id):
     """Get a rummy game."""
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 
     game_key = f"game:{game_id}"
+    app.logger.info('%d', game_key)
 
     if not redis_client.exists(game_key):
         return {"error": {"message": "Game does not exist"}}
 
-    return {"game": "hi"}
+    result = redis_client.json().get(game_key)
+    return result
 
 
-@app.route('/games/<game_id>', methods=['POST'])
+@app.route('/games/<game_id>/', methods=['POST'])
 def join_game(game_id):
-    """Join a rummy game"""
+    """Join a rummy game."""
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 
+    action = request.json.get('action')
+    if action is None:
+        return {"error": {"message": "Incorrect format"}}
+
     game_key = f"game:{game_id}"
 
-    if not redis_client.exists(game_key, 'game'):
+    if not redis_client.exists(game_key):
         return {"error": {"message": "Game does not exist"}}, 404
 
-    if session.get("in_game") and session.get('game_id') != game_id:
-        return {"error": {"message": "Already in game"}}, 404
+    if action == 'join':
+        if session.get("in_game") and session.get('game_id') != game_id:
+            return {"error": {"message": "Already in game"}}, 404
 
-    result = utils.join_game(game_key)
+        result = utils.join_game(game_id)
 
-    return {result}
+        return result
 
+    if action == 'leave':
+        if session.get("in_game") == False and session.get('game_id') is None:
+            return {"error": {"message": "Not in a game"}}, 404
 
-@app.route('/games/<game_id>', methods=['DELETE'])
+        result = utils.leave_game(game_id)
+        app.logger.info('test')
+
+        return result
+
+@app.route('/games/<game_id>/', methods=['DELETE'])
 def leave_game(game_id):
+    """Leave a rummy game."""
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 

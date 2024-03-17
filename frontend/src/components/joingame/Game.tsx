@@ -10,7 +10,7 @@ interface GameProps {
 const Game = ({ game, className }: GameProps) => {
     const navigate = useNavigate()
     const handleJoinGame = () => {
-        navigate('/game')
+        navigate('/games/' + game.id)
     }
     return (
         <tr>

@@ -11,9 +11,7 @@ import CreateGame from './game/CreateGame'
 const MainMenu = () => {
     const { dispatch } = useModal();
     useEffect(() => {
-        axiosInstance.get(`register`).then((res) => {
-            console.log(res.data)
-        });
+        axiosInstance.get(`register`).then((res) => {});
     }, [])
     return (
         <Container>

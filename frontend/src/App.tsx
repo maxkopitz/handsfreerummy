@@ -12,7 +12,7 @@ const router = createBrowserRouter([
         element: <MainMenu />,
     },
     {
-        path: 'game',
+        path: 'games/:gameId',
         element: <Table />,
     },
     {

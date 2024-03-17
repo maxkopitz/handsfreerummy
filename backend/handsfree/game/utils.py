@@ -4,9 +4,14 @@ from redis.commands.search.field import TextField, NumericField, TagField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 from redis.commands.search.query import NumericFilter, Query
 from flask import session
+import sys
 
 KEY_INDEX = 'games_index'
 
+def get_game(game_id):
+    game_id = int(game_id)
+    game = redis_client.json().get("game:%d" % game_id)
+    return game
 
 def create_game():
     """Create Rummy Game."""
@@ -18,7 +23,7 @@ def create_game():
             "game_id": index,
             "owner": str(session.get('uuid')),
             "max_players": 4,
-            "players": [],
+            "players": {},
             "turn_counter": 0,
             "melds": [],
             "game_state": "lobby"
@@ -32,10 +37,13 @@ def create_game():
 
 def join_game(game_id):
     """Join Rummy Game."""
+    game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
     session["game_id"] = game_id
-    game["players"]["uuid"] = {
-        "sid": "",
+
+    print(game, file=sys.stderr)
+    game["game"]["players"]["uuid"] = {
+        "sid": session.get("sid", None),
         "hand": []
     }
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
@@ -44,9 +52,12 @@ def join_game(game_id):
 
 def leave_game(game_id):
     """Leave Rummy Game."""
+    game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
+
     session["game_id"] = None
-    game["players"]["uuid"] = None
+    game["game"]["players"]["uuid"] = None
+
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
     return game
 
