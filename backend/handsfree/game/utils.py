@@ -1,4 +1,4 @@
-from handsfree import redis_client
+from handsfree import redis_client, socketio
 from redis.commands.json.path import Path
 from flask import session
 from random import shuffle
@@ -99,4 +99,11 @@ def start_game(game_id):
 
     game['state'] = 'started'
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
+
+    for player in game["players"]:
+        data = {
+                "hand": game["players"][player]["hand"],
+                "player_num": 0
+                }
+        print(data)
     return game
