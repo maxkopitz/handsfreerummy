@@ -2,38 +2,46 @@ import { Suit, Value } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
+import { useState } from 'react'
 
-interface HandProps {
+interface PlayerHandProps {
     playerId?: number
-    isPlayer: boolean
     hand: CardType[]
 }
 
-const Hand = ({ playerId, isPlayer, hand }: HandProps) => {
+const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
 
     const handSize = 7
 
-    // if not player - print one card with the number of cards in hand
-    if (!isPlayer) {
-        return (
-            <div className="flex flex-col justify-center item-center w-max">
-                <div className="flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Player {playerId} </h1>
-                </div>
-                <div className={cardClasses}>
-                    <Card
-                        card={{ value: Value.A, suit: Suit.C }}
-                        isBack={!isPlayer}
-                        num={handSize}
-                        isPickup={false}
-                    />
-                </div>
-            </div>
-        )
+    const sorts = ['Sort by Rank', 'Sort by Suit']
+
+    function ToggleSort() {
+        const [sort, setSort] = useState(sorts[0])
+
+        return 'hi'
+        // <div>
+        //     <button
+        //         onClick={()=>useState(sorts[0])}>
+        //         Recruiter
+        //     </button>
+        //     <>
+        //         {/* {active && <RecruiterForm /> } */}
+        //     </>
+        // </div>
+
+        // <div>
+        //     <button
+        //         onClick={()=>setActive(false)}
+        //         type="button">
+        //         Candidate
+        //     </button>
+        //     <>
+        //         {!active && <CandidateForm /> }
+        //     </>
+        // </div>
     }
 
-    // if player - print all players cards in hand:
     return (
         <div className="flex flex-col justify-center item-center w-max">
             <div>
@@ -41,47 +49,49 @@ const Hand = ({ playerId, isPlayer, hand }: HandProps) => {
                     Player {playerId}: {handSize} cards{' '}
                 </h1>
             </div>
+
+            <div className="flex flex-row gap-8"></div>
             <div className={cardClasses}>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
-                        isBack={!isPlayer}
+                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.H }}
-                        isBack={!isPlayer}
+                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.S }}
-                        isBack={!isPlayer}
+                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.D }}
-                        isBack={!isPlayer}
+                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.Q, suit: Suit.S }}
-                        isBack={!isPlayer}
+                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.D }}
-                        isBack={!isPlayer}
+                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.K, suit: Suit.C }}
-                        isBack={!isPlayer}
+                        isBack={!true}
                     />
                 </div>
             </div>
@@ -89,4 +99,4 @@ const Hand = ({ playerId, isPlayer, hand }: HandProps) => {
     )
 }
 
-export default Hand
+export default PlayerHand
