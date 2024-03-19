@@ -19,6 +19,7 @@ def handle_join(data):
     result = redis_client.json().get('game:1')
 
     print('result: ', result, file=sys.stderr)
+    socketio.emit('test')
 
 
 @socketio.on('game-start')
