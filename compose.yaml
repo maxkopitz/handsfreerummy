@@ -17,6 +17,7 @@ services:
       - ./backend:/code
     environment:
       REDIS_URL: 'redis://redis:6379'
+      MONGO_URL: mongodb://root:example@mongo:27017/
       HANDSFREE_SETTINGS: 'secret_config.py'
     depends_on:
         - redis

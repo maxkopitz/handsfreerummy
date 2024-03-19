@@ -17,30 +17,29 @@ const defaultGame: RummyGame = {
     players: [],
     gameState: 'lobby',
 }
+const dummyRuns = [
+    [
+        { value: Value.A, suit: Suit.C },
+        { value: Value.A, suit: Suit.D },
+    ],
+    [{ value: Value.K, suit: Suit.D }],
+    [{ value: Value.J, suit: Suit.C }],
+]
 
 const Table = () => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
     const [game, setGame] = useState<RummyGame>(defaultGame)
-    const [isConnected, setIsConnected] = useState(socket.connected)
-    const dummyRuns = [
-        [
-            { value: Value.A, suit: Suit.C },
-            { value: Value.A, suit: Suit.D },
-        ],
-        [{ value: Value.K, suit: Suit.D }],
-        [{ value: Value.J, suit: Suit.C }],
-    ]
 
-/*    useEffect(() => {
-        const connect = () => {
-            setIsConnected(true)
-        }
-        const disconnect = () => {
-            setIsConnected(false)
-        }
+    useEffect(() => {
+        const data = JSON.stringify({
+            "action": "join"
+        })
         axiosInstance
-            .post<any>('/games/1')
+            .post<any>(
+                '/games/1/', data
+            )
+
             .catch((error: AxiosError) => {
                 console.log(error)
                 navigate('/')
@@ -53,23 +52,35 @@ const Table = () => {
                     players: data.game.players,
                     gameState: data.game.gameState,
                 })
-                socket.connect()
             })
-        socket.on('connect', connect)
-        socket.on('disconenct', disconnect)
 
-        return () => {
-            socket.disconnect()
-        }
     }, [navigate])
-*/
+
+    const handleLeaveGame = () => {
+        axiosInstance
+            .post<any>(
+                '/games/1/',
+                {
+                    data: {
+                        'action': 'leave'
+                    }
+                })
+            .catch((error: AxiosError) => {
+                console.log(error)
+            })
+            .then((res: any) => {
+                navigate('/')
+            })
+
+    }
+
     return (
         <Container>
             <Modal />
             <div className="grid grid-cols-5">
                 <div>
                     <div>
-                        <Button text={'Main Menu'} link={'/'} />
+                        <Button text={'Leave Game'} onClick={handleLeaveGame} />
                     </div>
                     <div>
                         <Button

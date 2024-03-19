@@ -1,22 +1,35 @@
+import { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
+import axiosInstance from '../../api/axiosConfig'
 import { LobbyGame } from '../../Type'
 import Game from './Game'
 
-const tableHeaders = ['Players', '']
+const tableHeaders = ['ID', 'Players', 'Click to Join']
 
-const initalGames: LobbyGame[] = [
-    {
-        id: '1',
-        players: 0,
-        state: 'lobby',
-    },
-]
 const JoinGame = () => {
     const [games, setGames] = useState<LobbyGame[]>([])
+
     useEffect(() => {
-        /* TODO: Socket to listen for new games*/
-        setGames(initalGames)
-    }, [])
+        axiosInstance
+            .get<any>(
+                '/games/'
+            )
+            .catch((error: AxiosError) => {
+                console.log(error)
+            })
+            .then((res: any) => {
+                const { data } = res;
+                const parsedGames: any[] = [];
+                data.games.forEach((game: any) => {
+                    parsedGames.push({
+                        id: game.gameId,
+                        players: 0,
+                        state: game.state,
+                    })
+                })
+                setGames(parsedGames);
+            });
+    }, []);
 
     return (
         <div className="flex flex-col w-1/2 justify-center items-center">

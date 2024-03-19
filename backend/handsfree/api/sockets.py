@@ -1,31 +1,29 @@
-from flask import request, session
-from handsfree import app, redis_client, socketio
-from handsfree.game import Game, GameEncoder
-from flask_socketio import ConnectionRefusedError
-import json
+from flask import session, request
+import sys
+from handsfree import redis_client, socketio
 
 
 @socketio.on('connect')
-def handle_connect(data):
-
-    game_key = f"game:{session.get('game_id')}"
-    if not redis_client.hexists(game_key, 'game'):
-        raise ConnectionRefusedError('Not in game')
-
-    result = redis_client.hget(game_key, 'game').decode('utf-8')
-    game = Game().from_json(result)
-    print(game)
+def handle_connect(sid):
+    """Handle socket connection."""
+    session['sid'] = request.sid
+    print('connected: ', session.get('uuid'), file=sys.stderr)
 
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print('disconnect')
+    del session['sid']
+    print('disconnect: ', session.get('uuid'), file=sys.stderr)
+
+
+@socketio.on('game-join')
+def handle_join(data):
+    result = redis_client.json().get('game:1')
+
+    print('result: ', result, file=sys.stderr)
+    socketio.emit('test')
 
 
 @socketio.on('game-start')
 def handle_start():
-    print(session.get('uuid'), 'requested to start game', session.get('game_id'))
-    game_key = f"game:{session.get('game_id')}"
-    result = redis_client.hget(game_key, 'game').decode('utf-8')
-    game = Game().from_json(result)
-    print(game.gameId)
+    print('starting')

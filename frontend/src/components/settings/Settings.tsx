@@ -21,6 +21,10 @@ const Settings = () => {
     const handleChangeFontWeight = (size: number) => {
         dispatch({ type: 'changeCardFontWeight', size })
     }
+
+    const handleNameChange = (event : any) => {
+        dispatch({ type: 'setDisplayname', value: event.target.value})
+    }
     return (
         <Container>
             <div className="flex flex-col justify-center items-center">
@@ -31,6 +35,12 @@ const Settings = () => {
                     />
                 </div>
                 <div className="justify-center">
+                    <div>
+                        <label className="text-xl">
+                            Display Name
+                        </label>
+                        <input type="text" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={profile.displayName} onChange={handleNameChange} />
+                    </div>
                     <h2 className="text-xl">Change Card Size</h2>
                     <div className="flex flex-row">
                         <Button

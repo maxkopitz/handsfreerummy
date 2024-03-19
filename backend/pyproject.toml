@@ -12,7 +12,9 @@ dependencies = [
     "flask-socketio",
     "flask-redis",
     "redis[hiredis]",
-    "Flask-Session"
+    "Flask-Session",
+    "pymongo",
+    "Flask-PyMongo"
 ]
 requires-python = ">=3.8"
 

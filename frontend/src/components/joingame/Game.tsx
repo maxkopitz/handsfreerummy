@@ -10,10 +10,11 @@ interface GameProps {
 const Game = ({ game, className }: GameProps) => {
     const navigate = useNavigate()
     const handleJoinGame = () => {
-        navigate('/game')
+        navigate('/games/' + game.id)
     }
     return (
         <tr>
+            <td className={className}>{game.id}</td>
             <td className={className}>{game.players}</td>
             <td className={className}>
                 <Button text={'Join Game'} onClick={handleJoinGame} />

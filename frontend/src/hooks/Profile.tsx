@@ -7,6 +7,7 @@ interface Settings {
 }
 interface Profile {
     settings: Settings
+    displayName: string
 }
 
 const initialState: Profile = {
@@ -14,7 +15,8 @@ const initialState: Profile = {
         color: 'black',
         cardSize: 2,
         cardFontWeight: 1,
-    }
+    },
+    displayName: 'me'
 }
 
 const ProfileContext = createContext<{
@@ -49,6 +51,7 @@ type Action =
     | { type: 'changeCardSize'; size: number }
     | { type: 'changeColor'; color: string }
     | { type: 'changeCardFontWeight'; size: number }
+    | { type: 'setDisplayname'; value: string }
 
 const profileReducer = (state: any, action: Action) => {
     switch (action.type) {
@@ -58,6 +61,8 @@ const profileReducer = (state: any, action: Action) => {
             return { ...state, settings: { ...state.settings, cardFontWeight: action.size } }
         case 'changeColor':
             return { ...state, settings: { ...state.settings, color: action.color } }
+        case 'setDisplayname':
+            return { ...state, displayName: action.value }
         default:
             return state
     }
