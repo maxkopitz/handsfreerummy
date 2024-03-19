@@ -82,11 +82,14 @@ def handle_game_action(game_id):
         if session.get("in_game") and session.get('game_id') != game_id:
             return {"error": {"message": "Already in game"}}, 404
 
+        if session.get('sid') is None:
+            return {"error": {"message": "No socket"}}, 404
         result = utils.join_game(game_id)
 
-        return result
+        return {"game": result}
 
     if action == 'leave':
+        # TODO FIX
         if session.get("in_game") is False and session.get('game_id') is None:
             return {"error": {"message": "Not in a game"}}, 404
 

@@ -5,6 +5,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProfileProvider } from './hooks/Profile'
 import { GameProvider } from './hooks/Game'
 import { ModalProvider } from './hooks/Modal'
+import { useEffect } from 'react'
+import { socket } from './api/socket'
 
 const router = createBrowserRouter([
     {
@@ -21,6 +23,12 @@ const router = createBrowserRouter([
     },
 ])
 const App = () => {
+    useEffect(() => {
+        socket.on('connect', () => {
+            console.log('Connected')
+        });
+
+    }, []);
     return (
         <div className="h-screen bg-gradient-to-b from-gray-100 to-gray-300">
             <ProfileProvider>
