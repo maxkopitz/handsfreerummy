@@ -20,6 +20,7 @@ CORS(app,
 
 socketio = SocketIO(
     app,
+    message_queue="redis://",
     manage_session=False,
     cors_allowed_origins=app.config['CLIENT_URL'])
 

@@ -1,4 +1,4 @@
-import Container from '../ui/Container'
+
 import Board from './Board'
 import { RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
@@ -15,6 +15,7 @@ import OpponentHand from './OpponentHand'
 import PlayerHand from './PlayerHand'
 import { CardType } from '../../Type'
 import Card from './Card'
+import Container from '../ui/Container'
 
 const defaultGame: RummyGame = {
     gameId: '-1',
@@ -127,12 +128,13 @@ const Table = () => {
 
                 <div className="col-start-5">
                     <h1>Discard</h1>
-                    <Card card={discard} />
+
+                    <Card card={{ suit: Suit.C, value: Value.A }} />
                 </div>
 
                 <div className="col-start-6">
                     <h1>Pickup</h1>
-                    <Card card={discard} isBack={true} isPickup={true} />
+                    <Card card={{ suit: Suit.C, value: Value.A }} isBack={true} isPickup={true} />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">

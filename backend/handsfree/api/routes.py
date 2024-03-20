@@ -1,8 +1,7 @@
 """Handsfree Routes."""
-from handsfree import app, redis_client
-from handsfree.game import Game, GameEncoder, utils
+from handsfree import app, redis_client, socketio
+from handsfree.game import utils
 from flask import session, request
-from uuid import uuid4
 
 
 @app.route('/', methods=['GET'])
