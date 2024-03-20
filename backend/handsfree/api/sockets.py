@@ -31,9 +31,15 @@ def handle_disconnect():
 
 
 @socketio.on('player-joined')
-def handle_join():
-    print('joined: ', session.get('uuid'), file=sys.stderr)
-    socketio.emit('player-join')
+def handle_join(json):
+    data = {
+            "action": "player-joined",
+            "data": {
+                "player": str(session.get('uuid')),
+                "displayName": json.get('display-name')
+                }
+            }
+    socketio.emit('player-join', data)
 
 
 @socketio.on('game-start')

@@ -84,6 +84,7 @@ def handle_game_action(game_id):
 
         if session.get('sid') is None:
             return {"error": {"message": "No socket"}}, 404
+
         result = utils.join_game(game_id)
 
         return {"game": result}
@@ -99,13 +100,6 @@ def handle_game_action(game_id):
     if action == 'start':
         result = utils.start_game(game_id)
         return result
-
-
-@app.route('/broadcast/', methods=['GET'])
-def broadcast():
-    """Broadcast."""
-    data = {"action": "joined-game"}
-    emit('joined-game', data, broadcast=True)
 
 
 @app.route('/users/', methods=['GET'])
