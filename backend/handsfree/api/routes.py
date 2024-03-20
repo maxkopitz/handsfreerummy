@@ -1,7 +1,8 @@
 """Handsfree Routes."""
-from handsfree import app, redis_client, socketio
+from handsfree import app, redis_client
 from handsfree.game import utils
 from flask import session, request
+from uuid import uuid4
 
 
 @app.route('/', methods=['GET'])
@@ -40,7 +41,7 @@ def create_game():
 
     game = utils.create_game()
 
-    return game
+    return {"game": game}
 
 
 @app.route('/games/<game_id>/', methods=['GET'])
@@ -98,6 +99,13 @@ def handle_game_action(game_id):
     if action == 'start':
         result = utils.start_game(game_id)
         return result
+
+
+@app.route('/broadcast/', methods=['GET'])
+def broadcast():
+    """Broadcast."""
+    data = {"action": "joined-game"}
+    emit('joined-game', data, broadcast=True)
 
 
 @app.route('/users/', methods=['GET'])

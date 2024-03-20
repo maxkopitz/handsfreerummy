@@ -58,6 +58,7 @@ const Table = () => {
                 socket.on('player-join', (data: any) => {
                     console.log(data)
                 })
+                socket.emit('player-joined')
             })
     }, [navigate])
 
