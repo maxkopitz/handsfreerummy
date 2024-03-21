@@ -1,6 +1,6 @@
 """Handsfree Routes."""
 from handsfree import app, redis_client
-from handsfree.game import Game, GameEncoder, utils
+from handsfree.game import utils
 from flask import session, request
 from uuid import uuid4
 
@@ -41,7 +41,7 @@ def create_game():
 
     game = utils.create_game()
 
-    return game
+    return {"game": game}
 
 
 @app.route('/games/<game_id>/', methods=['GET'])
@@ -84,6 +84,7 @@ def handle_game_action(game_id):
 
         if session.get('sid') is None:
             return {"error": {"message": "No socket"}}, 404
+
         result = utils.join_game(game_id)
 
         return {"game": result}

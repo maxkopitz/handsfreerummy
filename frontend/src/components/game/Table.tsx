@@ -1,4 +1,4 @@
-import Container from '../ui/Container'
+
 import Board from './Board'
 import { RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
@@ -15,6 +15,7 @@ import OpponentHand from './OpponentHand'
 import PlayerHand from './PlayerHand'
 import { CardType } from '../../Type'
 import Card from './Card'
+import Container from '../ui/Container'
 
 const defaultGame: RummyGame = {
     gameId: '-1',
@@ -48,7 +49,6 @@ const Table = () => {
             })
             .then((res: any) => {
                 const { data } = res
-                console.log(data.game)
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
@@ -56,6 +56,11 @@ const Table = () => {
                 })
                 socket.on('player-join', (data: any) => {
                     console.log(data)
+                })
+                socket.emit('player-joined', { 'displayName': 'test'})
+
+                socket.on(SocketEvents.GAME_START, () => {
+
                 })
             })
     }, [navigate])
