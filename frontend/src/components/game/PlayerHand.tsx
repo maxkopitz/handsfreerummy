@@ -35,9 +35,8 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
                 return a.suit.localeCompare(b.suit);
             }
         });
-        hand.sort
         setSortedCards(sorted);
-        
+
     };
 
     // const sorts = ['Sort by Rank', 'Sort by Suit']
@@ -64,7 +63,7 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
     //                 <>
     //                     {sort == sorts[0] && <CandidateForm /> }
     //                 </>
-    //             </div> 
+    //             </div>
     //         </div>
     //     )
     // }
@@ -87,15 +86,15 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
                             <Card
                                 key={index}
                                 card={card}
-                                isBack={!true}                                
+                                isBack={!true}
                             />
                         </div>
                     ))}
-                        
+
                 </div>
             </div>
 
-            
+
             {/* <div className={cardClasses}>
                 <div className="m-2">
                     <Card
