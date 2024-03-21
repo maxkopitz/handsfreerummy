@@ -127,12 +127,12 @@ const Table = () => {
 
                 <div className="col-start-5">
                     <h1>Discard</h1>
-                    <Card card={discard} />
+                    {/* <Card card={discard} /> */}
                 </div>
 
                 <div className="col-start-6">
                     <h1>Pickup</h1>
-                    <Card card={discard} isBack={true} isPickup={true} />
+                    {/* <Card card={discard} isBack={true} isPickup={true} /> */}
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">
