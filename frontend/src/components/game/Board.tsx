@@ -9,14 +9,7 @@ interface BoardProps {
 const Board = ({ discard, playedRuns }: BoardProps) => {
     return (
         <div className="flex flex-row items-center justify-center width-screen">
-            <div className="col-start-3 flex flex-col items-center justify-center p-5">
-                <h1>Discard</h1>
-                <Card card={discard} />
-            </div>
-            <div className="col-start-4 flex flex-col items-center justify-center p-5">
-                <h1>Pickup</h1>
-                <Card card={discard} isBack={true} isPickup={true} />
-            </div>
+            
         </div>
     )
 }

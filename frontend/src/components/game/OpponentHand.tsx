@@ -1,6 +1,7 @@
 import { Suit, Value } from '../../Type'
 import Card from './Card'
 import classNames from 'classnames'
+import OpponentCard from './OpponentCard'
 
 interface OpponentHandProps {
     playerId?: number
@@ -18,12 +19,7 @@ const OpponentHand = ({ playerId, cardCount }: OpponentHandProps) => {
                 <h1 className="text-xl font-bold">Player {playerId} </h1>
             </div>
             <div className={cardClasses}>
-                <Card
-                    card={{ value: Value.A, suit: Suit.C }}
-                    isBack={!false}
-                    num={handSize}
-                    isPickup={false}
-                />
+                <OpponentCard num = {cardCount} />
             </div>
         </div>
     )

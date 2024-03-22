@@ -12,9 +12,12 @@ import { AxiosError } from 'axios'
 import { socket, SocketEvents } from '../../api/socket'
 import OpponentHand from './OpponentHand'
 import PlayerHand from './PlayerHand'
+import { CardType } from '../../Type'
+import Card from './Card'
+import CardBack from './CardBack'
 import Container from '../ui/Container'
 
-interface TableProps  {
+interface TableProps {
     game: RummyGame
 }
 
@@ -27,8 +30,7 @@ const dummyRuns = [
     [{ value: Value.J, suit: Suit.C }],
 ]
 
-
-const Table = ( { game } : TableProps ) => {
+const Table = ({ game }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
 
     return (
@@ -36,7 +38,7 @@ const Table = ( { game } : TableProps ) => {
             <Modal />
             <div className="grid grid-cols-5">
                 <div>
-                   <div>
+                    <div>
                         <Button
                             text={'Settings'}
                             onClick={() =>
@@ -77,15 +79,14 @@ const Table = ( { game } : TableProps ) => {
                 <div className="col-start-4">
                     <OpponentHand playerId={3} cardCount={7} />
                 </div>
-
-                <div className="col-start-5">
-                    <h1>Discard</h1>
-                    {/* <Card card={discard} /> */}
+                <div className="col-start-5 flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold">Discard</h1>
+                    <Card card={{ value: Value.J, suit: Suit.C }} />
                 </div>
 
-                <div className="col-start-6">
-                    <h1>Pickup</h1>
-                    {/* <Card card={discard} isBack={true} isPickup={true} /> */}
+                <div className="col-start-6 flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold">Pickup</h1>
+                    <CardBack />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">

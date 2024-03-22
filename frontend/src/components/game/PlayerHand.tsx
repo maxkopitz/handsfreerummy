@@ -86,7 +86,6 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
                             <Card
                                 key={index}
                                 card={card}
-                                isBack={!true}
                             />
                         </div>
                     ))}
@@ -94,51 +93,6 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
                 </div>
             </div>
 
-
-            {/* <div className={cardClasses}>
-                <div className="m-2">
-                    <Card
-                        card={hand[0]}
-                        isBack={!true}
-                    />
-                </div>
-                <div className="m-2">
-                    <Card
-                        card={hand[1]}
-                        isBack={!true}
-                    />
-                </div>
-                <div className="m-2">
-                    <Card
-                        card={hand[2]}
-                        isBack={!true}
-                    />
-                </div>
-                <div className="m-2">
-                    <Card
-                        card={hand[3]}
-                        isBack={!true}
-                    />
-                </div>
-                <div className="m-2">
-                    <Card
-                        card={hand[4]}
-                        isBack={!true}
-                    />
-                </div>
-                <div className="m-2">
-                    <Card
-                        card={hand[5]}
-                        isBack={!true}
-                    />
-                </div>
-                <div className="m-2">
-                    <Card
-                        card={hand[6]}
-                        isBack={!true}
-                    />
-                </div>
-            </div> */}
         </div>
     )
 }
