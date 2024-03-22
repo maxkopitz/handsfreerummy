@@ -50,6 +50,7 @@ def get_game(game_id):
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 
+    game_id = int(game_id)
     game_key = f"game:{game_id}"
     app.logger.info('%d', game_key)
 
@@ -62,6 +63,7 @@ def get_game(game_id):
 
 @app.route('/games/<game_id>/', methods=['POST'])
 def handle_game_action(game_id):
+    game_id = int(game_id)
     """Handle action for a rummy game."""
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
