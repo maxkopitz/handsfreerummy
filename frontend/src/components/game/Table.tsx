@@ -1,7 +1,6 @@
 import Board from './Board'
 import { RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
-import Modal from '../ui/Modal'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
 import Tutorial from '../tutorial/Tutorial'
@@ -47,7 +46,6 @@ const Table = ({ game }: TableProps) => {
     }
     return (
         <Container>
-            <Modal />
             <div className="grid grid-cols-5">
                 <div>
                     <div>

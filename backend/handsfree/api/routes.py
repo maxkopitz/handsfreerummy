@@ -14,7 +14,13 @@ def api():
 def register():
     if session.get('uuid') is None:
         session['uuid'] = uuid4()
-    return {"uuid": session.get('uuid')}
+    response = {
+            "redirect": "/"
+            }
+    if session.get('game_id'):
+        game_id = session.get('game_id')
+        response["redirect"] = f"games/{game_id}/"
+    return response
 
 
 @app.route('/games/', methods=['GET'])
@@ -76,14 +82,11 @@ def handle_game_action(game_id):
         # Extra clean up
         if int(game_id) == session.get('game_id'):
             del session['game_id']
-        return {"error": {"message": "Game does not exist"}}, 404
+        return {"error": {"message": "Game does not exist"}}, 403
 
     if action == 'join':
         if session.get("in_game") and session.get('game_id') != game_id:
-            return {"error": {"message": "Already in game"}}, 404
-
-        if session.get('sid') is None:
-            return {"error": {"message": "No socket"}}, 404
+            return {"error": {"message": "Already in game"}}, 403
 
         result = utils.join_game(game_id)
 
