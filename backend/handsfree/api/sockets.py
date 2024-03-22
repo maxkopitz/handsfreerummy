@@ -36,12 +36,19 @@ def handle_join(json):
             "action": "player-joined",
             "data": {
                 "player": str(session.get('uuid')),
-                "displayName": json.get('display-name')
+                "displayName": json.get('displayName')
                 }
             }
     socketio.emit('player-join', data)
 
 
 @socketio.on('game-start')
-def handle_start():
-    print('starting')
+def handle_start(json):
+    # Check if game exists
+    # Check if game has started
+    # Check if user who sent is in the game
+    # LATER Check if user who sent is the game owner
+    # LATER Check if game has enough players (2 for now)
+    # Send game-started to all players with individuals hands  
+
+    print(json, file=sys.stderr)
