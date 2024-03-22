@@ -1,16 +1,21 @@
-import Container from '../ui/Container'
+
 import Board from './Board'
-import Hand from './Hand'
 import { RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
 import Modal from '../ui/Modal'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
+import Tutorial from '../tutorial/Tutorial'
 import { useEffect, useState } from 'react'
 import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
 import { socket, SocketEvents } from '../../api/socket'
+import OpponentHand from './OpponentHand'
+import PlayerHand from './PlayerHand'
+import { CardType } from '../../Type'
+import Card from './Card'
+import Container from '../ui/Container'
 
 const defaultGame: RummyGame = {
     gameId: '-1',
@@ -33,12 +38,10 @@ const Table = () => {
 
     useEffect(() => {
         const data = JSON.stringify({
-            "action": "join"
+            action: 'join',
         })
         axiosInstance
-            .post<any>(
-                '/games/1/', data
-            )
+            .post<any>('/games/1/', data)
 
             .catch((error: AxiosError) => {
                 console.log(error)
@@ -46,32 +49,35 @@ const Table = () => {
             })
             .then((res: any) => {
                 const { data } = res
-                console.log(data.game)
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
                     gameState: data.game.gameState,
                 })
-            })
+                socket.on('player-join', (data: any) => {
+                    console.log(data)
+                })
+                socket.emit('player-joined', { 'displayName': 'test'})
 
+                socket.on(SocketEvents.GAME_START, () => {
+
+                })
+            })
     }, [navigate])
 
     const handleLeaveGame = () => {
         axiosInstance
-            .post<any>(
-                '/games/1/',
-                {
-                    data: {
-                        'action': 'leave'
-                    }
-                })
+            .post<any>('/games/1/', {
+                data: {
+                    action: 'leave',
+                },
+            })
             .catch((error: AxiosError) => {
                 console.log(error)
             })
             .then((res: any) => {
                 navigate('/')
             })
-
     }
 
     return (
@@ -96,16 +102,44 @@ const Table = () => {
                             }
                         />
                     </div>
+                    <div>
+                        <Button
+                            text={'Tutorial'}
+                            onClick={() =>
+                                dispatchModal({
+                                    type: 'showModal',
+                                    modal: {
+                                        title: 'Tutorial',
+                                        component: <Tutorial />,
+                                    },
+                                })
+                            }
+                        />
+                    </div>
                 </div>
+
                 <div className="col-start-2">
-                    <Hand isPlayer={false} playerId={1} hand={[]} />
+                    <OpponentHand playerId={1} cardCount={7} />
                 </div>
+
                 <div className="col-start-3">
-                    <Hand isPlayer={false} playerId={2} hand={[]} />
+                    <OpponentHand playerId={2} cardCount={7} />
                 </div>
+
                 <div className="col-start-4">
-                    <Hand isPlayer={false} playerId={3} hand={[]} />
+                    <OpponentHand playerId={3} cardCount={7} />
                 </div>
+
+                <div className="col-start-5">
+                    <h1>Discard</h1>
+                    {/* <Card card={discard} /> */}
+                </div>
+
+                <div className="col-start-6">
+                    <h1>Pickup</h1>
+                    {/* <Card card={discard} isBack={true} isPickup={true} /> */}
+                </div>
+
                 <div className="mb-20 mt-20 col-span-3">
                     <Board
                         playedRuns={dummyRuns}
@@ -116,7 +150,7 @@ const Table = () => {
                     <h2 className="text-lg font-semibold">Melds</h2>
                 </div>
                 <div className="col-start-2 col-span-3">
-                    <Hand isPlayer={true} playerId={4} hand={[]} />
+                    <PlayerHand playerId={4} hand={[]} />
                 </div>
             </div>
         </Container>
