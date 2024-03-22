@@ -1,5 +1,4 @@
 import MainMenu from './components/MainMenu'
-import Table from './components/game/Table'
 import About from './components/About'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ProfileProvider } from './hooks/Profile'
@@ -7,6 +6,7 @@ import { GameProvider } from './hooks/Game'
 import { ModalProvider } from './hooks/Modal'
 import { useEffect } from 'react'
 import { socket } from './api/socket'
+import Game from './components/game/Game'
 
 const router = createBrowserRouter([
     {
@@ -15,7 +15,7 @@ const router = createBrowserRouter([
     },
     {
         path: 'games/:gameId',
-        element: <Table />,
+        element: <Game />,
     },
     {
         path: 'about',

@@ -1,4 +1,3 @@
-
 import Board from './Board'
 import { RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
@@ -13,15 +12,8 @@ import { AxiosError } from 'axios'
 import { socket, SocketEvents } from '../../api/socket'
 import OpponentHand from './OpponentHand'
 import PlayerHand from './PlayerHand'
-import { CardType } from '../../Type'
-import Card from './Card'
 import Container from '../ui/Container'
 
-const defaultGame: RummyGame = {
-    gameId: '-1',
-    players: [],
-    gameState: 'lobby',
-}
 const dummyRuns = [
     [
         { value: Value.A, suit: Suit.C },
@@ -34,7 +26,7 @@ const dummyRuns = [
 const Table = () => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
-    const [game, setGame] = useState<RummyGame>(defaultGame)
+    const [game, setGame] = useState<RummyGame>()
 
     useEffect(() => {
         const data = JSON.stringify({
