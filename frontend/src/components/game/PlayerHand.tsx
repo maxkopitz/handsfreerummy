@@ -16,16 +16,6 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
 
     const handSize = 7
 
-    hand = [
-        { value: Value.A, suit: Suit.C },
-        { value: Value.Seven, suit: Suit.H },
-        { value: Value.Eight, suit: Suit.C },
-        { value: Value.K, suit: Suit.S },
-        { value: Value.Four, suit: Suit.H },
-        { value: Value.Two, suit: Suit.D },
-        { value: Value.Seven, suit: Suit.C },
-    ]
-
     const [sortedCards, setSortedCards] = useState([...hand])
 
     const sortCards = () => {

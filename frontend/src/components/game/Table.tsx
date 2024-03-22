@@ -10,6 +10,9 @@ import PlayerHand from './PlayerHand'
 import Card from './Card'
 import CardBack from './CardBack'
 import Container from '../ui/Container'
+import axiosInstance from '../../api/axiosConfig'
+import { AxiosError } from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 interface TableProps {
     game: RummyGame
@@ -26,7 +29,22 @@ const dummyRuns = [
 
 const Table = ({ game }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
+    const navigate = useNavigate()
 
+    const handleLeaveGame = () => {
+        const data = JSON.stringify({
+            action: 'leave',
+        })
+        axiosInstance
+            .post<any>('/games/' + game.gameId + '/', data)
+            .catch((error: AxiosError) => {
+                console.log(error)
+            })
+            .then((res: any) => {
+                console.log(res)
+                navigate('/')
+            })
+    }
     return (
         <Container>
             <Modal />
@@ -59,6 +77,7 @@ const Table = ({ game }: TableProps) => {
                                 })
                             }
                         />
+                        <Button text={'Leave Game'} onClick={handleLeaveGame} />
                     </div>
                 </div>
 
@@ -93,7 +112,7 @@ const Table = ({ game }: TableProps) => {
                     <h2 className="text-lg font-semibold">Melds</h2>
                 </div>
                 <div className="col-start-2 col-span-3">
-                    <PlayerHand playerId={4} hand={[]} />
+                    <PlayerHand playerId={4} hand={game.playerCards} />
                 </div>
             </div>
         </Container>

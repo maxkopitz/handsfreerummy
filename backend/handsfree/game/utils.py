@@ -5,9 +5,9 @@ from random import shuffle
 
 GAME_KEY_INDEX = 'games_index'
 ACTIVE_GAMES = 'active_games'
-suits = ["Heart", "Diamond", "Club", "Spade"]
-values = ["2", "3", "4", "5", "6", "7", "8",
-          "9", "10", "Jack", "Queen", "King", "Ace"]
+suits = ["hearts", "diamonds", "clubs", "spades"]
+values = ["A", "2", "3", "4", "5", "6", "7", "8",
+          "9", "10", "J", "Q", "K"]
 
 
 def get_game(game_id):
@@ -97,7 +97,7 @@ def start_game(game_id):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
 
-    game['state'] = 'started'
+    game['gameState'] = 'in-game'
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
     for player in game["players"]:

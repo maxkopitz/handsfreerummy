@@ -15,7 +15,7 @@ const Game = () => {
     const { gameId } = useParams()
     const [game, setGame] = useState<RummyGame>({
         gameId: '1',
-        gameState: 'lobby',
+        gameState: '',
         players: [],
         playerCards: [],
     })
@@ -49,13 +49,14 @@ const Game = () => {
                 socket.on(SocketEvents.GAME_START, (data: any) => {
                     console.log(data)
 
-                    const cards: CardType[] = [{ suit: Suit.C, value: Value.A }]
-                    // data.data.playerCards.forEach((tmp) => {
-                    //     cards.push({
-                    //         suit: tmp.
-                    //         value:
-                    //     })
-                    // })
+                    const cards: CardType[] = []
+                    data.data.hand.forEach((tmp: any) => {
+                        console.log(tmp)
+                        cards.push({
+                            suit: tmp.suit,
+                            value: tmp.value,
+                        })
+                    })
                     setGame({
                         ...game,
                         playerCards: cards,
