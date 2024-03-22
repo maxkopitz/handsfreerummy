@@ -105,5 +105,4 @@ def start_game(game_id):
                 "hand": game["players"][player]["hand"],
                 "player_num": 0
                 }
-        print(data)
     return game

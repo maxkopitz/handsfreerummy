@@ -1,17 +1,24 @@
-import { AxiosError } from 'axios';
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axiosInstance from '../../api/axiosConfig';
-import { socket, SocketEvents } from '../../api/socket';
-import { RummyGame } from '../../Type';
+import { AxiosError } from 'axios'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import axiosInstance from '../../api/axiosConfig'
+import { socket, SocketEvents } from '../../api/socket'
+import { CardType, RummyGame, Suit, Value } from '../../Type'
 import Container from '../ui/Container'
-import Lobby from './Lobby';
-import Table from './Table';
+import Lobby from './Lobby'
+import Table from './Table'
+import { useProfile } from '../../hooks/Profile'
 
 const Game = () => {
     const navigate = useNavigate()
-    const { gameId } = useParams();
-    const [game, setGame] = useState<RummyGame>()
+    const { profile } = useProfile()
+    const { gameId } = useParams()
+    const [game, setGame] = useState<RummyGame>({
+        gameId: '1',
+        gameState: 'lobby',
+        players: [],
+        playerCards: [],
+    })
 
     useEffect(() => {
         const data = JSON.stringify({
@@ -30,36 +37,54 @@ const Game = () => {
                     gameId: data.game.gameId,
                     players: data.game.players,
                     gameState: data.game.gameState,
-                    playerCards: []
+                    playerCards: [],
                 })
                 socket.on('player-join', (data: any) => {
-                    console.log(data)
+                    console.log(data.data.displayName, 'has joined')
                 })
-                socket.emit('player-joined', { 'displayName': 'test' })
-
-                socket.on(SocketEvents.JOIN_GAME, () => {
-
+                socket.emit('player-joined', {
+                    displayName: profile.displayName,
                 })
 
                 socket.on(SocketEvents.GAME_START, (data: any) => {
-                    console.log(data);
+                    console.log(data)
+
+                    const cards: CardType[] = [{ suit: Suit.C, value: Value.A }]
+                    // data.data.playerCards.forEach((tmp) => {
+                    //     cards.push({
+                    //         suit: tmp.
+                    //         value:
+                    //     })
+                    // })
+                    setGame({
+                        ...game,
+                        playerCards: cards,
+                        gameState: 'in-game',
+                    })
                 })
             })
+
+        return () => {
+            socket.off('player-join')
+            socket.off(SocketEvents.GAME_START)
+        }
     }, [navigate])
 
-    if (game?.gameState === "lobby") {
+    useEffect(() => {
+        console.log(game)
+    }, [game])
+
+    if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
     }
-    if (game?.gameState === "in-game") {
-        <Table game={game} />
+    if (game?.gameState === 'in-game') {
+        return <Table game={game} />
     }
     return (
         <Container>
             <h1>Loading...</h1>
         </Container>
     )
-
-
 }
 
-export default Game;
+export default Game

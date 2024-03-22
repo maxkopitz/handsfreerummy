@@ -3,6 +3,7 @@ import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
 import { useState } from 'react'
+import Button from '../ui/Button'
 // import { supports } from 'localforage'
 
 interface PlayerHandProps {
@@ -25,19 +26,18 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
         { value: Value.Seven, suit: Suit.C },
     ]
 
-    const [sortedCards, setSortedCards] = useState([...hand]);
+    const [sortedCards, setSortedCards] = useState([...hand])
 
     const sortCards = () => {
         const sorted = [...sortedCards].sort((a, b) => {
             if (a.suit === b.suit) {
-                return ValueOrder.indexOf(a.value) - ValueOrder.indexOf(b.value);
+                return ValueOrder.indexOf(a.value) - ValueOrder.indexOf(b.value)
             } else {
-                return SuitOrder.indexOf(a.suit) - SuitOrder.indexOf(b.suit);
+                return SuitOrder.indexOf(a.suit) - SuitOrder.indexOf(b.suit)
             }
-        });
-        setSortedCards(sorted);
-
-    };
+        })
+        setSortedCards(sorted)
+    }
 
     // const sorts = ['Sort by Rank', 'Sort by Suit']
 
@@ -79,20 +79,15 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
             <div className="flex flex-row gap-8"></div>
 
             <div>
-                <button onClick={sortCards}>Sort Cards</button>
+                <Button text={'Sort Cards'} onClick={sortCards}></Button>
                 <div className={cardClasses}>
                     {sortedCards.map((card, index) => (
                         <div className="m-2">
-                            <Card
-                                key={index}
-                                card={card}
-                            />
+                            <Card key={index} card={card} />
                         </div>
                     ))}
-
                 </div>
             </div>
-
         </div>
     )
 }
