@@ -1,4 +1,4 @@
-import { Suit, Value } from '../../Type'
+import { Suit, Value, ValueOrder, SuitOrder } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
@@ -30,9 +30,9 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
     const sortCards = () => {
         const sorted = [...sortedCards].sort((a, b) => {
             if (a.suit === b.suit) {
-                return Number(b.value) - Number(a.value);
+                return ValueOrder.indexOf(a.value) - ValueOrder.indexOf(b.value);
             } else {
-                return a.suit.localeCompare(b.suit);
+                return SuitOrder.indexOf(a.suit) - SuitOrder.indexOf(b.suit);
             }
         });
         setSortedCards(sorted);
