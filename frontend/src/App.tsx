@@ -27,7 +27,9 @@ const App = () => {
         socket.on('connect', () => {
             console.log('Connected')
         });
-
+        socket.on('disconnect', () => {
+            console.log('Disconnect')
+        });
     }, []);
     return (
         <div className="h-screen bg-gradient-to-b from-gray-100 to-gray-300">

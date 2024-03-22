@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../../api/axiosConfig';
 import { socket, SocketEvents } from '../../api/socket';
 import { RummyGame } from '../../Type';
@@ -10,6 +10,7 @@ import Table from './Table';
 
 const Game = () => {
     const navigate = useNavigate()
+    const { gameId } = useParams();
     const [game, setGame] = useState<RummyGame>()
 
     useEffect(() => {
@@ -17,7 +18,7 @@ const Game = () => {
             action: 'join',
         })
         axiosInstance
-            .post<any>('/games/1/', data)
+            .post<any>('/games/' + gameId + '/', data)
 
             .catch((error: AxiosError) => {
                 console.log(error)
@@ -29,6 +30,7 @@ const Game = () => {
                     gameId: data.game.gameId,
                     players: data.game.players,
                     gameState: data.game.gameState,
+                    playerCards: []
                 })
                 socket.on('player-join', (data: any) => {
                     console.log(data)
@@ -38,17 +40,26 @@ const Game = () => {
                 socket.on(SocketEvents.JOIN_GAME, () => {
 
                 })
+
+                socket.on(SocketEvents.GAME_START, (data: any) => {
+                    console.log(data);
+                })
             })
     }, [navigate])
 
     if (game?.gameState === "lobby") {
-        return <Lobby />
+        return <Lobby game={game} />
     }
-
+    if (game?.gameState === "in-game") {
+        <Table game={game} />
+    }
     return (
-        <Table />
-
+        <Container>
+            <h1>Loading...</h1>
+        </Container>
     )
+
+
 }
 
 export default Game;

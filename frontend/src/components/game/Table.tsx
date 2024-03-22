@@ -14,6 +14,10 @@ import OpponentHand from './OpponentHand'
 import PlayerHand from './PlayerHand'
 import Container from '../ui/Container'
 
+interface TableProps  {
+    game: RummyGame
+}
+
 const dummyRuns = [
     [
         { value: Value.A, suit: Suit.C },
@@ -23,64 +27,16 @@ const dummyRuns = [
     [{ value: Value.J, suit: Suit.C }],
 ]
 
-const Table = () => {
+
+const Table = ( { game } : TableProps ) => {
     const { dispatch: dispatchModal } = useModal()
-    const navigate = useNavigate()
-    const [game, setGame] = useState<RummyGame>()
-
-    useEffect(() => {
-        const data = JSON.stringify({
-            action: 'join',
-        })
-        axiosInstance
-            .post<any>('/games/1/', data)
-
-            .catch((error: AxiosError) => {
-                console.log(error)
-                navigate('/')
-            })
-            .then((res: any) => {
-                const { data } = res
-                setGame({
-                    gameId: data.game.gameId,
-                    players: data.game.players,
-                    gameState: data.game.gameState,
-                })
-                socket.on('player-join', (data: any) => {
-                    console.log(data)
-                })
-                socket.emit('player-joined', { 'displayName': 'test'})
-
-                socket.on(SocketEvents.GAME_START, () => {
-
-                })
-            })
-    }, [navigate])
-
-    const handleLeaveGame = () => {
-        axiosInstance
-            .post<any>('/games/1/', {
-                data: {
-                    action: 'leave',
-                },
-            })
-            .catch((error: AxiosError) => {
-                console.log(error)
-            })
-            .then((res: any) => {
-                navigate('/')
-            })
-    }
 
     return (
         <Container>
             <Modal />
             <div className="grid grid-cols-5">
                 <div>
-                    <div>
-                        <Button text={'Leave Game'} onClick={handleLeaveGame} />
-                    </div>
-                    <div>
+                   <div>
                         <Button
                             text={'Settings'}
                             onClick={() =>
