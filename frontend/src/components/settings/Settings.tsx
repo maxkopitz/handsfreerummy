@@ -31,7 +31,6 @@ const Settings = () => {
                 <div className="h-44 mb-10">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
-                        isBack={false}
                     />
                 </div>
                 <div className="justify-center">

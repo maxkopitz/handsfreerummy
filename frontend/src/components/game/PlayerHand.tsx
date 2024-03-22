@@ -55,43 +55,36 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
-                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.H }}
-                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.S }}
-                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.A, suit: Suit.D }}
-                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.Q, suit: Suit.S }}
-                        isBack={!true}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={{ value: Value.A, suit: Suit.D }}
-                        isBack={!true}
+                        card={{ value: Value.Eight, suit: Suit.D }}
                     />
                 </div>
                 <div className="m-2">
                     <Card
                         card={{ value: Value.K, suit: Suit.C }}
-                        isBack={!true}
                     />
                 </div>
             </div>
