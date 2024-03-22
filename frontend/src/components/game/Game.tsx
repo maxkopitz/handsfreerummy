@@ -20,50 +20,56 @@ const Game = () => {
         playerCards: [],
     })
 
-    useEffect(() => {
+
+    const joinGame = async () => {
         const data = JSON.stringify({
             action: 'join',
         })
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
-
-            .catch((error: AxiosError) => {
-                console.log(error)
-                navigate('/')
-            })
             .then((res: any) => {
                 const { data } = res
+                console.log(data)
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
                     gameState: data.game.gameState,
-                    playerCards: [],
+                    playerCards: data.game.playerHand,
                 })
-                socket.on('player-join', (data: any) => {
-                    console.log(data.data.displayName, 'has joined')
-                })
+
                 socket.emit('player-joined', {
                     displayName: profile.displayName,
                 })
 
-                socket.on(SocketEvents.GAME_START, (data: any) => {
-                    console.log(data)
+            })
+            .catch((error: AxiosError) => {
+                console.log('this is an error')
+                navigate('/')
+            })
+    }
+    useEffect(() => {
+        joinGame();
+        socket.on('player-join', (data: any) => {
+            console.log(data.data.displayName, 'has joined')
+        })
+        socket.on(SocketEvents.GAME_START, (data: any) => {
+            console.log(data)
 
-                    const cards: CardType[] = []
-                    data.data.hand.forEach((tmp: any) => {
-                        console.log(tmp)
-                        cards.push({
-                            suit: tmp.suit,
-                            value: tmp.value,
-                        })
-                    })
-                    setGame({
-                        ...game,
-                        playerCards: cards,
-                        gameState: 'in-game',
-                    })
+            const cards: CardType[] = []
+            data.data.hand.forEach((tmp: any) => {
+                console.log(tmp)
+                cards.push({
+                    suit: tmp.suit,
+                    value: tmp.value,
                 })
             })
+            setGame({
+                ...game,
+                playerCards: cards,
+                gameState: 'in-game',
+            })
+        })
+
 
         return () => {
             socket.off('player-join')

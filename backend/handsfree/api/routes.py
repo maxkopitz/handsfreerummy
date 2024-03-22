@@ -42,7 +42,6 @@ def create_game():
     if session.get('game_id'):
         result = redis_client.json().get('game:%d' % session.get('game_id'))
         app.logger.info(session)
-        print(result)
         return {"error": {"message": "Already in game"}}, 409
 
     game = utils.create_game()
@@ -82,7 +81,7 @@ def handle_game_action(game_id):
         # Extra clean up
         if int(game_id) == session.get('game_id'):
             del session['game_id']
-        return {"error": {"message": "Game does not exist"}}, 403
+        return {"error": {"message": "Game does not exist"}}, 404
 
     if action == 'join':
         if session.get("in_game") and session.get('game_id') != game_id:

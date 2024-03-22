@@ -2,6 +2,7 @@ from handsfree import redis_client, socketio
 from redis.commands.json.path import Path
 from flask import session
 from random import shuffle
+import sys
 
 GAME_KEY_INDEX = 'games_index'
 ACTIVE_GAMES = 'active_games'
@@ -59,6 +60,7 @@ def create_game():
 
 def join_game(game_id):
     """Join Rummy Game."""
+    print('JOINING', file=sys.stderr)
     game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
 
@@ -66,12 +68,26 @@ def join_game(game_id):
     session["game_id"] = game_id
 
     uuid = str(session.get('uuid'))
-    game["players"][uuid] = {
-        "sid": session.get("sid", None),
-        "hand": []
-    }
+
+    if game["players"].get(uuid) is None:
+        game["players"][uuid] = {
+            "sid": session.get("sid", None),
+            "hand": []
+        }
+    else:
+        game["players"][uuid]["sid"] = session.get("sid", None)
+
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
-    return game
+
+    print(game.get("players").get(uuid).get('hand'), file=sys.stderr)
+    result = {
+        "gameId": game.get("gameId"),
+        "playerHand": game.get("players").get(uuid).get('hand'),
+        "gameState": game.get("gameState")
+    }
+
+    print(result, file=sys.stderr)
+    return result
 
 
 def leave_game(game_id):
@@ -97,12 +113,13 @@ def start_game(game_id):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
 
+    print(game, file=sys.stderr)
     game['gameState'] = 'in-game'
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
     for player in game["players"]:
         data = {
-                "hand": game["players"][player]["hand"],
-                "player_num": 0
-                }
+            "hand": game["players"][player]["hand"],
+            "player_num": 0
+        }
     return game

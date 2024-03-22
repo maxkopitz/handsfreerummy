@@ -36,12 +36,10 @@ const Table = ({ game }: TableProps) => {
         })
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
-            .catch((error: AxiosError) => {
-                console.log(error)
-            })
-            .then((res: any) => {
-                console.log(res)
+            .then(() => {
                 navigate('/')
+            })
+            .catch(() => {
             })
     }
     return (
