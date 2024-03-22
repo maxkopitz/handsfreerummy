@@ -1,4 +1,4 @@
-
+import Container from '../ui/Container'
 import Board from './Board'
 import { RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
@@ -15,8 +15,6 @@ import OpponentHand from './OpponentHand'
 import PlayerHand from './PlayerHand'
 import { CardType } from '../../Type'
 import Card from './Card'
-import CardBack from './CardBack'
-import Container from '../ui/Container'
 
 const defaultGame: RummyGame = {
     gameId: '-1',
@@ -50,6 +48,7 @@ const Table = () => {
             })
             .then((res: any) => {
                 const { data } = res
+                console.log(data.game)
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
@@ -57,11 +56,6 @@ const Table = () => {
                 })
                 socket.on('player-join', (data: any) => {
                     console.log(data)
-                })
-                socket.emit('player-joined', { 'displayName': 'test'})
-
-                socket.on(SocketEvents.GAME_START, () => {
-
                 })
             })
     }, [navigate])
@@ -130,14 +124,15 @@ const Table = () => {
                 <div className="col-start-4">
                     <OpponentHand playerId={3} cardCount={7} />
                 </div>
-                <div className="col-start-5 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Discard</h1>
-                    <Card card={{ value: Value.J, suit: Suit.C }} />
+
+                <div className="col-start-5">
+                    <h1>Discard</h1>
+                    <Card card={discard} />
                 </div>
 
-                <div className="col-start-6 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Pickup</h1>
-                    <CardBack />
+                <div className="col-start-6">
+                    <h1>Pickup</h1>
+                    <Card card={discard} isBack={true} isPickup={true} />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">

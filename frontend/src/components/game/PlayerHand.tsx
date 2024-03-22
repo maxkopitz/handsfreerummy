@@ -98,44 +98,37 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
             {/* <div className={cardClasses}>
                 <div className="m-2">
                     <Card
-                        card={hand[0]}
-                        isBack={!true}
+                        card={{ value: Value.A, suit: Suit.C }}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={hand[1]}
-                        isBack={!true}
+                        card={{ value: Value.A, suit: Suit.H }}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={hand[2]}
-                        isBack={!true}
+                        card={{ value: Value.A, suit: Suit.S }}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={hand[3]}
-                        isBack={!true}
+                        card={{ value: Value.A, suit: Suit.D }}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={hand[4]}
-                        isBack={!true}
+                        card={{ value: Value.Q, suit: Suit.S }}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={hand[5]}
-                        isBack={!true}
+                        card={{ value: Value.Eight, suit: Suit.D }}
                     />
                 </div>
                 <div className="m-2">
                     <Card
-                        card={hand[6]}
-                        isBack={!true}
+                        card={{ value: Value.K, suit: Suit.C }}
                     />
                 </div>
             </div> */}

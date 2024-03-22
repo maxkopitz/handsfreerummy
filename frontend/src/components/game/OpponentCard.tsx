@@ -3,11 +3,10 @@ import { CardType, Suit } from '../../Type'
 import { useProfile } from '../../hooks/Profile'
 
 interface OpponentCardProps {
-    card: CardType
     num?: number // number of cards in hand
 }
 //Back of the Card with number of cards in hand printed on top
-const OpponentCard = ({ card, num }: OpponentCardProps) => {
+const OpponentCard = ({num }: OpponentCardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-2xl',
@@ -32,3 +31,5 @@ const OpponentCard = ({ card, num }: OpponentCardProps) => {
         </>
     )
 }
+
+export default OpponentCard
