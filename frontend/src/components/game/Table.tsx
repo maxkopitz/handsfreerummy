@@ -15,6 +15,7 @@ import OpponentHand from './OpponentHand'
 import PlayerHand from './PlayerHand'
 import { CardType } from '../../Type'
 import Card from './Card'
+import CardBack from './CardBack'
 import Container from '../ui/Container'
 
 const defaultGame: RummyGame = {
@@ -129,15 +130,14 @@ const Table = () => {
                 <div className="col-start-4">
                     <OpponentHand playerId={3} cardCount={7} />
                 </div>
-
-                <div className="col-start-5">
-                    <h1>Discard</h1>
-                    {/* <Card card={discard} /> */}
+                <div className="col-start-5 flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold">Discard</h1>
+                    <Card card={{ value: Value.J, suit: Suit.C }} />
                 </div>
 
-                <div className="col-start-6">
-                    <h1>Pickup</h1>
-                    {/* <Card card={discard} isBack={true} isPickup={true} /> */}
+                <div className="col-start-6 flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold">Pickup</h1>
+                    <CardBack />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">
