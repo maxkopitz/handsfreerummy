@@ -2,10 +2,10 @@ import classNames from 'classnames'
 import { CardType, Suit } from '../../Type'
 import { useProfile } from '../../hooks/Profile'
 
-interface Card2Props {
+interface CardProps {
     card: CardType 
 }
-const Card = ({card}: Card2Props) => {
+const Card = ({card}: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
