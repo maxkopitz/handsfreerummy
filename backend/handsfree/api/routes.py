@@ -100,10 +100,14 @@ def handle_game_action(game_id):
 
         return result
     if action == 'start':
+        if redis_client.json().get(game_key).get('gameState') == 'in-game':
+            return {"error": {"message": "Game has started"}}, 404
         result = utils.start_game(game_id)
-
-
         return result
+    
+    if action == 'move':
+        print('test')
+        return 'test'
 
 
 @app.route('/users/', methods=['GET'])
