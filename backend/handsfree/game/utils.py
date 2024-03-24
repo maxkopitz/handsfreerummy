@@ -39,7 +39,7 @@ def create_game():
     deck = []
     for suit in suits:
         for value in values:
-            deck.append({"value": value, "suite": suit})
+            deck.append({"value": value, "suit": suit})
     shuffle(deck)
     game = {
         "gameId": index,

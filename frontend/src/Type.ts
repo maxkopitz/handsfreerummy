@@ -2,7 +2,7 @@ export enum Suit {
     C = 'clubs',
     D = 'diamonds',
     S = 'spades',
-    H = 'hearts',   
+    H = 'hearts',
 }
 
 export const SuitOrder = Object.values(Suit);

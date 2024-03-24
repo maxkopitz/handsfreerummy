@@ -72,8 +72,8 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
                 <Button text={'Sort Cards'} onClick={sortCards}></Button>
                 <div className={cardClasses}>
                     {sortedCards.map((card, index) => (
-                        <div className="m-2">
-                            <Card key={index} card={card} />
+                        <div key={index} className="m-2">
+                            <Card card={card} />
                         </div>
                     ))}
                 </div>

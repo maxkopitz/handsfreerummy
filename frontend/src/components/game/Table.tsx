@@ -42,6 +42,7 @@ const Table = ({ game }: TableProps) => {
             .catch(() => {
             })
     }
+
     return (
         <Container>
             <div className="grid grid-cols-5">

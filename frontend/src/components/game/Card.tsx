@@ -3,10 +3,12 @@ import { CardType, Suit } from '../../Type'
 import { useProfile } from '../../hooks/Profile'
 
 interface Card2Props {
-    card: CardType 
+    card: CardType
 }
 const Card = ({card}: Card2Props) => {
     const { profile } = useProfile()
+    console.log(card)
+    console.log(card.suit)
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
         {
@@ -27,7 +29,7 @@ const Card = ({card}: Card2Props) => {
 
     // ['♠', '♣', '♥', '♦']
     let suitSymbol = ''
-    if (card.suit === Suit.S) {
+    if (card.suit === Suit.S.valueOf()) {
         suitSymbol = '♠'
     } else if (card.suit === Suit.C) {
         suitSymbol = '♣'
@@ -47,7 +49,7 @@ const Card = ({card}: Card2Props) => {
                     </>
             </div>
         </>
-    ) 
+    )
 }
 
 export default Card

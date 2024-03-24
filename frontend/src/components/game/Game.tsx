@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
-import { CardType, RummyGame, Suit, Value } from '../../Type'
+import { CardType, RummyGame } from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
 import Table from './Table'
@@ -29,7 +29,6 @@ const Game = () => {
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
                 const { data } = res
-                console.log(data)
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
@@ -42,30 +41,23 @@ const Game = () => {
                 })
 
             })
-            .catch((error: AxiosError) => {
-                console.log('this is an error')
+            .catch(() => {
+                console.log('This is an error')
                 navigate('/')
             })
     }
+
     useEffect(() => {
         joinGame();
+
         socket.on('player-join', (data: any) => {
             console.log(data.data.displayName, 'has joined')
         })
-        socket.on(SocketEvents.GAME_START, (data: any) => {
-            console.log(data)
 
-            const cards: CardType[] = []
-            data.data.hand.forEach((tmp: any) => {
-                console.log(tmp)
-                cards.push({
-                    suit: tmp.suit,
-                    value: tmp.value,
-                })
-            })
+        socket.on(SocketEvents.GAME_START, (data: any) => {
             setGame({
                 ...game,
-                playerCards: cards,
+                playerCards: data.data.hand,
                 gameState: 'in-game',
             })
         })
@@ -76,10 +68,6 @@ const Game = () => {
             socket.off(SocketEvents.GAME_START)
         }
     }, [navigate])
-
-    useEffect(() => {
-        console.log(game)
-    }, [game])
 
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
