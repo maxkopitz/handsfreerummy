@@ -35,11 +35,11 @@ const Lobby = ({ game }: LobbyProps) => {
         })
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
-            .catch((error: AxiosError) => {
-                console.log(error)
-            })
             .then((res: any) => {
                 console.log(res)
+            })
+            .catch((error: AxiosError) => {
+                console.log(error)
             })
     }
 
@@ -62,7 +62,6 @@ const Lobby = ({ game }: LobbyProps) => {
                         })
                     }
                 />
-
             </div>
         </Container>
     )

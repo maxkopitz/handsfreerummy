@@ -15,6 +15,8 @@ import { useEffect } from 'react'
 
 interface TableProps {
     game: RummyGame
+    handleClickPickup: any
+    handleClickDiscard: any
 }
 
 const dummyRuns = [
@@ -26,7 +28,7 @@ const dummyRuns = [
     [{ value: Value.J, suit: Suit.C }],
 ]
 
-const Table = ({ game }: TableProps) => {
+const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
 
@@ -78,39 +80,39 @@ const Table = ({ game }: TableProps) => {
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
                     </div>
                 </div>
+                {game.players.map((player, key) => (
+                    <div key={key}>
+                        <OpponentHand
+                            playerId={player.playerOrder}
+                            cardCount={player.cardCount}
+                            playerDisplayName={player.displayName}
+                            isTurn={player.playerOrder === game.turnCounter}
+                        />
+                    </div>
+                ))}
 
-                <div className="col-start-2">
-                    <OpponentHand playerId={1} cardCount={7} />
-                </div>
-
-                <div className="col-start-3">
-                    <OpponentHand playerId={2} cardCount={7} />
-                </div>
-
-                <div className="col-start-4">
-                    <OpponentHand playerId={3} cardCount={7} />
-                </div>
                 <div className="col-start-5 flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold">Discard</h1>
-                    <Card card={game.discard} />
+                    <Card card={game.discard} onClick={handleClickDiscard} />
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold">Pickup</h1>
-                    <CardBack />
+                    <CardBack onClick={handleClickPickup} />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">
-                    <Board
-                        playedRuns={dummyRuns}
-                        discard={game.discard}
-                    />
+                    <Board playedRuns={dummyRuns} discard={game.discard} />
                 </div>
                 <div className="col-start-2">
                     <h2 className="text-lg font-semibold">Melds</h2>
                 </div>
                 <div className="col-start-2 col-span-3">
-                    <PlayerHand playerId={4} hand={game.hand} />
+                    <PlayerHand
+                        playerId={game.playerOrder}
+                        hand={game.hand}
+                        isTurn={game.playerOrder === game.turnCounter}
+                    />
                 </div>
             </div>
         </Container>
