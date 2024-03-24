@@ -5,7 +5,7 @@ export enum Suit {
     H = 'hearts',
 }
 
-export const SuitOrder = Object.values(Suit);
+export const SuitOrder = Object.values(Suit)
 
 export enum Value {
     A = 'A',
@@ -23,7 +23,7 @@ export enum Value {
     K = 'K',
 }
 
-export const ValueOrder = Object.values(Value);
+export const ValueOrder = Object.values(Value)
 
 // export enum Color {
 //   black = "Black",
@@ -43,12 +43,18 @@ export interface LobbyGame {
     state: string
 }
 
+export interface RummyPlayer {
+    displayName: string
+    playerOrder: number
+    cardCount: number
+}
 export interface RummyGame {
     gameId: string
-    players: string[]
+    players: RummyPlayer[]
     gameState: string
     hand: CardType[]
     discard: CardType
     melds: CardType[]
     turnCounter: number
+    playerOrder: number
 }

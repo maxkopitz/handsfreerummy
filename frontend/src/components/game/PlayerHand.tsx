@@ -8,67 +8,63 @@ import Button from '../ui/Button'
 interface PlayerHandProps {
     playerId?: number
     hand: CardType[]
+    isTurn: boolean
 }
 
-const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
-    const cardClasses = classNames('flex flex-row justify-center items-center');
+const PlayerHand = ({ playerId, hand, isTurn }: PlayerHandProps) => {
+    const cardClasses = classNames('flex flex-row justify-center items-center')
 
-    const handSize = hand.length;
+    const handSize = hand.length
 
-    const [sortedCards, setSortedCards] = useState([...hand]);
+    const [sortedCards, setSortedCards] = useState([...hand])
+    const [sortBy, setSortBy] = useState('Suit')
 
     const sortCards = () => {
         const sorted = [...sortedCards].sort((a, b) => {
-            if (a.suit === b.suit) {
-                return ValueOrder.indexOf(a.value) - ValueOrder.indexOf(b.value)
+            if (sortBy === 'Suit') {
+                if (a.suit === b.suit) {
+                    return (
+                        ValueOrder.indexOf(a.value) -
+                        ValueOrder.indexOf(b.value)
+                    )
+                } else {
+                    return SuitOrder.indexOf(a.suit) - SuitOrder.indexOf(b.suit)
+                }
             } else {
-                return SuitOrder.indexOf(a.suit) - SuitOrder.indexOf(b.suit)
+                if (a.value === b.value) {
+                    return SuitOrder.indexOf(a.suit) - SuitOrder.indexOf(b.suit)
+                } else {
+                    return (
+                        ValueOrder.indexOf(a.value) -
+                        ValueOrder.indexOf(b.value)
+                    )
+                }
             }
         })
         setSortedCards(sorted)
     }
 
-    // const sorts = ['Sort by Rank', 'Sort by Suit']
-
-    // function ToggleSort() {
-    //     const [sort, setSort] = useState(sorts[0])
-
-    //     return(
-    //        <div>
-    //             <div>
-    //                 <button
-    //                     onClick={()=>useState(sorts[0])}>
-    //                 </button>
-    //                 <>
-    //                     {sort == sorts[1] && <RecruiterForm /> }
-    //                 </>
-    //             </div>
-
-    //             <div>
-    //                 <button
-    //                     onClick={()=>useState(sorts[1])}
-    //                     type="button">
-    //                 </button>
-    //                 <>
-    //                     {sort == sorts[0] && <CandidateForm /> }
-    //                 </>
-    //             </div>
-    //         </div>
-    //     )
-    // }
+    const toggleSortBy = () => {
+        sortCards()
+        setSortBy(sortBy === 'Suit' ? 'Rank' : 'Suit')
+    }
 
     return (
         <div className="flex flex-col justify-center item-center w-max">
             <div>
                 <h1 className="text-xl font-bold">
                     Player {playerId}: {handSize} cards{' '}
+                    {isTurn && 'It is my turn!'}
                 </h1>
             </div>
 
             <div className="flex flex-row gap-8"></div>
 
             <div>
-                <Button text={'Sort Cards'} onClick={sortCards}></Button>
+                <Button
+                    onClick={toggleSortBy}
+                    text={'Sort Cards by ' + sortBy}
+                ></Button>
                 <div className={cardClasses}>
                     {sortedCards.map((card, index) => (
                         <div key={index} className="m-2">

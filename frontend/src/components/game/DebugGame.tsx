@@ -12,7 +12,7 @@ const DebugGame = ({ game, isConnected }: DebugGameProps) => {
             <h1>Players</h1>
             <ul>
                 {game.players.map((item, key) => (
-                    <li key={key}>{item}</li>
+                    <li key={key}>{item.displayName}</li>
                 ))}
             </ul>
         </Container>
