@@ -48,6 +48,8 @@ def create_game():
         "players": {},
         "turnCounter": 0,
         "melds": [],
+        "discardPile": [],
+        "pickupCard": {},
         "gameState": "lobby",
         "deck": deck,
     }
@@ -58,9 +60,8 @@ def create_game():
     return game
 
 
-def join_game(game_id):
+def join_game(game_id, display_name):
     """Join Rummy Game."""
-    print('JOINING', file=sys.stderr)
     game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
 
@@ -77,16 +78,28 @@ def join_game(game_id):
     else:
         game["players"][uuid]["sid"] = session.get("sid", None)
 
+    for player in game['players']:
+            data = {
+            "action": "player-joined",
+            "data": {
+                "player": str(session.get('uuid')),
+                "displayName": display_name,
+                }
+            }
+            socketio.emit('player-joined', data, to=game['players'][player]['sid'])
+
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
-    print(game.get("players").get(uuid).get('hand'), file=sys.stderr)
     result = {
         "gameId": game.get("gameId"),
-        "playerHand": game.get("players").get(uuid).get('hand'),
+        "hand": game.get("players").get(uuid).get('hand'),
+        "discard": {},
         "gameState": game.get("gameState")
     }
+    if game.get('gameState') == "in-game":
+        result['discard'] = game.get('discardPile')[0]
 
-    print(result, file=sys.stderr)
+
     return result
 
 
@@ -113,13 +126,24 @@ def start_game(game_id):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
 
-    print(game, file=sys.stderr)
+    game['discardPile'].append(game['deck'][0])
+    game['deck'].pop(0)
+
+    game['pickupCard'] = game['deck'][0]
+    game['deck'].pop(0)
+
     game['gameState'] = 'in-game'
+    for player in game['players']:
+        data = {
+                "action": "started",
+                "game": {
+                    "hand": game["players"][player].get("hand"),
+                    "discard": game['discardPile'][0],
+                    "startPlayer": 0,
+                }
+            }
+        socketio.emit('game-started', data, to=game['players'][player]['sid'])
+
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
-    for player in game["players"]:
-        data = {
-            "hand": game["players"][player]["hand"],
-            "player_num": 0
-        }
     return game

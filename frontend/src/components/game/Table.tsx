@@ -10,8 +10,8 @@ import Card from './Card'
 import CardBack from './CardBack'
 import Container from '../ui/Container'
 import axiosInstance from '../../api/axiosConfig'
-import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 interface TableProps {
     game: RummyGame
@@ -40,6 +40,7 @@ const Table = ({ game }: TableProps) => {
                 navigate('/')
             })
             .catch(() => {
+                console.log('Error occured while leaving.')
             })
     }
 
@@ -91,7 +92,7 @@ const Table = ({ game }: TableProps) => {
                 </div>
                 <div className="col-start-5 flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold">Discard</h1>
-                    <Card card={{ value: Value.J, suit: Suit.C }} />
+                    <Card card={game.discard} />
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">
@@ -102,14 +103,14 @@ const Table = ({ game }: TableProps) => {
                 <div className="mb-20 mt-20 col-span-3">
                     <Board
                         playedRuns={dummyRuns}
-                        discard={{ value: Value.Six, suit: Suit.H }}
+                        discard={game.discard}
                     />
                 </div>
                 <div className="col-start-2">
                     <h2 className="text-lg font-semibold">Melds</h2>
                 </div>
                 <div className="col-start-2 col-span-3">
-                    <PlayerHand playerId={4} hand={game.playerCards} />
+                    <PlayerHand playerId={4} hand={game.hand} />
                 </div>
             </div>
         </Container>

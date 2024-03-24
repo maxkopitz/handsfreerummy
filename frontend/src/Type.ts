@@ -47,5 +47,8 @@ export interface RummyGame {
     gameId: string
     players: string[]
     gameState: string
-    playerCards: CardType[]
+    hand: CardType[]
+    discard: CardType
+    melds: CardType[]
+    turnCounter: number
 }

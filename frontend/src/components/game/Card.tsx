@@ -7,8 +7,6 @@ interface Card2Props {
 }
 const Card = ({card}: Card2Props) => {
     const { profile } = useProfile()
-    console.log(card)
-    console.log(card.suit)
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
         {

@@ -1,9 +1,8 @@
-import { AxiosError } from 'axios'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
-import { CardType, RummyGame } from '../../Type'
+import { CardType, RummyGame, Value, Suit } from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
 import Table from './Table'
@@ -13,17 +12,22 @@ const Game = () => {
     const navigate = useNavigate()
     const { profile } = useProfile()
     const { gameId } = useParams()
+
     const [game, setGame] = useState<RummyGame>({
         gameId: '1',
         gameState: '',
         players: [],
-        playerCards: [],
+        hand: [],
+        discard: {value: Value.J, suit: Suit.C},
+        melds: [],
+        turnCounter: 0
     })
 
 
     const joinGame = async () => {
         const data = JSON.stringify({
             action: 'join',
+            displayName: profile.displayName
         })
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
@@ -33,11 +37,10 @@ const Game = () => {
                     gameId: data.game.gameId,
                     players: data.game.players,
                     gameState: data.game.gameState,
-                    playerCards: data.game.playerHand,
-                })
-
-                socket.emit('player-joined', {
-                    displayName: profile.displayName,
+                    hand: data.game.hand,
+                    melds: data.game?.melds,
+                    discard: data.game?.discard,
+                    turnCounter: data.game?.turnCounter
                 })
 
             })
@@ -50,22 +53,23 @@ const Game = () => {
     useEffect(() => {
         joinGame();
 
-        socket.on('player-join', (data: any) => {
+        socket.on(SocketEvents.PLAYER_JOINED, (data: any) => {
             console.log(data.data.displayName, 'has joined')
         })
 
-        socket.on(SocketEvents.GAME_START, (data: any) => {
+        socket.on(SocketEvents.GAME_STARTED, (data: any) => {
             setGame({
                 ...game,
-                playerCards: data.data.hand,
+                hand: data.game.hand,
+                discard: data.game.discard,
                 gameState: 'in-game',
             })
         })
 
 
         return () => {
-            socket.off('player-join')
-            socket.off(SocketEvents.GAME_START)
+            socket.off(SocketEvents.PLAYER_JOINED)
+            socket.off(SocketEvents.GAME_STARTED)
         }
     }, [navigate])
 

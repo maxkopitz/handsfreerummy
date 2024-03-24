@@ -87,7 +87,7 @@ def handle_game_action(game_id):
         if session.get("in_game") and session.get('game_id') != game_id:
             return {"error": {"message": "Already in game"}}, 403
 
-        result = utils.join_game(game_id)
+        result = utils.join_game(game_id, request.json.get('displayName', 'NA'))
 
         return {"game": result}
 
@@ -102,15 +102,7 @@ def handle_game_action(game_id):
     if action == 'start':
         result = utils.start_game(game_id)
 
-        for player in result['players']:
-            data = {
-                "action": "started",
-                "data": {
-                    "hand": result["players"][player].get("hand"),
-                    "startPlayer": 0,
-                }
-            }
-            socketio.emit('game-start', data, to=result['players'][player]['sid'])
+
         return result
 
 
