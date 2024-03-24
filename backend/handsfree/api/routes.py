@@ -14,7 +14,13 @@ def api():
 def register():
     if session.get('uuid') is None:
         session['uuid'] = uuid4()
-    return {"uuid": session.get('uuid')}
+    response = {
+            "redirect": "/"
+            }
+    if session.get('game_id'):
+        game_id = session.get('game_id')
+        response["redirect"] = f"games/{game_id}/"
+    return response
 
 
 @app.route('/games/', methods=['GET'])
@@ -36,7 +42,6 @@ def create_game():
     if session.get('game_id'):
         result = redis_client.json().get('game:%d' % session.get('game_id'))
         app.logger.info(session)
-        print(result)
         return {"error": {"message": "Already in game"}}, 409
 
     game = utils.create_game()
@@ -80,12 +85,9 @@ def handle_game_action(game_id):
 
     if action == 'join':
         if session.get("in_game") and session.get('game_id') != game_id:
-            return {"error": {"message": "Already in game"}}, 404
+            return {"error": {"message": "Already in game"}}, 403
 
-        if session.get('sid') is None:
-            return {"error": {"message": "No socket"}}, 404
-
-        result = utils.join_game(game_id)
+        result = utils.join_game(game_id, request.json.get('displayName', 'NA'))
 
         return {"game": result}
 
@@ -100,15 +102,7 @@ def handle_game_action(game_id):
     if action == 'start':
         result = utils.start_game(game_id)
 
-        for player in result['players']:
-            data = {
-                "action": "started",
-                "data": {
-                    "hand": result["players"][player].get("hand"),
-                    "startPlayer": 0,
-                }
-            }
-            socketio.emit('game-start', data, to=result['players'][player]['sid'])
+
         return result
 
 

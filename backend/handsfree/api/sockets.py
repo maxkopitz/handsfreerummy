@@ -17,8 +17,7 @@ def handle_connect(sid):
 
         uuid = str(session.get('uuid'))
         game["players"][uuid]["sid"] = session.get("sid", None)
-        redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
-        print('sid: ', request.sid, file=sys.stderr)
+        #redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
     print('connected: ', session.get('uuid'), file=sys.stderr)
 
@@ -30,7 +29,7 @@ def handle_disconnect():
     print('disconnect: ', session.get('uuid'), file=sys.stderr)
 
 
-@socketio.on('player-joined')
+@socketio.on('join-game')
 def handle_join(json):
     data = {
             "action": "player-joined",
@@ -39,7 +38,7 @@ def handle_join(json):
                 "displayName": json.get('displayName')
                 }
             }
-    socketio.emit('player-join', data)
+    socketio.emit('player-joined', data)
 
 
 @socketio.on('game-start')
@@ -49,6 +48,6 @@ def handle_start(json):
     # Check if user who sent is in the game
     # LATER Check if user who sent is the game owner
     # LATER Check if game has enough players (2 for now)
-    # Send game-started to all players with individuals hands  
+    # Send game-started to all players with individuals hands
 
     print(json, file=sys.stderr)

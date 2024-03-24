@@ -2,7 +2,7 @@ export enum Suit {
     C = 'clubs',
     D = 'diamonds',
     S = 'spades',
-    H = 'hearts',   
+    H = 'hearts',
 }
 
 export const SuitOrder = Object.values(Suit);
@@ -47,5 +47,8 @@ export interface RummyGame {
     gameId: string
     players: string[]
     gameState: string
-    playerCards: CardType[]
+    hand: CardType[]
+    discard: CardType
+    melds: CardType[]
+    turnCounter: number
 }

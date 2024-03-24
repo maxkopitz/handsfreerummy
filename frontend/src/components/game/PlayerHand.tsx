@@ -1,10 +1,9 @@
-import { Suit, Value, ValueOrder, SuitOrder } from '../../Type'
+import { ValueOrder, SuitOrder } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
 import { useState } from 'react'
 import Button from '../ui/Button'
-// import { supports } from 'localforage'
 
 interface PlayerHandProps {
     playerId?: number
@@ -12,11 +11,11 @@ interface PlayerHandProps {
 }
 
 const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
-    const cardClasses = classNames('flex flex-row justify-center items-center')
+    const cardClasses = classNames('flex flex-row justify-center items-center');
 
-    const handSize = 7
+    const handSize = hand.length;
 
-    const [sortedCards, setSortedCards] = useState([...hand])
+    const [sortedCards, setSortedCards] = useState([...hand]);
 
     const sortCards = () => {
         const sorted = [...sortedCards].sort((a, b) => {
@@ -72,8 +71,8 @@ const PlayerHand = ({ playerId, hand }: PlayerHandProps) => {
                 <Button text={'Sort Cards'} onClick={sortCards}></Button>
                 <div className={cardClasses}>
                     {sortedCards.map((card, index) => (
-                        <div className="m-2">
-                            <Card key={index} card={card} />
+                        <div key={index} className="m-2">
+                            <Card card={card} />
                         </div>
                     ))}
                 </div>

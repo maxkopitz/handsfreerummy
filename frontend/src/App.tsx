@@ -1,28 +1,50 @@
 import MainMenu from './components/MainMenu'
 import About from './components/About'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider, useNavigate } from 'react-router-dom'
 import { ProfileProvider } from './hooks/Profile'
 import { GameProvider } from './hooks/Game'
 import { ModalProvider } from './hooks/Modal'
 import { useEffect } from 'react'
 import { socket } from './api/socket'
 import Game from './components/game/Game'
+import axiosInstance from './api/axiosConfig'
+import Modal from './components/ui/Modal'
 
-const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <MainMenu />,
-    },
-    {
-        path: 'games/:gameId',
-        element: <Game />,
-    },
-    {
-        path: 'about',
-        element: <About />,
-    },
-])
+
 const App = () => {
+
+    const router = createBrowserRouter([
+        {
+            element: <Layout />,
+            children: [
+                {
+                    path: '/',
+                    element: <MainMenu />,
+                },
+                {
+                    path: 'games/:gameId',
+                    element: <Game />,
+                },
+                {
+                    path: 'about',
+                    element: <About />,
+                }]
+        }
+    ])
+    return (
+        <RouterProvider router={router} />
+    )
+}
+
+const Layout = () => {
+    const navigate = useNavigate()
+    useEffect(() => {
+        axiosInstance.get(`register`).then((res) => {
+            if (res.data?.redirect) {
+            navigate(res.data.redirect);
+            }
+        });
+    }, [navigate])
     useEffect(() => {
         socket.on('connect', () => {
             console.log('Connected')
@@ -36,12 +58,12 @@ const App = () => {
             <ProfileProvider>
                 <GameProvider>
                     <ModalProvider>
-                        <RouterProvider router={router} />
+                        <Modal />
+                        <Outlet />
                     </ModalProvider>
                 </GameProvider>
             </ProfileProvider>
         </div>
     )
 }
-
 export default App
