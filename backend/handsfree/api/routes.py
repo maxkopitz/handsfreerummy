@@ -1,5 +1,5 @@
 """Handsfree Routes."""
-from handsfree import app, redis_client
+from handsfree import app, redis_client, socketio
 from handsfree.game import utils
 from flask import session, request
 from uuid import uuid4
@@ -101,6 +101,16 @@ def handle_game_action(game_id):
         return result
     if action == 'start':
         result = utils.start_game(game_id)
+
+        for player in result['players']:
+            data = {
+                "action": "started",
+                "data": {
+                    "hand": result["players"][player].get("hand"),
+                    "startPlayer": 0,
+                }
+            }
+            socketio.emit('game-start', data, to=result['players'][player]['sid'])
         return result
 
 
