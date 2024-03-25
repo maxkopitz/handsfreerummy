@@ -106,7 +106,8 @@ const Game = () => {
             .then((res: any) => {
                 setGame((prevState) => ({
                     ...prevState,
-                    hand: [...prevState.hand, res.data.game.card]
+                    hand: [...prevState.hand, res.data.game.card],
+                    turnState: res.data.game.turnState
                 }))
             })
             .catch(() => {
@@ -118,16 +119,22 @@ const Game = () => {
         const data = JSON.stringify({
             action: 'move',
             move: {
-                type: 'drawDiscard'
+                type: 'drawDiscard',
+                card: 'card'
             },
         })
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                setGame((prevState) => ({
+                    ...prevState,
+                    hand: [...prevState.hand, res.data.game.card],
+                    turnState: res.data.game.turnState
+                }))
             })
             .catch(() => {
                 console.log('An error occured')
+
             })
         console.log('discard pile')
     }
@@ -137,7 +144,9 @@ const Game = () => {
             action: 'move',
             move: {
                 type: 'discard',
-                card: card
+                data: {
+                    card: card
+                }
             },
         })
         axiosInstance
