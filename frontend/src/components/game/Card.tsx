@@ -5,18 +5,19 @@ import { useProfile } from '../../hooks/Profile'
 interface CardProps {
     card: CardType
     onClick?: any
+    isActive: boolean
 }
-const Card = ({ card, onClick }: CardProps) => {
+const Card = ({ card, onClick, isActive }: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
         {
             'text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex flex-col items-center justify-center':
-                card.suit === Suit.H || card.suit === Suit.D,
+                (card.suit === Suit.H || card.suit === Suit.D) && isActive,
         },
         {
             'text-black-500 border-slate-950 hover:bg-neutral-950 hover:text-white flex flex-col items-center justify-center':
-                card.suit === Suit.S || card.suit === Suit.C,
+                (card.suit === Suit.S || card.suit === Suit.C) && isActive,
         },
         { 'text-2xl w-20 h-32': profile.settings.cardSize === 1 },
         { 'text-4xl w-28 h-40': profile.settings.cardSize === 2 },
@@ -37,10 +38,25 @@ const Card = ({ card, onClick }: CardProps) => {
     } else if (card.suit === Suit.D) {
         suitSymbol = '♦'
     }
+    if (isActive) {
+
+        return (
+            <>
+                <div className={classes} onClick={onClick}>
+                    <div>
+                        <div>{suitSymbol}</div>
+                        <div>{card.value}</div>
+                        <div>{suitSymbol}</div>
+                    </div>
+                </div>
+            </>
+        )
+
+    }
 
     return (
         <>
-            <div className={classes} onClick={onClick}>
+            <div className={classes}>
                 <div>
                     <div>{suitSymbol}</div>
                     <div>{card.value}</div>

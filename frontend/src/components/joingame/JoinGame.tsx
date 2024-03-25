@@ -15,14 +15,16 @@ const JoinGame = () => {
             .then((res: any) => {
                 const { data } = res
                 const parsedGames: any[] = []
-                if (data.game) {
-                }
                 data.games.forEach((game: any) => {
-                    parsedGames.push({
-                        id: game.gameId,
-                        players: 0,
-                        state: game.gameState,
-                    })
+                    if (game.gameState === 'lobby') {
+
+                        parsedGames.push({
+                            id: game.gameId,
+                            players: 0,
+                            state: game.gameState,
+                        })
+
+                    }
                 })
                 setGames(parsedGames)
             })

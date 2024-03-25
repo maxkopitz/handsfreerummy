@@ -80,7 +80,7 @@ def join_game(game_id, display_name):
         }
     else:
         game["players"][uuid]["sid"] = session.get("sid", None)
-        game["players"][uuid]["displayName"] = display_name 
+        game["players"][uuid]["displayName"] = display_name
 
     for player in game['players']:
         if player != str(session.get('uuid')):
@@ -101,7 +101,8 @@ def join_game(game_id, display_name):
         "players": {},
         "playerOrder": game["players"].get(uuid).get('playerOrder'),
         "turnCounter": game.get('turnCounter'),
-        "currentTurnState": game['currentTurnState']
+        "currentTurnState": game['currentTurnState'],
+        "isOwner": game.get('owner') == uuid
     }
     if game.get('gameState') == "in-game":
         result['discard'] = game.get('discardPile')[0]
@@ -175,10 +176,10 @@ def make_move(player, move, data):
 
     if move == "layOff":
         pass
-    
+
     if move == "discard":
         pass
-    
+
 
 def player_response_builder(current, player_dic):
     """"Build player response."""
@@ -190,7 +191,7 @@ def player_response_builder(current, player_dic):
                 'displayName': player_dic[key]['displayName'],
                 'cardCount': len(player_dic[key]['hand']),
                 'playerOrder': player_dic[key].get('playerOrder', 0)
-            }) 
+            })
     if players[-1].get('playerOrder') > player_dic[current].get('playerOrder'):
         while players[0].get('playerOrder') < player_dic[current].get('playerOrder'):
             players.append(players.pop(0))

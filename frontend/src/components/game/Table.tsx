@@ -93,7 +93,7 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
 
                 <div className="col-start-5 flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold">Discard</h1>
-                    <Card card={game.discard} onClick={handleClickDiscard} />
+                    <Card card={game.discard} onClick={handleClickDiscard} isActive={game.playerOrder === game.turnCounter} />
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
-import { CardType, RummyGame, Value, Suit } from '../../Type'
+import { RummyGame, Value, Suit } from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
 import Table from './Table'
@@ -14,7 +14,7 @@ const Game = () => {
     const { gameId } = useParams()
 
     const [game, setGame] = useState<RummyGame>({
-        gameId: '1',
+        gameId: '0',
         gameState: '',
         players: [],
         hand: [],
@@ -22,6 +22,7 @@ const Game = () => {
         melds: [],
         turnCounter: 0,
         playerOrder: 0,
+        isOwner: false,
     })
 
     const joinGame = async () => {
@@ -43,10 +44,12 @@ const Game = () => {
                     discard: data.game?.discard,
                     turnCounter: data.game?.turnCounter,
                     playerOrder: data.game?.playerOrder,
+                    isOwner: data.game?.isOwner
                 })
             })
-            .catch(() => {
-                console.log('This is an error')
+            .catch((error: any) => {
+                const data = error?.response?.data;
+                console.log(data?.error?.message);
                 navigate('/')
             })
     }
@@ -71,9 +74,14 @@ const Game = () => {
             })
         })
 
+        socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
+            console.log(data)
+        });
+
         return () => {
             socket.off(SocketEvents.PLAYER_JOINED)
             socket.off(SocketEvents.GAME_STARTED)
+            socket.off(SocketEvents.PLAYED_MOVE)
         }
     }, [])
 

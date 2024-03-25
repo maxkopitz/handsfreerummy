@@ -57,4 +57,5 @@ export interface RummyGame {
     melds: CardType[]
     turnCounter: number
     playerOrder: number
+    isOwner: boolean
 }
