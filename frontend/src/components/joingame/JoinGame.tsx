@@ -11,25 +11,27 @@ const JoinGame = () => {
 
     useEffect(() => {
         axiosInstance
-            .get<any>(
-                '/games/'
-            )
+            .get<any>('/games/')
+            .then((res: any) => {
+                const { data } = res
+                const parsedGames: any[] = []
+                data.games.forEach((game: any) => {
+                    if (game.gameState === 'lobby') {
+
+                        parsedGames.push({
+                            id: game.gameId,
+                            players: 0,
+                            state: game.gameState,
+                        })
+
+                    }
+                })
+                setGames(parsedGames)
+            })
             .catch((error: AxiosError) => {
                 console.log(error)
             })
-            .then((res: any) => {
-                const { data } = res;
-                const parsedGames: any[] = [];
-                data.games.forEach((game: any) => {
-                    parsedGames.push({
-                        id: game.gameId,
-                        players: 0,
-                        state: game.state,
-                    })
-                })
-                setGames(parsedGames);
-            });
-    }, []);
+    }, [])
 
     return (
         <div className="flex flex-col w-1/2 justify-center items-center">

@@ -4,13 +4,15 @@ import axiosInstance from '../../api/axiosConfig'
 import { RummyGame } from '../../Type'
 import Button from '../ui/Button'
 import Container from '../ui/Container'
-import { SocketEvents, socket } from '../../api/socket'
+import { useModal } from '../../hooks/Modal'
+import Settings from '../settings/Settings'
 
 interface LobbyProps {
     game: RummyGame
 }
 const Lobby = ({ game }: LobbyProps) => {
     const navigate = useNavigate()
+    const { dispatch } = useModal()
     const handleLeaveGame = () => {
         const data = JSON.stringify({
             action: 'leave',
@@ -32,21 +34,47 @@ const Lobby = ({ game }: LobbyProps) => {
         })
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
-            .catch((error: AxiosError) => {
-                console.log(error)
-            })
             .then((res: any) => {
                 console.log(res)
             })
+            .catch((error: AxiosError) => {
+                console.log(error)
+            })
     }
-
+    const handleCloseGame = () => {
+        const data = JSON.stringify({
+            action: 'close',
+        })
+        axiosInstance
+            .post<any>('/games/' + game.gameId + '/', data)
+            .then((res: any) => {
+                console.log(res)
+            })
+            .catch((error: AxiosError) => {
+                console.log(error)
+            })
+    }
     return (
         <Container>
             <div>
-                <h1>I am a lobby {game.gameId} </h1>
+                <h1>Lobby {game.gameId} </h1>
+                <h1>Players {game.players.length} </h1>
+                {!game.isOwner && <Button text={'Leave Game'} onClick={handleLeaveGame} />}
+                {game.isOwner && <Button text={'Close Game'} onClick={handleCloseGame} />}
 
-                <Button text={'Leave Game'} onClick={handleLeaveGame} />
-                <Button text={'Start Game'} onClick={handleStartGame} />
+                {game.isOwner && <Button text={'Start Game'} onClick={handleStartGame} />}
+                <Button
+                    text={'Settings'}
+                    onClick={() =>
+                        dispatch({
+                            type: 'showModal',
+                            modal: {
+                                title: 'Settings',
+                                component: <Settings />,
+                            },
+                        })
+                    }
+                />
             </div>
         </Container>
     )

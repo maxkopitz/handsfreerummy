@@ -2,23 +2,23 @@ import classNames from 'classnames'
 import { CardType, Suit } from '../../Type'
 import { useProfile } from '../../hooks/Profile'
 
-interface Card2Props {
-    card: CardType 
+interface MeldCardProps {
+    card: CardType
 }
 
 // width and height of card need to be 12 away from each other
 // widths and heights need to be 8 away from each other with size 1, 2, and 3
-const Card = ({card}: Card2Props) => {
+const Card = ({ card }: MeldCardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
         {
             'text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex flex-col items-center justify-center':
-                (card.suit === Suit.H || card.suit === Suit.D),
+                card.suit === Suit.H || card.suit === Suit.D,
         },
         {
             'text-black-500 border-slate-950 hover:bg-neutral-950 hover:text-white flex flex-col items-center justify-center':
-                (card.suit === Suit.S || card.suit === Suit.C),
+                card.suit === Suit.S || card.suit === Suit.C,
         },
         { 'text-2xl w-8 h-20': profile.settings.cardSize === 1 },
         { 'text-4xl w-16 h-28': profile.settings.cardSize === 2 },
@@ -43,14 +43,14 @@ const Card = ({card}: Card2Props) => {
     return (
         <>
             <div className={classes}>
-                    <>
-                        <div>{suitSymbol}</div>
-                        <div>{card.value}</div>
-                        <div>{suitSymbol}</div>
-                    </>
+                <>
+                    <div>{suitSymbol}</div>
+                    <div>{card.value}</div>
+                    <div>{suitSymbol}</div>
+                </>
             </div>
         </>
-    ) 
+    )
 }
 
 export default Card
