@@ -7,17 +7,10 @@ import { Suit, Value } from '../../Type'
 const Settings = () => {
     const { profile, dispatch } = useProfile()
 
-    // const buttonStyle = {
-    //     padding: '10px 20px',
-    //     fontSize: '20px',
-    //     margin: '10px',
-    //     cursor: 'pointer',
-    //     border: 'black',
-    // }
-
     const handleChangeCardSize = (size: number) => {
         dispatch({ type: 'changeCardSize', size })
     }
+
     const handleChangeFontWeight = (size: number) => {
         dispatch({ type: 'changeCardFontWeight', size })
     }
@@ -25,12 +18,14 @@ const Settings = () => {
     const handleNameChange = (event : any) => {
         dispatch({ type: 'setDisplayname', value: event.target.value})
     }
+
     return (
         <Container>
             <div className="flex flex-col justify-center items-center">
                 <div className="h-44 mb-10">
                     <Card
                         card={{ value: Value.A, suit: Suit.C }}
+                        isActive={true}
                     />
                 </div>
                 <div className="justify-center">

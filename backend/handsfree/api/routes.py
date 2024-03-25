@@ -113,8 +113,8 @@ def handle_game_action(game_id):
         return result
 
     if action == 'move':
-        print('test')
         return 'test'
+    return {"error": {"message": "Unknown action."}}, 404
 
 
 @app.route('/users/', methods=['GET'])

@@ -68,7 +68,8 @@ const PlayerHand = ({ playerId, hand, isTurn }: PlayerHandProps) => {
                 <div className={cardClasses}>
                     {sortedCards.map((card, index) => (
                         <div key={index} className="m-2">
-                            <Card card={card} />
+                        {/* TODO: isTurn and Correct stage*/}
+                            <Card card={card} isActive={isTurn}/>
                         </div>
                     ))}
                 </div>
