@@ -54,6 +54,7 @@ def create_game():
         "deck": deck,
         "currentTurnState": "pickup"
     }
+    # currentTurnState: "pickup", "meld", "discard"
 
     redis_client.json().set("game:%d" % index, Path.root_path(), game)
     redis_client.sadd(ACTIVE_GAMES, index)
@@ -85,13 +86,14 @@ def join_game(game_id, display_name):
     for player in game['players']:
         if player != str(session.get('uuid')):
             data = {
-            "action": "player-joined",
-            "data": {
-                "player": str(session.get('uuid')),
-                "displayName": display_name,
+                "action": "player-joined",
+                "data": {
+                    "player": str(session.get('uuid')),
+                    "displayName": display_name,
                 }
             }
-            socketio.emit('player-joined', data, to=game['players'][player]['sid'])
+            socketio.emit('player-joined', data,
+                          to=game['players'][player]['sid'])
 
     result = {
         "gameId": game.get("gameId"),
@@ -101,9 +103,10 @@ def join_game(game_id, display_name):
         "players": {},
         "playerOrder": game["players"].get(uuid).get('playerOrder'),
         "turnCounter": game.get('turnCounter'),
-        "currentTurnState": game['currentTurnState'],
+        "turnState": game['currentTurnState'],
         "isOwner": game.get('owner') == uuid
     }
+
     if game.get('gameState') == "in-game":
         result['discard'] = game.get('discardPile')[0]
         result['players'] = player_response_builder(uuid, game['players'])
@@ -146,30 +149,43 @@ def start_game(game_id):
 
     for player in game['players']:
         data = {
-                "action": "started",
-                "game": {
-                    "hand": game["players"][player].get("hand"),
-                    "discard": game['discardPile'][0],
-                    "turnCounter": 1,
-                    "playerOrder": game["players"][player]["playerOrder"],
-                    "players": player_response_builder(player, game['players']),
-                    "currentTurnState": game["currentTurnState"],
-                }
+            "action": "started",
+            "game": {
+                "hand": game["players"][player].get("hand"),
+                "discard": game['discardPile'][0],
+                "turnCounter": 1,
+                "playerOrder": game["players"][player]["playerOrder"],
+                "players": player_response_builder(player, game['players']),
+                "currentTurnState": game["currentTurnState"],
             }
-        socketio.emit('game-started', data, to=game['players'][player]['sid'])
+        }
+        if game['players'][player]['sid']:
+            socketio.emit('game-started', data, to=game['players'][player]['sid'])
 
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
     return game
 
 
-def make_move(player, move, data):
+def make_move(game_key, player, move, data):
     """Make Rummy Move."""
+    game = redis_client.json().get(game_key)
     if move == "drawPickup":
-        print('test')
+        # TODO verify enough cards
+        picked_card = game.get('deck')[0]
+        game.get('deck').pop(0)
+        game.get('players').get(player).get('hand').append(picked_card)
+
+        result = {
+            "card": picked_card,
+            "turnState": "meld"
+        }
+        game['currentTurnState'] = 'meld'
+        redis_client.json().set(game_key, Path.root_path(), game)
+        return result
 
     if move == "drawDiscard":
-        print('test')
+        return move
 
     if move == "meld":
         pass
@@ -188,16 +204,17 @@ def player_response_builder(current, player_dic):
         if key != current:
             players.append(
                 {
-                'displayName': player_dic[key]['displayName'],
-                'cardCount': len(player_dic[key]['hand']),
-                'playerOrder': player_dic[key].get('playerOrder', 0)
-            })
+                    'displayName': player_dic[key]['displayName'],
+                    'cardCount': len(player_dic[key]['hand']),
+                    'playerOrder': player_dic[key].get('playerOrder', 0)
+                })
     if players[-1].get('playerOrder') > player_dic[current].get('playerOrder'):
         while players[0].get('playerOrder') < player_dic[current].get('playerOrder'):
             players.append(players.pop(0))
     return players
 
-def winner_points(player_dic, winner, game): # winner = player uuid
+
+def winner_points(player_dic, winner, game):  # winner = player uuid
     """Returns points of winner"""
     sum = 0
     for player in player_dic:

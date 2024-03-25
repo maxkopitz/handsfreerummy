@@ -1,4 +1,4 @@
-import { ValueOrder, SuitOrder } from '../../Type'
+import { ValueOrder, SuitOrder, GameTurn } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
@@ -9,9 +9,11 @@ interface PlayerHandProps {
     playerId?: number
     hand: CardType[]
     isTurn: boolean
+    turnState: GameTurn
+    handleDiscard: any
 }
 
-const PlayerHand = ({ playerId, hand, isTurn }: PlayerHandProps) => {
+const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: PlayerHandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
 
     const handSize = hand.length
@@ -68,8 +70,10 @@ const PlayerHand = ({ playerId, hand, isTurn }: PlayerHandProps) => {
                 <div className={cardClasses}>
                     {sortedCards.map((card, index) => (
                         <div key={index} className="m-2">
-                        {/* TODO: isTurn and Correct stage*/}
-                            <Card card={card} isActive={isTurn}/>
+                            <Card
+                                card={card}
+                                isActive={isTurn && (turnState === GameTurn.MELD || turnState === GameTurn.DISCARD)}
+                                onClick={() => handleDiscard({card: card})} />
                         </div>
                     ))}
                 </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
-import { RummyGame, Value, Suit } from '../../Type'
+import { RummyGame, Value, Suit, GameTurn } from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
 import Table from './Table'
@@ -23,6 +23,7 @@ const Game = () => {
         turnCounter: 0,
         playerOrder: 0,
         isOwner: false,
+        turnState: GameTurn.PICKUP
     })
 
     const joinGame = async () => {
@@ -44,7 +45,8 @@ const Game = () => {
                     discard: data.game?.discard,
                     turnCounter: data.game?.turnCounter,
                     playerOrder: data.game?.playerOrder,
-                    isOwner: data.game?.isOwner
+                    isOwner: data.game?.isOwner,
+                    turnState: data.game?.turnState
                 })
             })
             .catch((error: any) => {
@@ -71,11 +73,18 @@ const Game = () => {
                 players: data.game.players,
                 playerOrder: data.game.playerOrder,
                 turnCounter: data.game.turnCounter,
+                turnState: data.game.turnState
             })
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
-            console.log(data)
+            setGame({
+                ...game,
+                discard: data.game.discard,
+                players: data.game.players,
+                turnCounter: data.game.turnCounter,
+                turnState: data.game.turnState
+            })
         });
 
         return () => {
@@ -88,7 +97,29 @@ const Game = () => {
     const handleClickPickup = () => {
         const data = JSON.stringify({
             action: 'move',
-            move: 'drawPickup',
+            move: {
+                type: 'drawPickup'
+            },
+        })
+        axiosInstance
+            .post<any>('/games/' + gameId + '/', data)
+            .then((res: any) => {
+                setGame((prevState) => ({
+                    ...prevState,
+                    hand: [...prevState.hand, res.data.game.card]
+                }))
+            })
+            .catch(() => {
+                console.log('An error occured')
+            })
+    }
+
+    const handleClickPickupDiscard = () => {
+        const data = JSON.stringify({
+            action: 'move',
+            move: {
+                type: 'drawDiscard'
+            },
         })
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
@@ -98,9 +129,25 @@ const Game = () => {
             .catch(() => {
                 console.log('An error occured')
             })
+        console.log('discard pile')
     }
 
-    const handleClickDiscard = () => {
+    const handleDiscard = ({ card } : any) => {
+        const data = JSON.stringify({
+            action: 'move',
+            move: {
+                type: 'discard',
+                card: card
+            },
+        })
+        axiosInstance
+            .post<any>('/games/' + gameId + '/', data)
+            .then((res: any) => {
+                console.log(res)
+            })
+            .catch(() => {
+                console.log('An error occured')
+            })
         console.log('discard pile')
     }
     if (game?.gameState === 'lobby') {
@@ -111,7 +158,8 @@ const Game = () => {
             <Table
                 game={game}
                 handleClickPickup={handleClickPickup}
-                handleClickDiscard={handleClickDiscard}
+                handleClickDiscard={handleClickPickupDiscard}
+                handleDiscard={handleDiscard}
             />
         )
     }

@@ -1,5 +1,5 @@
 import Board from './Board'
-import { RummyGame, Suit, Value } from '../../Type'
+import { GameTurn, RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
@@ -17,6 +17,7 @@ interface TableProps {
     game: RummyGame
     handleClickPickup: any
     handleClickDiscard: any
+    handleDiscard: any
 }
 
 const dummyRuns = [
@@ -28,7 +29,7 @@ const dummyRuns = [
     [{ value: Value.J, suit: Suit.C }],
 ]
 
-const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
+const Table = ({ game, handleClickPickup, handleClickDiscard, handleDiscard }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
 
@@ -93,12 +94,17 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
 
                 <div className="col-start-5 flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold">Discard</h1>
-                    <Card card={game.discard} onClick={handleClickDiscard} isActive={game.playerOrder === game.turnCounter} />
+                    <Card
+                        card={game.discard}
+                        onClick={handleClickDiscard}
+                        isActive={game.playerOrder === game.turnCounter && game.turnState === GameTurn.PICKUP} />
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold">Pickup</h1>
-                    <CardBack onClick={handleClickPickup} />
+                    <CardBack
+                        onClick={handleClickPickup}
+                        isActive={game.playerOrder === game.turnCounter && game.turnState === GameTurn.PICKUP} />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">
@@ -112,6 +118,8 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
                         playerId={game.playerOrder}
                         hand={game.hand}
                         isTurn={game.playerOrder === game.turnCounter}
+                        turnState={game.turnState}
+                        handleDiscard={handleDiscard}
                     />
                 </div>
             </div>

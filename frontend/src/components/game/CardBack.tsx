@@ -18,9 +18,15 @@ const CardBack = ({ onClick, isActive = false }: CardBackProps) => {
         { 'font-bold border-4': profile.settings.cardFontWeight === 2 },
         { 'font-extrabold border-8': profile.settings.cardFontWeight === 3 }
     )
-
+    if (isActive) {
+        return (
+            <div className={classes} onClick={onClick}>
+                {' '}
+            </div>
+        )
+    }
     return (
-        <div className={classes} onClick={onClick}>
+        <div className={classes}>
             {' '}
         </div>
     )
