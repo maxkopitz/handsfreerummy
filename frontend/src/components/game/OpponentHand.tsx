@@ -19,11 +19,11 @@ const OpponentHand = ({
     const cardClasses = classNames('flex flex-row justify-center items-center')
 
     return (
-        <div className="flex flex-col justify-center item-center w-max">
+        <div className="flex flex-col justify-center item-center">
             <div className="flex flex-col items-center justify-center">
                 <h1 className="text-xl font-bold">
                     Player {playerDisplayName} {playerId}{' '}
-                    {isTurn && 'It is my turn!'}
+                    {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>
             <div className={cardClasses}>
