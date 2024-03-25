@@ -60,6 +60,15 @@ const Layout = () => {
             setIsConnected(false)
         })
     }, [])
+
+    useEffect(() => {
+        document.body.style.backgroundColor = "#d1d5db";
+
+        return () => {
+            document.body.style.backgroundColor = ""; // Reset to original or another desired color
+        };
+    }, []); // Empty dependency array ensures this runs once on mount and unmount
+    
     return (
         <div className="h-screen bg-gradient-to-b from-gray-100 to-gray-300">
             <ProfileProvider>
