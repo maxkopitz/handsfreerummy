@@ -52,6 +52,9 @@
         ]
     },
     "devDependencies": {
-        "prettier": "3.2.5"
+        "prettier": "3.2.5",
+        "object-path": ">=0.11.8",
+        "webpack-dev-middleware": ">=5.3.4",
+        "nth-check": ">=2.0.1"
     }
 }
