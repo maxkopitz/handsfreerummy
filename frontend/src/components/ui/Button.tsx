@@ -6,24 +6,28 @@ interface ButtonProps {
     onClick?: any
     link?: string
     isActive?: boolean
+    disabled?: boolean
     size?: 'sm' | 'md' | 'lg'
 }
-const Button = (props: ButtonProps) => {
+
+const Button = ({ text, onClick, link, isActive = false, size, disabled = false }: ButtonProps) => {
     const classes = classNames(
-        'bg-blue-500 hover:bg-blue-700 text-white text-2xl font-bold py-3 px-8 m-1 rounded shadow-md hover:shadow-lg outline-none inline-block',
-        { 'bg-green-700': props.isActive }
+        'text-white text-2xl font-bold py-3 px-8 m-1 rounded shadow-md hover:shadow-lg outline-none inline-block',
+        { 'bg-green-500 hover:bg-green-700': isActive && !disabled },
+        { 'bg-blue-500 hover:bg-blue-700': !isActive && !disabled },
+        { 'bg-gray-500': disabled },
     )
 
-    if (props.link) {
+    if (link) {
         return (
-            <Link to={props.link} className={classes}>
-                {props.text}
+            <Link to={link} className={classes}>
+                {text}
             </Link>
         )
     }
     return (
-        <button className={classes} onClick={props.onClick}>
-            {props.text}
+        <button className={classes} onClick={onClick} disabled={disabled}>
+            {text}
         </button>
     )
 }

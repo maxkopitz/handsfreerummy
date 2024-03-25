@@ -35,7 +35,6 @@ const Game = () => {
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
                 const { data } = res
-                console.log(data.game)
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
@@ -129,6 +128,7 @@ const Game = () => {
                 setGame((prevState) => ({
                     ...prevState,
                     hand: [...prevState.hand, res.data.game.card],
+                    discard: res.data.game?.discard,
                     turnState: res.data.game.turnState
                 }))
             })
@@ -152,7 +152,13 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                 setGame((prevState) => {
+                 return {
+                    ...prevState,
+                    hand: prevState.hand.filter((c) => (c.suit !== card.suit && c.value !== card.value)),
+                    discard: res.data.game?.discard,
+                    turnState: res.data.game.turnState
+                }})
             })
             .catch(() => {
                 console.log('An error occured')

@@ -2,7 +2,7 @@ import { ValueOrder, SuitOrder, GameTurn } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Button from '../ui/Button'
 
 interface PlayerHandProps {
@@ -21,8 +21,12 @@ const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: Player
     const [sortedCards, setSortedCards] = useState([...hand])
     const [sortBy, setSortBy] = useState('Suit')
 
+    useEffect(() => {
+        sortCards()
+    }, [hand])
+
     const sortCards = () => {
-        const sorted = [...sortedCards].sort((a, b) => {
+        const sorted = [...hand].sort((a, b) => {
             if (sortBy === 'Suit') {
                 if (a.suit === b.suit) {
                     return (
@@ -67,13 +71,23 @@ const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: Player
                     onClick={toggleSortBy}
                     text={'Sort Cards by ' + sortBy}
                 ></Button>
+                <Button
+                    onClick={toggleSortBy}
+                    text={'Create Meld'}
+                    disabled={!isTurn || (turnState !== GameTurn.MELD && turnState !== GameTurn.DISCARD)}
+                ></Button>
+                <Button
+                    onClick={toggleSortBy}
+                    text={'Discard'}
+                    disabled={!isTurn || (turnState !== GameTurn.MELD && turnState !== GameTurn.DISCARD)}
+                ></Button>
                 <div className={cardClasses}>
                     {sortedCards.map((card, index) => (
                         <div key={index} className="m-2">
                             <Card
                                 card={card}
                                 isActive={isTurn && (turnState === GameTurn.MELD || turnState === GameTurn.DISCARD)}
-                                onClick={() => handleDiscard({card: card})} />
+                                onClick={() => handleDiscard({ card: card })} />
                         </div>
                     ))}
                 </div>

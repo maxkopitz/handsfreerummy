@@ -175,19 +175,21 @@ def start_game(game_id):
 def make_move(game_key, player, move, data):
     """Make Rummy Move."""
     game = redis_client.json().get(game_key)
+    result = {
+        "type": move,
+        "card": {},
+        "turnState": ""
+    }
     if move == "drawPickup":
         # TODO verify enough cards
         picked_card = game.get('deck')[0]
         game.get('deck').pop(0)
         game.get('players').get(player).get('hand').append(picked_card)
 
-        result = {
-            "card": picked_card,
-            "turnState": "meld"
-        }
+        result['card'] = picked_card
+        result["turnState"] = "meld"
+
         game['currentTurnState'] = 'meld'
-        redis_client.json().set(game_key, Path.root_path(), game)
-        return result
 
     if move == "drawDiscard":
         if len(game.get('discardPile')) > 0:
@@ -195,13 +197,14 @@ def make_move(game_key, player, move, data):
             game.get('discardPile').pop(0)
             game.get('players').get(player).get('hand').append(picked_card)
 
-            result = {
-                "card": picked_card,
-                "turnState": "meld"
-            }
+            result['card'] = picked_card
+            result["turnState"] = "meld"
+            result["discard"] = {}
+
+            if len(game.get('discardPile')) > 0:
+                result['discard'] = game.get('discardPile')[0]
+
             game['currentTurnState'] = 'meld'
-            redis_client.json().set(game_key, Path.root_path(), game)
-            return result
 
     if move == "meld":
         pass
@@ -215,17 +218,26 @@ def make_move(game_key, player, move, data):
             player).get('hand').remove(discardedCard)
         game.get('discardPile').insert(0, discardedCard)
         turnCounter = (game['turnCounter'] + 1) % 4
+
         game['currentTurnState'] = "pickup"
         game['turnCounter'] = (game['turnCounter'] + 1) % 4
-        result = {
-            "turnState": "pickup",
-            "turnCounter": turnCounter,
-            "hand": game.get('players').get(player).get('hand'),
-            "discard": game.get('discardPile')[0]
-        }
 
-        redis_client.json().set(game_key, Path.root_path(), game)
-        return result
+        result["turnState"] = "pickup"
+        result["turnCounter"] = turnCounter
+        result["hand"] = game.get('players').get(player).get('hand')
+        result["discard"] = game.get('discardPile')[0]
+
+    for key in game.get('players'):
+        sid = game.get('players').get(key).get('sid')
+
+        if key != player and sid is not None:
+            data = {
+
+            }
+            socketio.emit('played_move', data, to=sid)
+
+    redis_client.json().set(game_key, Path.root_path(), game)
+    return result
 
 
 def player_response_builder(current, player_dic):

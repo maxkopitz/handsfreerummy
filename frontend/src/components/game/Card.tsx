@@ -6,8 +6,10 @@ interface CardProps {
     card: CardType
     onClick?: any
     isActive: boolean
+    isSelected?: boolean
 }
-const Card = ({ card, onClick, isActive }: CardProps) => {
+
+const Card = ({ card, onClick, isActive, isSelected = false }: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
