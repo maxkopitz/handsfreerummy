@@ -13,6 +13,7 @@ import Container from '../ui/Container'
 import axiosInstance from '../../api/axiosConfig'
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 interface TableProps {
     game: RummyGame
@@ -26,6 +27,35 @@ const dummyRuns = [
     [{ value: Value.K, suit: Suit.D }],
     [{ value: Value.J, suit: Suit.C }],
 ]
+
+const Dictaphone = () => {
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
+
+    if (!browserSupportsSpeechRecognition) {
+        return <span>Browser does not support speech recognition</span>;
+    }
+
+    return (
+        <div>
+            <p>Microphone: {listening ? 'on' : 'off'}</p>
+            <Button 
+                text={'start'}
+                onClick={
+                    
+                }
+            
+            />
+
+        </div>
+    )
+}
+
+
 
 const Table = ({ game }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
