@@ -81,6 +81,7 @@ const Table = ({ game, handleClickPickup, handleClickDiscard, handleDiscard }: T
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
                     </div>
                 </div>
+            
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand

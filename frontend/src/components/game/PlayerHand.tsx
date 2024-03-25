@@ -56,7 +56,7 @@ const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: Player
             <div>
                 <h1 className="text-xl font-bold">
                     Player {playerId}: {handSize} cards{' '}
-                    {isTurn && 'It is my turn!'}
+                    {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>
 

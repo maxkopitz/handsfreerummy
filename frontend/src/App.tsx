@@ -60,6 +60,16 @@ const Layout = () => {
             setIsConnected(false)
         })
     }, [])
+
+    useEffect(() => {
+        document.body.style.backgroundColor = "#d1d5db";
+
+        return () => {
+            document.body.style.backgroundColor = "#d1d5db"; 
+        };
+    }, []); 
+    
+    
     return (
         <div className="h-screen bg-gradient-to-b from-gray-100 to-gray-300">
             <ProfileProvider>
