@@ -1,5 +1,3 @@
-import { Suit, Value } from '../../Type'
-import Card from './Card'
 import classNames from 'classnames'
 import OpponentCard from './OpponentCard'
 
@@ -22,7 +20,7 @@ const OpponentHand = ({
         <div className="flex flex-col justify-center item-center">
             <div className="flex flex-col items-center justify-center">
                 <h1 className="text-xl font-bold">
-                    Player {playerDisplayName} {playerId}{' '}
+                    {playerDisplayName} {playerId}{' '}
                     {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>

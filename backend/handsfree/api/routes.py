@@ -16,8 +16,8 @@ def register():
     if session.get('uuid') is None:
         session['uuid'] = uuid4()
     response = {
-            "redirect": "/"
-            }
+        "redirect": "/"
+    }
     if session.get('game_id'):
         game_id = session.get('game_id')
         response["redirect"] = f"games/{game_id}/"
@@ -72,7 +72,9 @@ def handle_game_action(game_id):
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 
-    action = request.json.get('action')
+    json_body = request.json
+    action = json_body.get('action')
+
     if action is None:
         return {"error": {"message": "Incorrect format"}}
 
@@ -94,7 +96,8 @@ def handle_game_action(game_id):
         if game.get('gameState') != 'lobby' and players.get(uuid) is None:
             return {"error": {"message": "Game has started!"}}, 403
 
-        result = utils.join_game(game_id, request.json.get('displayName', 'NA'))
+        result = utils.join_game(
+            game_id, request.json.get('displayName', 'NA'))
 
         return {"game": result}
 
@@ -113,7 +116,14 @@ def handle_game_action(game_id):
         return result
 
     if action == 'move':
-        return 'test'
+        move = json_body.get('move', {})
+        if move.get('type') is None:
+            return {"error": {"message": "No move specified"}}, 404
+        uuid = str(session.get('uuid'))
+
+        result = utils.make_move(game_key, uuid, move.get('type'), move.get('data', {}))
+
+        return {"game": result}
     return {"error": {"message": "Unknown action."}}, 404
 
 
