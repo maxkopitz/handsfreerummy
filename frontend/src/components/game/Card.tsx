@@ -12,11 +12,19 @@ const Card = ({ card, onClick, isActive }: CardProps) => {
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
         {
-            'text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex flex-col items-center justify-center':
+            'text-red-500 border-red-500  flex flex-col items-center justify-center':
+                card.suit === Suit.H || card.suit === Suit.D,
+        },
+        {
+            'hover:bg-red-500 hover:text-white':
                 (card.suit === Suit.H || card.suit === Suit.D) && isActive,
         },
         {
-            'text-black-500 border-slate-950 hover:bg-neutral-950 hover:text-white flex flex-col items-center justify-center':
+            'text-black-500 border-slate-950 flex flex-col items-center justify-center':
+                card.suit === Suit.S || card.suit === Suit.C,
+        },
+        {
+            'hover:bg-neutral-950 hover:text-white':
                 (card.suit === Suit.S || card.suit === Suit.C) && isActive,
         },
         { 'text-2xl w-20 h-32': profile.settings.cardSize === 1 },
