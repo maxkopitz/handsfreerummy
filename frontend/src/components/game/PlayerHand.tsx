@@ -54,7 +54,7 @@ const PlayerHand = ({ playerId, hand, isTurn }: PlayerHandProps) => {
             <div>
                 <h1 className="text-xl font-bold">
                     Player {playerId}: {handSize} cards{' '}
-                    {isTurn && 'It is my turn!'}
+                    {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>
 

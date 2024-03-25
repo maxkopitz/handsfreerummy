@@ -80,6 +80,7 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
                     </div>
                 </div>
+            
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand
