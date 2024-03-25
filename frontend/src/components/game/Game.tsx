@@ -7,6 +7,7 @@ import Container from '../ui/Container'
 import Lobby from './Lobby'
 import Table from './Table'
 import { useProfile } from '../../hooks/Profile'
+import { AxiosError } from 'axios'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -45,8 +46,9 @@ const Game = () => {
                     playerOrder: data.game?.playerOrder,
                 })
             })
-            .catch(() => {
-                console.log('This is an error')
+            .catch((error: any) => {
+                const data = error?.response?.data;
+                console.log(data?.error?.message);
                 navigate('/')
             })
     }
