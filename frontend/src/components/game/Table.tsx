@@ -1,5 +1,5 @@
 import Board from './Board'
-import { GameTurn, RummyGame, Suit, Value } from '../../Type'
+import { CardType, GameTurn, RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
@@ -18,18 +18,24 @@ interface TableProps {
     handleClickPickup: any
     handleClickDiscard: any
     handleDiscard: any
+    handlePlayerCardClick: any
 }
 
 const dummyRuns = [
     [
-        { value: Value.A, suit: Suit.C },
-        { value: Value.A, suit: Suit.D },
+        { value: Value.A, suit: Suit.C, isSelected: false },
+        { value: Value.A, suit: Suit.D, isSelected: false },
     ],
-    [{ value: Value.K, suit: Suit.D }],
-    [{ value: Value.J, suit: Suit.C }],
+    [{ value: Value.K, suit: Suit.D, isSelected: false }],
+    [{ value: Value.J, suit: Suit.C, isSelected: false }],
 ]
 
-const Table = ({ game, handleClickPickup, handleClickDiscard, handleDiscard }: TableProps) => {
+const Table = ({
+    game,
+    handleClickPickup,
+    handleClickDiscard,
+    handleDiscard,
+    handlePlayerCardClick }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
 
@@ -79,9 +85,10 @@ const Table = ({ game, handleClickPickup, handleClickDiscard, handleDiscard }: T
                             }
                         />
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
+                        <h1>It is {game.players[game.turnCounter - 2]?.displayName} turn. Awaiting : {game.turnState} </h1>
                     </div>
                 </div>
-            
+
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand
@@ -121,6 +128,7 @@ const Table = ({ game, handleClickPickup, handleClickDiscard, handleDiscard }: T
                         isTurn={game.playerOrder === game.turnCounter}
                         turnState={game.turnState}
                         handleDiscard={handleDiscard}
+                        handleCardClick={handlePlayerCardClick}
                     />
                 </div>
             </div>

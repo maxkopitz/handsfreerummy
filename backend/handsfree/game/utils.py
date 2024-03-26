@@ -175,21 +175,49 @@ def start_game(game_id):
 def make_move(game_key, player, move, data):
     """Make Rummy Move."""
     game = redis_client.json().get(game_key)
+
+    print(data, file=sys.stderr)
     result = {
-        "type": move,
-        "card": {},
-        "turnState": ""
+        "move": {
+            "type": move,
+            "data": {}
+        },
+        "nextTurnState": ""
     }
+
     if move == "drawPickup":
         # TODO verify enough cards
         picked_card = game.get('deck')[0]
         game.get('deck').pop(0)
         game.get('players').get(player).get('hand').append(picked_card)
 
-        result['card'] = picked_card
-        result["turnState"] = "meld"
+        result['move']['data']['card'] = picked_card
+        result["nextTurnState"] = "meld"
 
         game['currentTurnState'] = 'meld'
+        for key in game.get('players'):
+            sid = game.get('players').get(key).get('sid')
+
+            if key != player and sid is not None:
+                message = {
+                    "move": {
+                        "type": move,
+                        "data": {
+                            "players":
+                                player_response_builder(key,
+                                                        game.get('players')),
+                            "discard": {}
+
+                        }
+                    },
+                    "nextMove": game['currentTurnState']
+
+                }
+
+                if len(game.get('discardPile')) > 0:
+                    message['move']['data']['discard'] = game.get('discardPile')[
+                        0]
+                socketio.emit('played-move', message, to=sid)
 
     if move == "drawDiscard":
         if len(game.get('discardPile')) > 0:
@@ -197,14 +225,32 @@ def make_move(game_key, player, move, data):
             game.get('discardPile').pop(0)
             game.get('players').get(player).get('hand').append(picked_card)
 
-            result['card'] = picked_card
-            result["turnState"] = "meld"
-            result["discard"] = {}
+            result['move']['data']['card'] = picked_card
+            result["nextTurnState"] = "meld"
+            result['move']['data']["discard"] = {}
 
             if len(game.get('discardPile')) > 0:
-                result['discard'] = game.get('discardPile')[0]
+                result['move']['data']['discard'] = game.get('discardPile')[0]
 
             game['currentTurnState'] = 'meld'
+
+            for key in game.get('players'):
+                sid = game.get('players').get(key).get('sid')
+
+                if key != player and sid is not None:
+                    message = {
+                        "move": {
+                            "type": move,
+                            "data": {
+                                "players":
+                                    player_response_builder(key,
+                                                            game.get('players')),
+                                "discard": result['move']['data']['discard']
+                            }
+                        },
+                        "nextMove": game['currentTurnState']
+                    }
+                    socketio.emit('played-move', message, to=sid)
 
     if move == "meld":
         pass
@@ -217,24 +263,15 @@ def make_move(game_key, player, move, data):
         game.get('players').get(
             player).get('hand').remove(discardedCard)
         game.get('discardPile').insert(0, discardedCard)
-        turnCounter = (game['turnCounter'] + 1) % 4
+        turnCounter = (game['turnCounter'] + 1) % len(game['players'])
 
         game['currentTurnState'] = "pickup"
-        game['turnCounter'] = (game['turnCounter'] + 1) % 4
+        game['turnCounter'] = turnCounter
 
-        result["turnState"] = "pickup"
+        result["nextTurnState"] = "pickup"
         result["turnCounter"] = turnCounter
         result["hand"] = game.get('players').get(player).get('hand')
-        result["discard"] = game.get('discardPile')[0]
-
-    for key in game.get('players'):
-        sid = game.get('players').get(key).get('sid')
-
-        if key != player and sid is not None:
-            data = {
-
-            }
-            socketio.emit('played_move', data, to=sid)
+        result['move']['data']["discard"] = game.get('discardPile')[0]
 
     redis_client.json().set(game_key, Path.root_path(), game)
     return result

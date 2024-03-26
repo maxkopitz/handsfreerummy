@@ -4,6 +4,7 @@ import { CardType } from '../../Type'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Button from '../ui/Button'
+import { selectedCards } from '../../lib/parsers'
 
 interface PlayerHandProps {
     playerId?: number
@@ -11,9 +12,16 @@ interface PlayerHandProps {
     isTurn: boolean
     turnState: GameTurn
     handleDiscard: any
+    handleCardClick: any
 }
 
-const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: PlayerHandProps) => {
+const PlayerHand = ({
+    playerId,
+    hand,
+    isTurn,
+    turnState,
+    handleDiscard,
+    handleCardClick }: PlayerHandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
 
     const handSize = hand.length
@@ -21,9 +29,6 @@ const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: Player
     const [sortedCards, setSortedCards] = useState([...hand])
     const [sortBy, setSortBy] = useState('Suit')
 
-    useEffect(() => {
-        sortCards()
-    }, [hand])
 
     const sortCards = () => {
         const sorted = [...hand].sort((a, b) => {
@@ -50,6 +55,10 @@ const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: Player
         setSortedCards(sorted)
     }
 
+    useEffect(() => {
+        sortCards()
+    }, [hand])
+
     const toggleSortBy = () => {
         sortCards()
         setSortBy(sortBy === 'Suit' ? 'Rank' : 'Suit')
@@ -74,20 +83,27 @@ const PlayerHand = ({ playerId, hand, isTurn, turnState, handleDiscard }: Player
                 <Button
                     onClick={toggleSortBy}
                     text={'Create Meld'}
-                    disabled={!isTurn || (turnState !== GameTurn.MELD && turnState !== GameTurn.DISCARD)}
+                    disabled={
+                        !isTurn
+                        || (turnState !== GameTurn.MELD && turnState !== GameTurn.DISCARD)
+                        || selectedCards(hand).length < 3
+                    }
                 ></Button>
                 <Button
-                    onClick={toggleSortBy}
+                    onClick={handleDiscard}
                     text={'Discard'}
-                    disabled={!isTurn || (turnState !== GameTurn.MELD && turnState !== GameTurn.DISCARD)}
+                    disabled={
+                        !isTurn ||
+                        (turnState !== GameTurn.MELD && turnState !== GameTurn.DISCARD)
+                        || selectedCards(hand).length !== 1}
                 ></Button>
                 <div className={cardClasses}>
-                    {sortedCards.map((card, index) => (
+                    {hand.map((card, index) => (
                         <div key={index} className="m-2">
                             <Card
                                 card={card}
                                 isActive={isTurn && (turnState === GameTurn.MELD || turnState === GameTurn.DISCARD)}
-                                onClick={() => handleDiscard({ card: card })} />
+                                onClick={() => handleCardClick({ card: card })} />
                         </div>
                     ))}
                 </div>

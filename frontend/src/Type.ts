@@ -34,7 +34,7 @@ export const ValueOrder = Object.values(Value)
 export interface CardType {
     suit: Suit
     value: Value
-    // rank: Rank
+    isSelected: boolean
 }
 
 export interface LobbyGame {

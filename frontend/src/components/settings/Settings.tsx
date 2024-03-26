@@ -24,7 +24,7 @@ const Settings = () => {
             <div className="flex flex-col justify-center items-center">
                 <div className="h-44 mb-10">
                     <Card
-                        card={{ value: Value.A, suit: Suit.C }}
+                        card={{ value: Value.A, suit: Suit.C, isSelected: false }}
                         isActive={true}
                     />
                 </div>
