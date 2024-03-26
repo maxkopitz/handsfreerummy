@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
-import { RummyGame, Value, Suit, GameTurn } from '../../Type'
+import { RummyGame, Value, Suit, GameTurn, CardType } from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
 import Table from './Table'
 import { useProfile } from '../../hooks/Profile'
+import { parseHand, selectedCards } from '../../lib/parsers'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -18,7 +19,8 @@ const Game = () => {
         gameState: '',
         players: [],
         hand: [],
-        discard: { value: Value.J, suit: Suit.C },
+        discard: { value: Value.J, suit: Suit.C, isSelected: false },
+        // rank: Rank
         melds: [],
         turnCounter: 0,
         playerOrder: 0,
@@ -40,7 +42,7 @@ const Game = () => {
                     gameId: data.game.gameId,
                     players: data.game.players,
                     gameState: data.game.gameState,
-                    hand: data.game.hand,
+                    hand: parseHand(data.game.hand),
                     melds: data.game?.melds,
                     discard: data.game?.discard,
                     turnCounter: data.game?.turnCounter,
@@ -49,7 +51,7 @@ const Game = () => {
                     turnState: data.game?.turnState
                 })
             })
-            .catch((error: any) => {
+            .catch(() => {
                 navigate('/')
             })
     }
@@ -58,14 +60,18 @@ const Game = () => {
         joinGame()
 
         socket.on(SocketEvents.PLAYER_JOINED, (data: any) => {
-            console.log(data.data.displayName, 'has joined')
+            console.log(data.data.displayName, 'has joined.')
+        })
+
+        socket.on(SocketEvents.PLAYER_LEFT, (data: any) => {
+            console.log(data.data.displayName, 'has left.')
         })
 
         socket.on(SocketEvents.GAME_STARTED, (data: any) => {
             console.log('STARTED:', data)
             setGame({
                 ...game,
-                hand: data.game.hand,
+                hand: parseHand(data.game.hand),
                 discard: data.game.discard,
                 gameState: 'in-game',
                 players: data.game.players,
@@ -157,7 +163,18 @@ const Game = () => {
             })
     }
 
-    const handleDiscard = ({ card }: any) => {
+    const handleDiscard = () => {
+        if (selectedCards(game.hand).length !== 1) {
+            return;
+        }
+        let card: any = selectedCards(game.hand).at(0)
+        card = Object.keys(card)
+            .filter((objKey) => objKey !== 'isSelected').reduce((newObj: any, key: any) => {
+                newObj[key] = card[key]
+                return newObj
+            }, {})
+
+
         const data = JSON.stringify({
             action: 'move',
             move: {
@@ -182,8 +199,21 @@ const Game = () => {
             .catch(() => {
                 console.log('An error occured')
             })
-        console.log('discard pile')
     }
+
+    const handleCardClick = ({ card }: any) => {
+        setGame((prevState) => ({
+            ...prevState,
+            hand: prevState.hand.map((c) => {
+                if (c.suit === card.suit && c.value === card.value) {
+                    return { ...c, isSelected: !c.isSelected }
+                }
+                return c;
+            })
+
+        }))
+    }
+
 
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
@@ -195,6 +225,7 @@ const Game = () => {
                 handleClickPickup={handleClickPickup}
                 handleClickDiscard={handleClickPickupDiscard}
                 handleDiscard={handleDiscard}
+                handlePlayerCardClick={handleCardClick}
             />
         )
     }

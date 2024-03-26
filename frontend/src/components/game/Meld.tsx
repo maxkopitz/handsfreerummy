@@ -3,7 +3,7 @@ import { CardType, Suit } from '../../Type'
 import MeldCard from './MeldCard'
 
 interface MeldProps {
-    card: CardType 
+    card: CardType
     meld: CardType[]
     num: number
 }
@@ -15,12 +15,12 @@ const Meld = ({card, meld, num}: MeldProps) => {
         <>
             <div className={classes}>
                 {meld.map((card, index) => (
-                    <MeldCard card={{ value: card.value, suit: card.suit }} />
+                    <MeldCard card={{ value: card.value, suit: card.suit, isSelected: false }} />
                 ))}
                 <h1>{num}</h1>
             </div>
         </>
-    ) 
+    )
 }
 
 export default Meld

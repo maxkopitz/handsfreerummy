@@ -6,28 +6,40 @@ interface CardProps {
     card: CardType
     onClick?: any
     isActive: boolean
-    isSelected?: boolean
 }
 
-const Card = ({ card, onClick, isActive, isSelected = false }: CardProps) => {
+const Card = ({ card, onClick, isActive }: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
-        'rounded-md text-center shadow-lg bg-white',
+        'rounded-md text-center shadow-lg bg-white flex flex-col items-center justify-center',
         {
-            'text-red-500 border-red-500  flex flex-col items-center justify-center':
+            'text-red-500':
                 card.suit === Suit.H || card.suit === Suit.D,
+        },
+        {
+            'border-red-500': (card.suit === Suit.H || card.suit === Suit.D) && !card.isSelected,
         },
         {
             'hover:bg-red-500 hover:text-white':
                 (card.suit === Suit.H || card.suit === Suit.D) && isActive,
         },
         {
-            'text-black-500 border-slate-950 flex flex-col items-center justify-center':
+            'text-black-500':
                 card.suit === Suit.S || card.suit === Suit.C,
+        },
+        {
+            'border-black-500': (card.suit === Suit.S || card.suit === Suit.C) && !card.isSelected,
         },
         {
             'hover:bg-neutral-950 hover:text-white':
                 (card.suit === Suit.S || card.suit === Suit.C) && isActive,
+        },
+        {
+            'border-green-500': (
+                card.suit === Suit.H ||
+                card.suit === Suit.D ||
+                card.suit === Suit.S ||
+                card.suit === Suit.C) && card.isSelected,
         },
         { 'text-2xl w-20 h-32': profile.settings.cardSize === 1 },
         { 'text-4xl w-28 h-40': profile.settings.cardSize === 2 },
