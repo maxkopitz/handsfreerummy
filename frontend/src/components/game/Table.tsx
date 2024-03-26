@@ -79,9 +79,10 @@ const Table = ({ game, handleClickPickup, handleClickDiscard, handleDiscard }: T
                             }
                         />
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
+                        <h1>It is {game.players[game.turnCounter - 2]?.displayName } turn. Awaiting : {game.turnState} </h1>
                     </div>
                 </div>
-            
+
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand

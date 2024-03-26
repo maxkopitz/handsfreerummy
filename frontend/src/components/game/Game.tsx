@@ -35,6 +35,7 @@ const Game = () => {
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
                 const { data } = res
+                console.log(data)
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
@@ -49,8 +50,6 @@ const Game = () => {
                 })
             })
             .catch((error: any) => {
-                const data = error?.response?.data;
-                console.log(data?.error?.message);
                 navigate('/')
             })
     }
@@ -77,13 +76,31 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
-            setGame({
-                ...game,
-                discard: data.game.discard,
-                players: data.game.players,
-                turnCounter: data.game.turnCounter,
-                turnState: data.game.turnState
-            })
+            console.log(data)
+            if (data?.move.type === 'pickup') {
+                setGame({
+                    ...game,
+                    turnState: data.nextMove,
+                    discard: data.move.data.discard,
+                    players: data.move.data.players
+                })
+            }
+            else if (data?.move.type === 'meld') {
+                setGame({
+                    ...game,
+                    turnState: data.nextMove,
+                    players: data.move.data.players
+                })
+            }
+            else if (data?.move.type === 'discard') {
+                setGame({
+                    ...game,
+                    discard: data.game.discard,
+                    players: data.game.players,
+                    turnCounter: data.game.turnCounter,
+                    turnState: data.game.turnState
+                })
+            }
         });
 
         return () => {
@@ -119,7 +136,9 @@ const Game = () => {
             action: 'move',
             move: {
                 type: 'drawDiscard',
-                card: 'card'
+                data: {
+                    card: 'card'
+                }
             },
         })
         axiosInstance
@@ -127,19 +146,18 @@ const Game = () => {
             .then((res: any) => {
                 setGame((prevState) => ({
                     ...prevState,
-                    hand: [...prevState.hand, res.data.game.card],
-                    discard: res.data.game?.discard,
-                    turnState: res.data.game.turnState
+                    hand: [...prevState.hand, res.data.move.data.card],
+                    discard: res.data.move?.data.discard,
+                    turnState: res.data.nextTurnState
                 }))
             })
             .catch(() => {
                 console.log('An error occured')
 
             })
-        console.log('discard pile')
     }
 
-    const handleDiscard = ({ card } : any) => {
+    const handleDiscard = ({ card }: any) => {
         const data = JSON.stringify({
             action: 'move',
             move: {
@@ -152,19 +170,21 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                 setGame((prevState) => {
-                 return {
-                    ...prevState,
-                    hand: prevState.hand.filter((c) => (c.suit !== card.suit && c.value !== card.value)),
-                    discard: res.data.game?.discard,
-                    turnState: res.data.game.turnState
-                }})
+                setGame((prevState) => {
+                    return {
+                        ...prevState,
+                        hand: prevState.hand.filter((c) => (c.suit !== card.suit && c.value !== card.value)),
+                        discard: res.data.move?.data.discard,
+                        turnState: res.data.nextTurnState
+                    }
+                })
             })
             .catch(() => {
                 console.log('An error occured')
             })
         console.log('discard pile')
     }
+
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
     }

@@ -3,6 +3,7 @@ from handsfree import app, redis_client, socketio
 from handsfree.game import utils
 from flask import session, request
 from uuid import uuid4
+import sys
 
 
 @app.route('/', methods=['GET'])
@@ -74,11 +75,11 @@ def handle_game_action(game_id):
 
     json_body = request.json
     action = json_body.get('action')
+    game_key = f"game:{game_id}"
+    uuid = str(session.get('uuid'))
 
     if action is None:
         return {"error": {"message": "Incorrect format"}}
-
-    game_key = f"game:{game_id}"
 
     if not redis_client.exists(game_key):
         # Extra clean up
@@ -92,12 +93,15 @@ def handle_game_action(game_id):
 
         game = redis_client.json().get(game_key)
         players = game.get('players')
-        uuid = str(session.get('uuid'))
         if game.get('gameState') != 'lobby' and players.get(uuid) is None:
-            return {"error": {"message": "Game has started!"}}, 403
+            return {
+                "error": {
+                    "message": "Game has started!"
+                }}, 403
 
         result = utils.join_game(
-            game_id, request.json.get('displayName', 'NA'))
+            game_id,
+            request.json.get('displayName', 'NA'))
 
         return {"game": result}
 
@@ -109,21 +113,31 @@ def handle_game_action(game_id):
         result = utils.leave_game(game_id)
 
         return result
+
     if action == 'start':
         if redis_client.json().get(game_key).get('gameState') == 'in-game':
             return {"error": {"message": "Game has started"}}, 404
         result = utils.start_game(game_id)
+
         return result
 
     if action == 'move':
         move = json_body.get('move', {})
         if move.get('type') is None:
             return {"error": {"message": "No move specified"}}, 404
-        uuid = str(session.get('uuid'))
 
-        result = utils.make_move(game_key, uuid, move.get('type'), move.get('data', {}))
+        result = utils.make_move(
+            game_key,
+            uuid,
+            move.get('type'),
+            move.get('data', {}))
 
-        return {"game": result}
+        return result
+
+    if action == 'end-game':
+        if redis_client.json().get(game_key).get('owner') != uuid:
+            return {"error": {"message": "Not owner!"}}, 403
+
     return {"error": {"message": "Unknown action."}}, 404
 
 
