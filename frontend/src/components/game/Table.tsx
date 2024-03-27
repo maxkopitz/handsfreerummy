@@ -12,6 +12,7 @@ import Container from '../ui/Container'
 import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import Meld from './Meld'
 
 interface TableProps {
     game: RummyGame
@@ -20,6 +21,7 @@ interface TableProps {
     handleDiscard: any
     handlePlayerCardClick: any
     handleSortCardClick: any
+    handleClickMeld: any
 }
 
 const dummyRuns = [
@@ -38,6 +40,7 @@ const Table = ({
     handleDiscard,
     handlePlayerCardClick,
     handleSortCardClick,
+    handleClickMeld,
 }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
@@ -131,8 +134,17 @@ const Table = ({
                 <div className="mb-20 mt-20 col-span-3">
                     <Board playedRuns={dummyRuns} discard={game.discard} />
                 </div>
-                <div className="col-start-2">
-                    <h2 className="text-lg font-semibold">Melds</h2>
+                <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
+                    {game.melds.map((meld, index) => (
+                        <Meld
+                            meld={meld}
+                            key={index}
+                            isActive={
+                                game.turnCounter === game.playerOrder &&
+                                game.turnState === 'meld'
+                            }
+                        />
+                    ))}
                 </div>
                 <div className="col-start-2 col-span-3">
                     <PlayerHand
@@ -143,6 +155,7 @@ const Table = ({
                         handleDiscard={handleDiscard}
                         handleCardClick={handlePlayerCardClick}
                         handleSortCardClick={handleSortCardClick}
+                        handleClickMeld={handleClickMeld}
                     />
                 </div>
             </div>

@@ -15,6 +15,7 @@ interface PlayerHandProps {
     handleDiscard: any
     handleCardClick: any
     handleSortCardClick: any
+    handleClickMeld: any
 }
 
 const PlayerHand = ({
@@ -25,6 +26,7 @@ const PlayerHand = ({
     handleDiscard,
     handleCardClick,
     handleSortCardClick,
+    handleClickMeld,
 }: PlayerHandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
     const { profile } = useProfile()
@@ -57,7 +59,7 @@ const PlayerHand = ({
                 {(turnState === 'meld' || turnState === 'discard') && (
                     <>
                         <Button
-                            onClick={toggleSortBy}
+                            onClick={handleClickMeld}
                             text={'Create Meld'}
                             disabled={
                                 !isTurn ||

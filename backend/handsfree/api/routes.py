@@ -3,6 +3,7 @@ from handsfree import app, redis_client, socketio
 from handsfree.game import utils
 from flask import session, request
 from uuid import uuid4
+from redis.commands.json.path import Path
 import sys
 
 
@@ -21,7 +22,10 @@ def register():
     }
     if session.get('game_id'):
         game_id = session.get('game_id')
-        response["redirect"] = f"games/{game_id}/"
+        game_key = f"game:{game_id}"
+        game = redis_client.json().get(game_key)
+        if game.get('gameState') != 'ended':
+            response["redirect"] = f"games/{game_id}/"
     return response
 
 
@@ -43,8 +47,9 @@ def create_game():
 
     if session.get('game_id'):
         result = redis_client.json().get('game:%d' % session.get('game_id'))
-        app.logger.info(session)
-        return {"error": {"message": "Already in game"}}, 409
+        if result.get('gameState') != 'ended':
+            app.logger.info(session)
+            return {"error": {"message": "Already in game"}}, 409
 
     game = utils.create_game()
 
@@ -135,8 +140,12 @@ def handle_game_action(game_id):
         return result
 
     if action == 'end-game':
-        if redis_client.json().get(game_key).get('owner') != uuid:
+        game = redis_client.json().get(game_key)
+        if game.get('owner') != uuid:
             return {"error": {"message": "Not owner!"}}, 403
+        game['gameState'] = 'ended'
+        redis_client.json().set(game_key, Path.root_path(), game)
+        return {"game": "ended"}
 
     return {"error": {"message": "Unknown action."}}, 404
 

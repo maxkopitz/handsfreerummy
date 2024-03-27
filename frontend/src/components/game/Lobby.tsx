@@ -44,12 +44,13 @@ const Lobby = ({ game }: LobbyProps) => {
     }
     const handleCloseGame = () => {
         const data = JSON.stringify({
-            action: 'close',
+            action: 'end-game',
         })
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
             .then((res: any) => {
                 console.log(res)
+                navigate('/')
             })
             .catch((error: AxiosError) => {
                 console.log(error)

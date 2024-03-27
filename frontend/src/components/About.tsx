@@ -38,7 +38,7 @@ const About = () => {
                     .
                 </p>
                 <p>
-                    Start a game or join a game to play with up to Six players!
+                    Start a game or join a game to play with up to four players!
                 </p>
             </div>
 
