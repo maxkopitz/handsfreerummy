@@ -19,11 +19,54 @@
 
 # Installation
 ## External Requirements
-- [Docker](https://docs.docker.com/desktop/), used for Redis Stack
-    - Can be installed without docker [here](https://redis.io/docs/install/install-stack/) if desired
-- [Python-3.10.12](https://www.python.org/downloads/release/python-31012/)
+- [Docker](https://docs.docker.com/desktop/)
 - Node v21.6.1, we use [nvm](https://github.com/nvm-sh/nvm) to get correct verison
 
 ## Setup
-1. [Frontend](./frontend/README.md)
-2. [Backend](./backend/README.md)
+Clone the repository
+```sh
+git clone https://github.com/maxkopitz/handsfreerummy
+```
+## Start the flask API via ``Docker``
+1. Build the backend container, this step is only needed once
+```sh
+docker compose build .
+```
+2. Run docker compose
+```sh
+docker compose up
+```
+The API should be running at ``http://localhost:4000/``
+
+> Use ``CTRL-C`` to stop docker compose or docker compose down
+<br />
+
+## Running React UI
+
+1. Install [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) (for Node.JS)
+
+2. In a new terminal navigate to the UI
+```sh
+cd ./frontend
+```
+
+3. Install correct node version (see `.nvmrc`)
+```sh
+nvm use
+```
+
+4. Install packages
+```sh
+npm install
+```
+
+5. Create copy of env example
+```
+cp ~/.env.example ~/.env
+```
+
+6. Start the development server
+```sh
+npm start
+```
+The UI should be running at ``http://localhost:3000/``

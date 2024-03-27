@@ -5,6 +5,7 @@ import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Button from '../ui/Button'
 import { selectedCards } from '../../lib/parsers'
+import { useProfile } from '../../hooks/Profile'
 
 interface PlayerHandProps {
     playerId?: number
@@ -26,6 +27,7 @@ const PlayerHand = ({
     handleSortCardClick,
 }: PlayerHandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
+    const { profile } = useProfile()
 
     const handSize = hand.length
 
@@ -40,7 +42,7 @@ const PlayerHand = ({
         <div className="flex flex-col justify-center item-center w-max">
             <div>
                 <h1 className="text-xl font-bold">
-                    Player {playerId}: {handSize} cards{' '}
+                    {profile.displayName} {playerId}: {handSize} cards{' '}
                     {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>

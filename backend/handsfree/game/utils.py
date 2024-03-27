@@ -143,9 +143,6 @@ def start_game(game_id):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
 
-    game['discardPile'].append(game['deck'][0])
-    game['deck'].pop(0)
-
     game['pickupCard'] = game['deck'][0]
     game['deck'].pop(0)
 
@@ -156,7 +153,7 @@ def start_game(game_id):
             "action": "started",
             "game": {
                 "hand": game["players"][player].get("hand"),
-                "discard": game['discardPile'][0],
+                "discard": {},
                 "turnCounter": 1,
                 "playerOrder": game["players"][player]["playerOrder"],
                 "players": player_response_builder(player, game['players']),

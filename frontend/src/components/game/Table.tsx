@@ -88,7 +88,9 @@ const Table = ({
                             }
                         />
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
-                        <h1>Awaiting move: {game.turnState} </h1>
+                        <h1 className="text-xl font-bold">
+                            Awaiting move: {game.turnState}{' '}
+                        </h1>
                     </div>
                 </div>
 
@@ -104,7 +106,7 @@ const Table = ({
                 ))}
 
                 <div className="col-start-5 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Discard</h1>
+                    <h1 className="text-xl font-bold">Discard Pile</h1>
                     <Card
                         card={game.discard}
                         onClick={handleClickDiscard}
@@ -116,7 +118,7 @@ const Table = ({
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Pickup</h1>
+                    <h1 className="text-xl font-bold">Pickup Pile</h1>
                     <CardBack
                         onClick={handleClickPickup}
                         isActive={
