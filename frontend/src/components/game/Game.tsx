@@ -52,13 +52,18 @@ const Game = () => {
             .then((res: any) => {
                 const { data } = res
                 console.log(data)
+                const melds = data.game.melds.map(
+                    (meld: any, index: number) => {
+                        return { meldId: index, cards: meld }
+                    }
+                )
                 setGame({
                     gameId: data.game.gameId,
                     players: data.game.players,
                     gameState: data.game.gameState,
                     hand: parseHand(data.game.hand),
                     sortState: true,
-                    melds: [],
+                    melds: melds,
                     discard: data.game?.discard,
                     turnCounter: data.game?.turnCounter,
                     playerOrder: data.game?.playerOrder,
@@ -106,9 +111,15 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'meld') {
+                const melds = data.move.data.melds.map(
+                    (meld: any, index: number) => {
+                        return { meldId: index, cards: meld }
+                    }
+                )
                 setGame((prevState) => ({
                     ...prevState,
                     turnState: data.nextMove,
+                    melds: melds,
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'discard') {
@@ -202,7 +213,19 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                console.log(res.data)
+
+                const melds = res.data.move.data.melds.map(
+                    (meld: any, index: number) => {
+                        return { meldId: index, cards: meld }
+                    }
+                )
+                setGame((prevState) => ({
+                    ...prevState,
+                    hand: parseHand(res.data.move.data.hand),
+                    turnState: res.data.nextTurnState,
+                    melds: melds,
+                }))
             })
             .catch(() => {
                 console.log('An error occured')
@@ -332,6 +355,7 @@ const Game = () => {
                 handleDiscard={handleDiscard}
                 handlePlayerCardClick={handleCardClick}
                 handleSortCardClick={handleSortCardClick}
+                handleClickMeld={handleMeld}
             />
         )
     }
