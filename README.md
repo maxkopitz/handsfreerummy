@@ -63,7 +63,7 @@ npm install
 
 5. Create copy of env example
 ```
-cp ~/.env.example ~/.env
+cp ./.env.example ./.env
 ```
 
 6. Start the development server
