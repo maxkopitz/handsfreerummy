@@ -4,7 +4,7 @@ import axiosInstance from '../../api/axiosConfig'
 import { LobbyGame } from '../../Type'
 import Game from './Game'
 
-const tableHeaders = ['ID', 'Players', 'Click to Join']
+const tableHeaders = ['ID', 'Players', 'Click Button to Join']
 
 const JoinGame = () => {
     const [games, setGames] = useState<LobbyGame[]>([])
@@ -35,13 +35,13 @@ const JoinGame = () => {
 
     return (
         <div className="flex flex-col w-1/2 justify-center items-center">
-            <h1 className="font-bold text-2xl">Join Game</h1>
-            <table className="table-auto w-full w-min-max text-left border-4 rounded-sm">
+            <h1 className="font-bold text-2xl">Join on a game below to get started!</h1>
+            <table className="table-auto w-full w-min-max text-left border-30 rounded-sm justify-center items-center">
                 <thead>
                     <tr>
                         {tableHeaders.map((header, index) => (
                             <th
-                                className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
+                                className="border-b border-black bg-blue-gray-50 p-4 justify-center items-center"
                                 key={index}
                             >
                                 {header}
@@ -59,7 +59,7 @@ const JoinGame = () => {
                         const isLast = index === games.length - 1
                         const classes = isLast
                             ? 'p-4'
-                            : 'p-4 border-b border-blue-gray-50'
+                            : 'p-4 border-b border-30 border-black'
                         return (
                             <Game
                                 key={item.id}

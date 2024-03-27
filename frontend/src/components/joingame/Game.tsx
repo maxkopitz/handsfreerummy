@@ -13,7 +13,7 @@ const Game = ({ game, className }: GameProps) => {
         navigate('/games/' + game.id)
     }
     return (
-        <tr>
+        <tr className= "border-b border-30 border-black items-center justify-center">
             <td className={className}>{game.id}</td>
             <td className={className}>{game.players}</td>
             <td className={className}>
