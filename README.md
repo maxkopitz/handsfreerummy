@@ -36,7 +36,8 @@ docker compose build .
 ```sh
 docker compose up
 ```
-The API should be running at ``http://localhost:4000/``
+- The API should be running at ``http://localhost:4000/``
+- Redis Insight should be running at ``http://localhost:8001/``
 
 > Use ``CTRL-C`` to stop docker compose or docker compose down
 <br />
@@ -69,4 +70,11 @@ cp ~/.env.example ~/.env
 ```sh
 npm start
 ```
-The UI should be running at ``http://localhost:3000/``
+- The UI should be running at ``http://localhost:3000/``
+<br />
+
+## Notes
+1. If you get stuck on a page, go to Redis Insight ``http://localhost:8001``.
+2. Open the [CLI](https://redis.io/docs/connect/insight/#cli)
+3. Flush the DB by entering ``FLUSHDB`` in the CLI
+
