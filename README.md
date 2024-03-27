@@ -30,7 +30,7 @@ git clone https://github.com/maxkopitz/handsfreerummy
 ## Start the flask API via ``Docker``
 1. Build the backend container, this step is only needed once
 ```sh
-docker compose build .
+docker compose build
 ```
 2. Run docker compose
 ```sh
