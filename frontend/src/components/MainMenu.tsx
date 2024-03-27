@@ -16,6 +16,8 @@ const MainMenu = () => {
                     </h1>
                 </div>
                 <JoinGame />
+                <br></br>
+                <br></br>
                 <div>
                     <Button text={'Create Game'} onClick={() => dispatch(
                         {
