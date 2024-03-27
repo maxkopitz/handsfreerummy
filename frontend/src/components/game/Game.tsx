@@ -21,11 +21,13 @@ import {
     reduceCard,
     selectedCards,
 } from '../../lib/parsers'
+import { useModal } from '../../hooks/Modal'
 
 const Game = () => {
     const navigate = useNavigate()
     const { profile } = useProfile()
     const { gameId } = useParams()
+    const { dispatch: dispatchModal } = useModal()
 
     const [game, setGame] = useState<RummyGame>({
         gameId: '0',
@@ -130,6 +132,8 @@ const Game = () => {
                     turnCounter: data.nextTurnCounter,
                     turnState: data.nextTurnState,
                 }))
+            } else if (data?.move.type === 'roundEnd') {
+                navigate('/')
             }
         })
 
@@ -231,6 +235,49 @@ const Game = () => {
                 console.log('An error occured')
             })
     }
+    /*
+    const handleMeld = () => {
+        if (selectedCards(game.hand).length > 1) {
+            return
+        }
+
+        const cards: any = selectedCards(game.hand).map((card) => {
+            return reduceCard(card)
+        })
+
+        const data = JSON.stringify({
+            action: 'move',
+            move: {
+                type: 'layoff',
+                data: {
+                    subtype: 'new',
+                    cards: cards,
+                },
+            },
+        })
+
+        axiosInstance
+            .post<any>('/games/' + gameId + '/', data)
+            .then((res: any) => {
+                console.log(res.data)
+
+                const melds = res.data.move.data.melds.map(
+                    (meld: any, index: number) => {
+                        return { meldId: index, cards: meld }
+                    }
+                )
+                setGame((prevState) => ({
+                    ...prevState,
+                    hand: parseHand(res.data.move.data.hand),
+                    turnState: res.data.nextTurnState,
+                    melds: melds,
+                }))
+            })
+            .catch(() => {
+                console.log('An error occured')
+            })
+    }
+    */
     const handleDiscard = () => {
         if (selectedCards(game.hand).length !== 1) {
             return
@@ -346,7 +393,7 @@ const Game = () => {
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
     }
-    if (game?.gameState === 'in-game') {
+    if (game?.gameState === 'in-game' || game?.gameState === 'roundEnd') {
         return (
             <Table
                 game={game}
@@ -359,6 +406,7 @@ const Game = () => {
             />
         )
     }
+
     return (
         <Container>
             <h1>Loading...</h1>

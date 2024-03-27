@@ -134,10 +134,7 @@ const Table = ({
                 <div className="mb-20 mt-20 col-span-3">
                     <Board playedRuns={dummyRuns} discard={game.discard} />
                 </div>
-                <div className="col-start-2">
-                    <h2 className="text-lg font-semibold">
-                        Melds {game.melds.length}{' '}
-                    </h2>
+                <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
                     {game.melds.map((meld, index) => (
                         <Meld
                             meld={meld}

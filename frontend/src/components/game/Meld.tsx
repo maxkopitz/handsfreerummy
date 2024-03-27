@@ -8,18 +8,28 @@ interface MeldProps {
     onClick?: any
 }
 const Meld = ({ meld, isActive = false, onClick = () => {} }: MeldProps) => {
-    let classes = classNames('flex justify-center items-center')
+    let classes = classNames(
+        'flex flex-col justify-center items-center mt-2 ml-2'
+    )
     return (
         <div className={classes} onClick={onClick}>
-            {meld.cards.map((card, index) => (
-                <MeldCard
-                    card={{
-                        value: card.value,
-                        suit: card.suit,
-                        isSelected: false,
-                    }}
-                />
-            ))}
+            <div
+                className="flex justify-center items-center flex-row p-3 rounded shadow-lg bg-indigo-200"
+                onClick={onClick}
+            >
+                {meld.cards.map((card, index) => (
+                    <div key={index}>
+                        <MeldCard
+                            card={{
+                                value: card.value,
+                                suit: card.suit,
+                                isSelected: false,
+                            }}
+                        />
+                    </div>
+                ))}
+            </div>
+            <h1 className="text-xl font-bold">Meld #{meld.meldId}</h1>
         </div>
     )
 }
