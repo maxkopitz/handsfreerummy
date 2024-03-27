@@ -2,12 +2,25 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
-import { RummyGame, Value, Suit, GameTurn, CardType } from '../../Type'
+import {
+    RummyGame,
+    Value,
+    Suit,
+    GameTurn,
+    CardType,
+    ValueOrder,
+    SuitOrder,
+} from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
 import Table from './Table'
 import { useProfile } from '../../hooks/Profile'
-import { parseHand, selectedCards } from '../../lib/parsers'
+import {
+    parseCard,
+    parseHand,
+    reduceCard,
+    selectedCards,
+} from '../../lib/parsers'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -19,13 +32,14 @@ const Game = () => {
         gameState: '',
         players: [],
         hand: [],
+        sortState: true,
         discard: { value: Value.J, suit: Suit.C, isSelected: false },
         // rank: Rank
         melds: [],
         turnCounter: 0,
         playerOrder: 0,
         isOwner: false,
-        turnState: GameTurn.PICKUP
+        turnState: GameTurn.PICKUP,
     })
 
     const joinGame = async () => {
@@ -43,12 +57,13 @@ const Game = () => {
                     players: data.game.players,
                     gameState: data.game.gameState,
                     hand: parseHand(data.game.hand),
-                    melds: data.game?.melds,
+                    sortState: true,
+                    melds: [],
                     discard: data.game?.discard,
                     turnCounter: data.game?.turnCounter,
                     playerOrder: data.game?.playerOrder,
                     isOwner: data.game?.isOwner,
-                    turnState: data.game?.turnState
+                    turnState: data.game?.turnState,
                 })
             })
             .catch(() => {
@@ -77,37 +92,35 @@ const Game = () => {
                 players: data.game.players,
                 playerOrder: data.game.playerOrder,
                 turnCounter: data.game.turnCounter,
-                turnState: data.game.turnState
+                turnState: data.game.turnState,
             })
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
             console.log(data)
             if (data?.move.type === 'pickup') {
-                setGame({
-                    ...game,
+                setGame((prevState) => ({
+                    ...prevState,
                     turnState: data.nextMove,
-                    discard: data.move.data.discard,
-                    players: data.move.data.players
-                })
-            }
-            else if (data?.move.type === 'meld') {
-                setGame({
-                    ...game,
+                    discard: parseCard(data.move.data.discard),
+                    players: data.move.data.players,
+                }))
+            } else if (data?.move.type === 'meld') {
+                setGame((prevState) => ({
+                    ...prevState,
                     turnState: data.nextMove,
-                    players: data.move.data.players
-                })
+                    players: data.move.data.players,
+                }))
+            } else if (data?.move.type === 'discard') {
+                setGame((prevState) => ({
+                    ...prevState,
+                    discard: parseCard(data.move.data.discard),
+                    players: data.move.data.players,
+                    turnCounter: data.nextTurnCounter,
+                    turnState: data.nextTurnState,
+                }))
             }
-            else if (data?.move.type === 'discard') {
-                setGame({
-                    ...game,
-                    discard: data.game.discard,
-                    players: data.game.players,
-                    turnCounter: data.game.turnCounter,
-                    turnState: data.game.turnState
-                })
-            }
-        });
+        })
 
         return () => {
             socket.off(SocketEvents.PLAYER_JOINED)
@@ -120,16 +133,20 @@ const Game = () => {
         const data = JSON.stringify({
             action: 'move',
             move: {
-                type: 'drawPickup'
+                type: 'drawPickup',
             },
         })
+
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
                 setGame((prevState) => ({
                     ...prevState,
-                    hand: [...prevState.hand, res.data.game.card],
-                    turnState: res.data.game.turnState
+                    hand: [
+                        ...prevState.hand,
+                        { ...res.data.move.data.card, isSelected: false },
+                    ],
+                    turnState: res.data.nextTurnState,
                 }))
             })
             .catch(() => {
@@ -143,8 +160,8 @@ const Game = () => {
             move: {
                 type: 'drawDiscard',
                 data: {
-                    card: 'card'
-                }
+                    card: 'card',
+                },
             },
         })
         axiosInstance
@@ -154,47 +171,70 @@ const Game = () => {
                     ...prevState,
                     hand: [...prevState.hand, res.data.move.data.card],
                     discard: res.data.move?.data.discard,
-                    turnState: res.data.nextTurnState
+                    turnState: res.data.nextTurnState,
                 }))
             })
             .catch(() => {
                 console.log('An error occured')
-
             })
     }
 
+    const handleMeld = () => {
+        if (selectedCards(game.hand).length < 3) {
+            return
+        }
+
+        const cards: any = selectedCards(game.hand).map((card) => {
+            return reduceCard(card)
+        })
+
+        const data = JSON.stringify({
+            action: 'move',
+            move: {
+                type: 'meld',
+                data: {
+                    subtype: 'new',
+                    cards: cards,
+                },
+            },
+        })
+
+        axiosInstance
+            .post<any>('/games/' + gameId + '/', data)
+            .then((res: any) => {
+                console.log(res)
+            })
+            .catch(() => {
+                console.log('An error occured')
+            })
+    }
     const handleDiscard = () => {
         if (selectedCards(game.hand).length !== 1) {
-            return;
+            return
         }
-        let card: any = selectedCards(game.hand).at(0)
-        card = Object.keys(card)
-            .filter((objKey) => objKey !== 'isSelected').reduce((newObj: any, key: any) => {
-                newObj[key] = card[key]
-                return newObj
-            }, {})
-
+        const card: any = reduceCard(selectedCards(game.hand).at(0))
 
         const data = JSON.stringify({
             action: 'move',
             move: {
                 type: 'discard',
                 data: {
-                    card: card
-                }
+                    card: card,
+                },
             },
         })
+
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                setGame((prevState) => {
-                    return {
-                        ...prevState,
-                        hand: prevState.hand.filter((c) => (c.suit !== card.suit && c.value !== card.value)),
-                        discard: res.data.move?.data.discard,
-                        turnState: res.data.nextTurnState
-                    }
-                })
+                console.log(res)
+                setGame((prevState) => ({
+                    ...prevState,
+                    hand: parseHand(res.data.hand),
+                    discard: res.data.move?.data.discard,
+                    turnState: res.data.nextTurnState,
+                    turnCounter: res.data.nextTurnCounter,
+                }))
             })
             .catch(() => {
                 console.log('An error occured')
@@ -208,12 +248,77 @@ const Game = () => {
                 if (c.suit === card.suit && c.value === card.value) {
                     return { ...c, isSelected: !c.isSelected }
                 }
-                return c;
-            })
-
+                return c
+            }),
         }))
     }
 
+    const handleSortCard = () => {
+        setGame((prevState) => ({
+            ...prevState,
+            hand: prevState.hand.sort((a, b) => {
+                if (prevState.sortState) {
+                    if (a.suit === b.suit) {
+                        return (
+                            ValueOrder.indexOf(a.value) -
+                            ValueOrder.indexOf(b.value)
+                        )
+                    } else {
+                        return (
+                            SuitOrder.indexOf(a.suit) -
+                            SuitOrder.indexOf(b.suit)
+                        )
+                    }
+                } else {
+                    if (a.value === b.value) {
+                        return (
+                            SuitOrder.indexOf(a.suit) -
+                            SuitOrder.indexOf(b.suit)
+                        )
+                    } else {
+                        return (
+                            ValueOrder.indexOf(a.value) -
+                            ValueOrder.indexOf(b.value)
+                        )
+                    }
+                }
+            }),
+        }))
+    }
+
+    const handleSortCardClick = () => {
+        setGame((prevState) => ({
+            ...prevState,
+            hand: prevState.hand.sort((a, b) => {
+                if (prevState.sortState) {
+                    if (a.suit === b.suit) {
+                        return (
+                            ValueOrder.indexOf(a.value) -
+                            ValueOrder.indexOf(b.value)
+                        )
+                    } else {
+                        return (
+                            SuitOrder.indexOf(a.suit) -
+                            SuitOrder.indexOf(b.suit)
+                        )
+                    }
+                } else {
+                    if (a.value === b.value) {
+                        return (
+                            SuitOrder.indexOf(a.suit) -
+                            SuitOrder.indexOf(b.suit)
+                        )
+                    } else {
+                        return (
+                            ValueOrder.indexOf(a.value) -
+                            ValueOrder.indexOf(b.value)
+                        )
+                    }
+                }
+            }),
+            sortState: !prevState.sortState,
+        }))
+    }
 
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
@@ -226,6 +331,7 @@ const Game = () => {
                 handleClickDiscard={handleClickPickupDiscard}
                 handleDiscard={handleDiscard}
                 handlePlayerCardClick={handleCardClick}
+                handleSortCardClick={handleSortCardClick}
             />
         )
     }
