@@ -50,15 +50,16 @@ export interface RummyPlayer {
 }
 
 export enum GameTurn {
-    PICKUP = "pickup",
+    PICKUP = 'pickup',
     MELD = 'meld',
-    DISCARD = 'discard'
+    DISCARD = 'discard',
 }
 export interface RummyGame {
     gameId: string
     players: RummyPlayer[]
     gameState: string
     hand: CardType[]
+    sortState: boolean
     discard: CardType
     melds: CardType[]
     turnCounter: number

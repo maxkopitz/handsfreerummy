@@ -19,6 +19,7 @@ interface TableProps {
     handleClickDiscard: any
     handleDiscard: any
     handlePlayerCardClick: any
+    handleSortCardClick: any
 }
 
 const dummyRuns = [
@@ -35,7 +36,9 @@ const Table = ({
     handleClickPickup,
     handleClickDiscard,
     handleDiscard,
-    handlePlayerCardClick }: TableProps) => {
+    handlePlayerCardClick,
+    handleSortCardClick,
+}: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
 
@@ -85,7 +88,7 @@ const Table = ({
                             }
                         />
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
-                        <h1>It is {game.players[game.turnCounter - 2]?.displayName} turn. Awaiting : {game.turnState} </h1>
+                        <h1>Awaiting move: {game.turnState} </h1>
                     </div>
                 </div>
 
@@ -105,14 +108,22 @@ const Table = ({
                     <Card
                         card={game.discard}
                         onClick={handleClickDiscard}
-                        isActive={game.playerOrder === game.turnCounter && game.turnState === GameTurn.PICKUP} />
+                        isActive={
+                            game.playerOrder === game.turnCounter &&
+                            game.turnState === GameTurn.PICKUP
+                        }
+                    />
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">
                     <h1 className="text-xl font-bold">Pickup</h1>
                     <CardBack
                         onClick={handleClickPickup}
-                        isActive={game.playerOrder === game.turnCounter && game.turnState === GameTurn.PICKUP} />
+                        isActive={
+                            game.playerOrder === game.turnCounter &&
+                            game.turnState === GameTurn.PICKUP
+                        }
+                    />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">
@@ -129,6 +140,7 @@ const Table = ({
                         turnState={game.turnState}
                         handleDiscard={handleDiscard}
                         handleCardClick={handlePlayerCardClick}
+                        handleSortCardClick={handleSortCardClick}
                     />
                 </div>
             </div>
