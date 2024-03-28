@@ -14,6 +14,7 @@ import { socket } from './api/socket'
 import Game from './components/game/Game'
 import axiosInstance from './api/axiosConfig'
 import Modal from './components/ui/Modal'
+import { toast, Toaster } from 'react-hot-toast'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -60,6 +61,7 @@ const Layout = () => {
                 socket.connect()
             }
             socket.on('connect', () => {
+
                 console.log('Connected')
                 setIsConnected(true)
             })
@@ -87,6 +89,9 @@ const Layout = () => {
                 <GameProvider>
                     <ModalProvider>
                         <Modal />
+                        <Toaster
+                        position='top-right'
+                        />
                         {isConnected && !isLoading && <Outlet />}
                     </ModalProvider>
                 </GameProvider>
