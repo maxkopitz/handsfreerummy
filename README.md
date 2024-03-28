@@ -21,7 +21,6 @@
 ## External Requirements
 - [Docker](https://docs.docker.com/desktop/)
 - Node v21.6.1, we use [nvm](https://github.com/nvm-sh/nvm) to get correct verison
-- npm
 
 ## Setup
 Clone the repository
