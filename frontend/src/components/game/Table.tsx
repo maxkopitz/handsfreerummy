@@ -22,6 +22,7 @@ interface TableProps {
     handlePlayerCardClick: any
     handleSortCardClick: any
     handleClickMeld: any
+    handleLayoff: any
 }
 
 const dummyRuns = [
@@ -41,6 +42,7 @@ const Table = ({
     handlePlayerCardClick,
     handleSortCardClick,
     handleClickMeld,
+    handleLayoff
 }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
@@ -139,6 +141,7 @@ const Table = ({
                         <Meld
                             meld={meld}
                             key={index}
+                            onClick={handleLayoff}
                             isActive={
                                 game.turnCounter === game.playerOrder &&
                                 game.turnState === 'meld'
@@ -150,6 +153,7 @@ const Table = ({
                     <PlayerHand
                         playerId={game.playerOrder}
                         hand={game.hand}
+                        melds={game.melds}
                         isTurn={game.playerOrder === game.turnCounter}
                         turnState={game.turnState}
                         handleDiscard={handleDiscard}

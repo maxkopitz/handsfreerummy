@@ -7,15 +7,17 @@ interface MeldProps {
     isActive: boolean
     onClick?: any
 }
-const Meld = ({ meld, isActive = false, onClick = () => {} }: MeldProps) => {
+const Meld = ({ meld, isActive = false, onClick }: MeldProps) => {
     let classes = classNames(
         'flex flex-col justify-center items-center mt-2 ml-2'
     )
+    const handleClickMeld = () => {
+        onClick(meld)
+    }
     return (
-        <div className={classes} onClick={onClick}>
+        <div className={classes} onClick={handleClickMeld}>
             <div
                 className="flex justify-center items-center flex-row p-3 rounded shadow-lg bg-indigo-200"
-                onClick={onClick}
             >
                 {meld.cards.map((card, index) => (
                     <div key={index}>

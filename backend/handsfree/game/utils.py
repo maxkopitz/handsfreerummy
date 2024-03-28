@@ -9,6 +9,7 @@ ACTIVE_GAMES = 'active_games'
 suits = ["hearts", "diamonds", "clubs", "spades"]
 values = ["A", "2", "3", "4", "5", "6", "7", "8",
           "9", "10", "J", "Q", "K"]
+game_states = ['lobby', 'in-game', 'ended']
 
 
 def get_game(game_id):
@@ -40,7 +41,9 @@ def create_game():
     for suit in suits:
         for value in values:
             deck.append({"value": value, "suit": suit})
+
     shuffle(deck)
+
     game = {
         "gameId": index,
         "owner": str(session.get('uuid')),
@@ -174,14 +177,14 @@ def make_move(game_key, player, move, data):
     """Make Rummy Move."""
     game = redis_client.json().get(game_key)
 
-    print(data, file=sys.stderr)
     result = {
+        'status': 'success',
         "move": {
             "type": move,
             "data": {}
         },
         "nextTurnState": "",
-        "nextTurnCounter": game['turnCounter'] 
+        "nextTurnCounter": game['turnCounter']
     }
 
     if move == "drawPickup":
@@ -257,8 +260,9 @@ def make_move(game_key, player, move, data):
         for card in meld:
             game.get('players').get(player).get('hand').remove(card)
 
-        result['move']['data']['melds'] = game.get('melds') 
-        result['move']['data']['hand'] = game.get('players').get(player).get('hand', {})
+        result['move']['data']['melds'] = game.get('melds')
+        result['move']['data']['hand'] = game.get(
+            'players').get(player).get('hand', {})
         result["nextTurnState"] = "meld"
 
         game['currentTurnState'] = 'meld'
@@ -280,14 +284,15 @@ def make_move(game_key, player, move, data):
                 }
                 socketio.emit('played-move', message, to=sid)
 
-    if move == "layOff":
-        meld = data.get('cards')
-        game.get('melds').append(meld)
-        for card in meld:
-            game.get('players').get(player).get('hand').remove(card)
+    if move == 'layoff':
+        card = data.get('card')
+        meldId = data.get('meldId')
+        game.get('melds')[meldId].append(card)
+        game.get('players').get(player).get('hand').remove(card)
 
-        result['move']['data']['melds'] = game.get('melds') 
-        result['move']['data']['hand'] = game.get('players').get(player).get('hand', {})
+        result['move']['data']['melds'] = game.get('melds')
+        result['move']['data']['hand'] = game.get(
+            'players').get(player).get('hand', {})
         result["nextTurnState"] = "meld"
 
         game['currentTurnState'] = 'meld'
@@ -335,7 +340,7 @@ def make_move(game_key, player, move, data):
                         'data': {
                             'players': player_response_builder(key, game.get('players')),
                             'discard': result['move']['data']["discard"]
-                        } 
+                        }
                     },
                     'nextTurnState': game['currentTurnState'],
                     'nextTurnCounter': game['turnCounter']
@@ -358,15 +363,14 @@ def make_move(game_key, player, move, data):
                                 'isPlayer': key == player
                             },
                             'redirect': '/'
-                        } 
+                        }
                     },
                 }
                 socketio.emit('played-move', message, to=sid)
-        
+
     redis_client.json().set(game_key, Path.root_path(), game)
 
     return result
-
 
 
 def player_response_builder(current, player_dic):
@@ -400,9 +404,10 @@ def winner_points(player_dic, winner, game):  # winner = player uuid
                     sum += int(card.get('value'))
     return sum
 
+
 """def is_valid_meld(meld):
     if len(meld) < 3:
         return false
     meld.sort(key=lambda x: x.value)
-    
+
 """
