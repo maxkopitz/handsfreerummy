@@ -10,6 +10,7 @@ import {
     CardType,
     ValueOrder,
     SuitOrder,
+    Meld,
 } from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
@@ -36,7 +37,6 @@ const Game = () => {
         hand: [],
         sortState: true,
         discard: { value: Value.J, suit: Suit.C, isSelected: false },
-        // rank: Rank
         melds: [],
         turnCounter: 0,
         playerOrder: 0,
@@ -155,6 +155,7 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
+                console.log(res)
                 setGame((prevState) => ({
                     ...prevState,
                     hand: [
@@ -208,8 +209,7 @@ const Game = () => {
             move: {
                 type: 'meld',
                 data: {
-                    subtype: 'new',
-                    cards: cards,
+                    cards: cards
                 },
             },
         })
@@ -217,8 +217,7 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res.data)
-
+            console.log(res)
                 const melds = res.data.move.data.melds.map(
                     (meld: any, index: number) => {
                         return { meldId: index, cards: meld }
@@ -231,53 +230,58 @@ const Game = () => {
                     melds: melds,
                 }))
             })
-            .catch(() => {
+            .catch((error: any) => {
                 console.log('An error occured')
             })
     }
-    /*
-    const handleMeld = () => {
-        if (selectedCards(game.hand).length > 1) {
+
+    const handleLayoff = (meld: Meld) => {
+        if (selectedCards(game.hand).length !== 1) {
+            console.log('no card')
             return
         }
 
-        const cards: any = selectedCards(game.hand).map((card) => {
-            return reduceCard(card)
-        })
+        const card: any = reduceCard(selectedCards(game.hand).at(0))
 
         const data = JSON.stringify({
             action: 'move',
             move: {
                 type: 'layoff',
                 data: {
-                    subtype: 'new',
-                    cards: cards,
+                    meldId: meld.meldId,
+                    card: card,
                 },
             },
         })
 
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
-            .then((res: any) => {
-                console.log(res.data)
+            .then(({ data }: any) => {
+                console.log(data)
+                if (data.status === 'success') {
+                    const melds = data.move.data.melds.map(
+                        (meld: any, index: number) => {
+                            return { meldId: index, cards: meld }
+                        }
+                    )
+                    setGame((prevState) => ({
+                        ...prevState,
+                        hand: parseHand(data.move.data.hand),
+                        turnState: data.nextTurnState,
+                        melds: melds,
+                    }))
 
-                const melds = res.data.move.data.melds.map(
-                    (meld: any, index: number) => {
-                        return { meldId: index, cards: meld }
-                    }
-                )
-                setGame((prevState) => ({
-                    ...prevState,
-                    hand: parseHand(res.data.move.data.hand),
-                    turnState: res.data.nextTurnState,
-                    melds: melds,
-                }))
+                }
+                else if (data.status === 'error') {
+                    console.log(data.error?.message)
+                }
             })
-            .catch(() => {
+            .catch((error: any) => {
+                console.log(error)
                 console.log('An error occured')
             })
     }
-    */
+
     const handleDiscard = () => {
         if (selectedCards(game.hand).length !== 1) {
             return
@@ -403,6 +407,7 @@ const Game = () => {
                 handlePlayerCardClick={handleCardClick}
                 handleSortCardClick={handleSortCardClick}
                 handleClickMeld={handleMeld}
+                handleLayoff={handleLayoff}
             />
         )
     }

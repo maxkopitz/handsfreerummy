@@ -1,4 +1,4 @@
-import { ValueOrder, SuitOrder, GameTurn } from '../../Type'
+import { ValueOrder, SuitOrder, GameTurn, Meld } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
@@ -16,6 +16,7 @@ interface PlayerHandProps {
     handleCardClick: any
     handleSortCardClick: any
     handleClickMeld: any
+    melds: Meld[]
 }
 
 const PlayerHand = ({
@@ -27,6 +28,7 @@ const PlayerHand = ({
     handleCardClick,
     handleSortCardClick,
     handleClickMeld,
+    melds
 }: PlayerHandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
     const { profile } = useProfile()
@@ -76,6 +78,17 @@ const PlayerHand = ({
                                 (turnState !== GameTurn.MELD &&
                                     turnState !== GameTurn.DISCARD) ||
                                 selectedCards(hand).length !== 1
+                            }
+                        ></Button>
+                        <Button
+                            onClick={handleDiscard}
+                            text={'Layoff'}
+                            disabled={
+                                !isTurn ||
+                                (turnState !== GameTurn.MELD &&
+                                    turnState !== GameTurn.DISCARD) ||
+                                selectedCards(hand).length < 1 ||
+                                melds.length === 0
                             }
                         ></Button>
                     </>
