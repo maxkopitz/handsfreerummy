@@ -28,7 +28,7 @@ Clone the repository
 git clone https://github.com/maxkopitz/handsfreerummy
 ```
 ## Start the flask API via ``Docker``
-1. Build the backend container, this step is only needed once
+1. Build the backend & frontend containers, this step is only needed the first time installing and when package.json or requirements.txt changes.
 ```sh
 docker compose build
 ```
@@ -36,41 +36,11 @@ docker compose build
 ```sh
 docker compose up
 ```
+- The UI should be running at ``http://localhost:3000/``
 - The API should be running at ``http://localhost:4000/``
 - Redis Insight should be running at ``http://localhost:8001/``
 
 > Use ``CTRL-C`` to stop docker compose or docker compose down
-<br />
-
-## Running React UI
-
-1. Install [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) (for Node.JS)
-
-2. In a new terminal navigate to the UI
-```sh
-cd ./frontend
-```
-
-3. Install correct node version (see `.nvmrc`)
-```sh
-nvm use
-```
-
-4. Install packages
-```sh
-npm install
-```
-
-5. Create copy of env example
-```
-cp ./.env.example ./.env
-```
-
-6. Start the development server
-```sh
-npm start
-```
-- The UI should be running at ``http://localhost:3000/``
 <br />
 
 ## Notes
