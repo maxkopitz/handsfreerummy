@@ -15,11 +15,14 @@ def api():
 @app.route('/register/', methods=['GET'])
 def register():
     """Register a user and direct them."""
-    if session.get('uuid') is None:
-        session['uuid'] = uuid4()
     response = {
+        "status": "success",
         "redirect": "/"
     }
+    if session.get('uuid') is None:
+        session['uuid'] = uuid4()
+        return response
+
     if session.get('game_id'):
         game_id = session.get('game_id')
         game_key = f"game:{game_id}"
