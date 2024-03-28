@@ -23,7 +23,7 @@ def register():
         session['uuid'] = uuid4()
         return response
 
-    if session.get('game_id'):
+    if session.get('game_id') is not None:
         game_id = session.get('game_id')
         game_key = f"game:{game_id}"
         game = redis_client.json().get(game_key)
