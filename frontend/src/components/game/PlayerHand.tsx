@@ -80,17 +80,6 @@ const PlayerHand = ({
                                 selectedCards(hand).length !== 1
                             }
                         ></Button>
-                        <Button
-                            onClick={handleDiscard}
-                            text={'Layoff'}
-                            disabled={
-                                !isTurn ||
-                                (turnState !== GameTurn.MELD &&
-                                    turnState !== GameTurn.DISCARD) ||
-                                selectedCards(hand).length < 1 ||
-                                melds.length === 0
-                            }
-                        ></Button>
                     </>
                 )}
                 <div className={cardClasses}>
