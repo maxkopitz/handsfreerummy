@@ -6,6 +6,8 @@ services:
       - '8001:8001'
     networks:
       proxy:
+        aliases:
+        - redis
   api:
     build:
       context: backend
@@ -18,9 +20,12 @@ services:
     volumes:
       - ./backend:/code
     environment:
-      REDIS_URL: 'redis://redis:6379'
-      MONGO_URL: mongodb://root:example@mongo:27017/
-      HANDSFREE_SETTINGS: 'secret_config.py'
+      - REDIS_URL='redis://redis:6379'
+      - MONGO_URL='mongodb://root:example@mongo:27017/'
+      - HANDSFREE_SETTINGS='secret_config.py'
+      - FLASK_CONFIG=development
+      - FLASK_ENV=development
+      - APP_SETTINGS=handsfree.config.DevelopmentConfig
     networks:
       proxy:
     depends_on:
