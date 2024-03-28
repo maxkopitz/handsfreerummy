@@ -23,6 +23,7 @@ import {
     selectedCards,
 } from '../../lib/parsers'
 import { useModal } from '../../hooks/Modal'
+import { toast } from 'react-hot-toast'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -82,11 +83,11 @@ const Game = () => {
         joinGame()
 
         socket.on(SocketEvents.PLAYER_JOINED, (data: any) => {
-            console.log(data.data.displayName, 'has joined.')
+            toast(data.data.displayName + ' has joined.')
         })
 
         socket.on(SocketEvents.PLAYER_LEFT, (data: any) => {
-            console.log(data.data.displayName, 'has left.')
+            toast(data.data.displayName + ' has left.')
         })
 
         socket.on(SocketEvents.GAME_STARTED, (data: any) => {
@@ -217,7 +218,7 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-            console.log(res)
+                console.log(res)
                 const melds = res.data.move.data.melds.map(
                     (meld: any, index: number) => {
                         return { meldId: index, cards: meld }
