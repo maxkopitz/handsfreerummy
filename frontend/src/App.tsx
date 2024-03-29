@@ -14,6 +14,7 @@ import { socket } from './api/socket'
 import Game from './components/game/Game'
 import axiosInstance from './api/axiosConfig'
 import Modal from './components/ui/Modal'
+import { toast, Toaster } from 'react-hot-toast'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -43,29 +44,54 @@ const Layout = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [isConnected, setIsConnected] = useState<boolean>(false)
     useEffect(() => {
-        axiosInstance.get(`register`).then((res) => {
-            if (res.data?.redirect) {
-                navigate(res.data.redirect)
-            }
-            setIsLoading(false)
-        })
+        const fetch = async () => {
+            await axiosInstance.get(`register`).then((res) => {
+                if (res.data?.redirect) {
+                    navigate(res.data.redirect)
+                }
+                setIsLoading(false)
+            })
+        }
+        fetch()
     }, [navigate])
+
     useEffect(() => {
-        socket.on('connect', () => {
-            console.log('Connected')
-            setIsConnected(true)
-        })
-        socket.on('disconnect', () => {
-            console.log('Disconnect')
-            setIsConnected(false)
-        })
-    }, [])
+        if (!isLoading) {
+            if (!isConnected) {
+                socket.connect()
+            }
+            socket.on('connect', () => {
+
+                console.log('Connected')
+                setIsConnected(true)
+            })
+            socket.on('disconnect', () => {
+                console.log('Disconnected')
+                setIsConnected(false)
+            })
+        }
+        return () => {
+        }
+    }, [isLoading, isConnected])
+
+    useEffect(() => {
+        document.body.style.backgroundColor = "#d1d5db";
+
+        return () => {
+            document.body.style.backgroundColor = "#d1d5db";
+        };
+    }, []);
+
+
     return (
         <div className="h-screen bg-gradient-to-b from-gray-100 to-gray-300">
             <ProfileProvider>
                 <GameProvider>
                     <ModalProvider>
                         <Modal />
+                        <Toaster
+                        position='top-right'
+                        />
                         {isConnected && !isLoading && <Outlet />}
                     </ModalProvider>
                 </GameProvider>

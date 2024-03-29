@@ -1,5 +1,5 @@
 import Board from './Board'
-import { RummyGame, Suit, Value } from '../../Type'
+import { CardType, GameTurn, Meld as MeldType, RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
@@ -13,20 +13,27 @@ import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { useEffect } from 'react'
+import Meld from './Meld'
+import { toast } from 'react-hot-toast'
 
 interface TableProps {
     game: RummyGame
-    handleClickPickup: any
-    handleClickDiscard: any
+    handleClickPickup: () => void
+    handleClickDiscard: () => void
+    handleDiscard: (card: CardType) => void
+    handlePlayerCardClick: (card: CardType) => void
+    handleSortCardClick: any
+    handleClickMeld: (meld: MeldType) => void
+    handleLayoff: any
 }
 
 const dummyRuns = [
     [
-        { value: Value.A, suit: Suit.C },
-        { value: Value.A, suit: Suit.D },
+        { value: Value.A, suit: Suit.C, isSelected: false },
+        { value: Value.A, suit: Suit.D, isSelected: false },
     ],
-    [{ value: Value.K, suit: Suit.D }],
-    [{ value: Value.J, suit: Suit.C }],
+    [{ value: Value.K, suit: Suit.D, isSelected: false }],
+    [{ value: Value.J, suit: Suit.C, isSelected: false }],
 ]
 
 const Dictaphone = () => {
@@ -70,7 +77,16 @@ const Dictaphone = () => {
 
 
 
-const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
+const Table = ({
+    game,
+    handleClickPickup,
+    handleClickDiscard,
+    handleDiscard,
+    handlePlayerCardClick,
+    handleSortCardClick,
+    handleClickMeld,
+    handleLayoff
+}: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
 
@@ -84,7 +100,7 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
                 navigate('/')
             })
             .catch(() => {
-                console.log('Error occured while leaving.')
+                toast('Unable to leave!')
             })
     }
 
@@ -120,11 +136,15 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
                             }
                         />
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
+                        <h1 className="text-xl font-bold">
+                            Awaiting move: {game.turnState}{' '}
+                        </h1>
                     </div>
                     <div>
                         <Dictaphone/>
                     </div>
                 </div>
+
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand
@@ -137,26 +157,55 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
                 ))}
 
                 <div className="col-start-5 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Discard</h1>
-                    <Card card={game.discard} onClick={handleClickDiscard} isActive={game.playerOrder === game.turnCounter} />
+                    <h1 className="text-xl font-bold">Discard Pile</h1>
+                    <Card
+                        card={game.discard}
+                        onClick={handleClickDiscard}
+                        isActive={
+                            game.playerOrder === game.turnCounter &&
+                            game.turnState === GameTurn.PICKUP
+                        }
+                    />
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Pickup</h1>
-                    <CardBack onClick={handleClickPickup} />
+                    <h1 className="text-xl font-bold">Pickup Pile</h1>
+                    <CardBack
+                        onClick={handleClickPickup}
+                        isActive={
+                            game.playerOrder === game.turnCounter &&
+                            game.turnState === GameTurn.PICKUP
+                        }
+                    />
                 </div>
 
                 <div className="mb-20 mt-20 col-span-3">
                     <Board playedRuns={dummyRuns} discard={game.discard} />
                 </div>
-                <div className="col-start-2">
-                    <h2 className="text-lg font-semibold">Melds</h2>
+                <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
+                    {game.melds.map((meld, index) => (
+                        <Meld
+                            meld={meld}
+                            key={index}
+                            onClick={handleLayoff}
+                            isActive={
+                                game.turnCounter === game.playerOrder &&
+                                game.turnState === 'meld'
+                            }
+                        />
+                    ))}
                 </div>
                 <div className="col-start-2 col-span-3">
                     <PlayerHand
                         playerId={game.playerOrder}
                         hand={game.hand}
+                        melds={game.melds}
                         isTurn={game.playerOrder === game.turnCounter}
+                        turnState={game.turnState}
+                        handleDiscard={handleDiscard}
+                        handleCardClick={handlePlayerCardClick}
+                        handleSortCardClick={handleSortCardClick}
+                        handleClickMeld={handleClickMeld}
                     />
                 </div>
             </div>

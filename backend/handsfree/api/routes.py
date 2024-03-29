@@ -3,6 +3,8 @@ from handsfree import app, redis_client, socketio
 from handsfree.game import utils
 from flask import session, request
 from uuid import uuid4
+from redis.commands.json.path import Path
+import sys
 
 
 @app.route('/', methods=['GET'])
@@ -13,14 +15,20 @@ def api():
 @app.route('/register/', methods=['GET'])
 def register():
     """Register a user and direct them."""
+    response = {
+        "status": "success",
+        "redirect": "/"
+    }
     if session.get('uuid') is None:
         session['uuid'] = uuid4()
-    response = {
-            "redirect": "/"
-            }
-    if session.get('game_id'):
+        return response
+
+    if session.get('game_id') is not None:
         game_id = session.get('game_id')
-        response["redirect"] = f"games/{game_id}/"
+        game_key = f"game:{game_id}"
+        game = redis_client.json().get(game_key)
+        if game.get('gameState') != 'ended':
+            response["redirect"] = f"games/{game_id}/"
     return response
 
 
@@ -42,8 +50,9 @@ def create_game():
 
     if session.get('game_id'):
         result = redis_client.json().get('game:%d' % session.get('game_id'))
-        app.logger.info(session)
-        return {"error": {"message": "Already in game"}}, 409
+        if result.get('gameState') != 'ended':
+            app.logger.info(session)
+            return {"error": {"message": "Already in game"}}, 409
 
     game = utils.create_game()
 
@@ -72,51 +81,145 @@ def handle_game_action(game_id):
     game_id = int(game_id)
     """Handle action for a rummy game."""
     if session.get('uuid') is None:
-        return {"error": {"message": "You are not logged in"}}
+        return {
+            "status": "error",
+            "error": {
+                "message": "You are not logged in"
+            }}
 
-    action = request.json.get('action')
+    json_body = request.json
+    action = json_body.get('action')
     if action is None:
-        return {"error": {"message": "Incorrect format"}}
+        return {
+            "status": "error",
+            "error": {
+                "message": "Incorrect format"
+            }}
 
     game_key = f"game:{game_id}"
+    uuid = str(session.get('uuid'))
 
     if not redis_client.exists(game_key):
         # Extra clean up
         if int(game_id) == session.get('game_id'):
             del session['game_id']
-        return {"error": {"message": "Game does not exist"}}, 404
+        return {
+            "status": "error",
+            "error": {
+                "message": "Game does not exist",
+                "type": 404
+            }}, 404
+
+    game = redis_client.json().get(game_key)
+    players = game.get('players')
 
     if action == 'join':
         if session.get("in_game") and session.get('game_id') != game_id:
-            return {"error": {"message": "Already in game"}}, 403
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Already in game"
+                }}, 403
 
-        game = redis_client.json().get(game_key)
-        players = game.get('players')
-        uuid = str(session.get('uuid'))
         if game.get('gameState') != 'lobby' and players.get(uuid) is None:
-            return {"error": {"message": "Game has started!"}}, 403
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Game has started!"
+                }}, 403
 
-        result = utils.join_game(game_id, request.json.get('displayName', 'NA'))
+        result = utils.join_game(
+            game_id,
+            request.json.get('displayName', 'NA'))
 
-        return {"game": result}
+        return {
+            "status": "success",
+            "game": result
+        }
 
     if action == 'leave':
-        # TODO FIX
-        if session.get("in_game") is False and session.get('game_id') is None:
-            return {"error": {"message": "Not in a game"}}, 404
+        if session.get('game_id') is None:
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Not in a game"
+                }}, 404
 
         result = utils.leave_game(game_id)
 
         return result
+
     if action == 'start':
-        if redis_client.json().get(game_key).get('gameState') == 'in-game':
-            return {"error": {"message": "Game has started"}}, 404
+        if game.get('gameState') == 'in-game':
+            return {
+                'status': 'error',
+                "error": {
+                    "message": "Game has started"
+                }}, 404
+        if game.get('owner') != uuid:
+            return {
+                'status': 'error',
+                "error": {
+                    "message": "Not owner!"
+                }}, 403
+
         result = utils.start_game(game_id)
+
         return result
 
     if action == 'move':
-        return 'test'
-    return {"error": {"message": "Unknown action."}}, 404
+        if session.get('game_id') != game_id:
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Not in game"
+                }}
+        players = list(game.get('players'))
+        whos_turn = players[game.get('turnCounter') - 1]
+        if whos_turn != uuid:
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Not player turn"
+                }}
+
+        move = json_body.get('move', {})
+        moves = ['drawPickup', 'drawDiscard', 'meld', 'layoff', 'discard']
+        move_type = move.get('type')
+
+        if move_type is None or move_type not in moves:
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Invalid move"
+                }}
+
+        result = utils.make_move(
+            game_key,
+            uuid,
+            move.get('type'),
+            move.get('data', {}))
+
+        return result
+
+    if action == 'end-game':
+        game = redis_client.json().get(game_key)
+        if game.get('owner') != uuid:
+            return {
+                'status': 'error',
+                "error": {
+                    "message": "Not owner!"
+                }}, 403
+        game['gameState'] = 'ended'
+        redis_client.json().set(game_key, Path.root_path(), game)
+        return {'status': 'success',
+                "game": "ended"}
+
+    return {
+        'status': 'error',
+        "error": {
+            "message": "Unknown action"
+        }}, 404
 
 
 @app.route('/users/', methods=['GET'])

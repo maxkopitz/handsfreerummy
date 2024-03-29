@@ -9,6 +9,7 @@ ACTIVE_GAMES = 'active_games'
 suits = ["hearts", "diamonds", "clubs", "spades"]
 values = ["A", "2", "3", "4", "5", "6", "7", "8",
           "9", "10", "J", "Q", "K"]
+game_states = ['lobby', 'in-game', 'ended']
 
 
 def get_game(game_id):
@@ -40,7 +41,9 @@ def create_game():
     for suit in suits:
         for value in values:
             deck.append({"value": value, "suit": suit})
+
     shuffle(deck)
+
     game = {
         "gameId": index,
         "owner": str(session.get('uuid')),
@@ -54,6 +57,7 @@ def create_game():
         "deck": deck,
         "currentTurnState": "pickup"
     }
+    # currentTurnState: "pickup", "meld", "discard"
 
     redis_client.json().set("game:%d" % index, Path.root_path(), game)
     redis_client.sadd(ACTIVE_GAMES, index)
@@ -85,13 +89,17 @@ def join_game(game_id, display_name):
     for player in game['players']:
         if player != str(session.get('uuid')):
             data = {
-            "action": "player-joined",
-            "data": {
-                "player": str(session.get('uuid')),
-                "displayName": display_name,
+                "action": "player-joined",
+                "data": {
+                    "player": str(session.get('uuid')),
+                    "displayName": display_name,
                 }
             }
-            socketio.emit('player-joined', data, to=game['players'][player]['sid'])
+            if game['players'][player]['sid'] is not None:
+                socketio.emit('player-joined',
+                              data,
+                              to=game['players'][player]['sid'],
+                              )
 
     result = {
         "gameId": game.get("gameId"),
@@ -101,11 +109,14 @@ def join_game(game_id, display_name):
         "players": {},
         "playerOrder": game["players"].get(uuid).get('playerOrder'),
         "turnCounter": game.get('turnCounter'),
-        "currentTurnState": game['currentTurnState'],
-        "isOwner": game.get('owner') == uuid
+        "turnState": game['currentTurnState'],
+        "isOwner": game.get('owner') == uuid,
+        "melds": game.get('melds')
     }
+
     if game.get('gameState') == "in-game":
-        result['discard'] = game.get('discardPile')[0]
+        if len(game.get('discardPile')) > 0:
+            result['discard'] = game.get('discardPile')[0]
         result['players'] = player_response_builder(uuid, game['players'])
 
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
@@ -136,9 +147,6 @@ def start_game(game_id):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
 
-    game['discardPile'].append(game['deck'][0])
-    game['deck'].pop(0)
-
     game['pickupCard'] = game['deck'][0]
     game['deck'].pop(0)
 
@@ -146,39 +154,223 @@ def start_game(game_id):
 
     for player in game['players']:
         data = {
-                "action": "started",
-                "game": {
-                    "hand": game["players"][player].get("hand"),
-                    "discard": game['discardPile'][0],
-                    "turnCounter": 1,
-                    "playerOrder": game["players"][player]["playerOrder"],
-                    "players": player_response_builder(player, game['players']),
-                    "currentTurnState": game["currentTurnState"],
-                }
+            "action": "started",
+            "game": {
+                "hand": game["players"][player].get("hand"),
+                "discard": {},
+                "turnCounter": 1,
+                "playerOrder": game["players"][player]["playerOrder"],
+                "players": player_response_builder(player, game['players']),
+                "turnState": game["currentTurnState"],
             }
-        socketio.emit('game-started', data, to=game['players'][player]['sid'])
+        }
+        if game['players'][player]['sid'] is not None:
+            socketio.emit('game-started', data,
+                          to=game['players'][player]['sid'])
 
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
     return game
 
 
-def make_move(player, move, data):
+def make_move(game_key, player, move, data):
     """Make Rummy Move."""
+    game = redis_client.json().get(game_key)
+
+    result = {
+        'status': 'success',
+        "move": {
+            "type": move,
+            "data": {}
+        },
+        "nextTurnState": "",
+        "nextTurnCounter": game['turnCounter']
+    }
+
     if move == "drawPickup":
-        print('test')
+        # TODO verify enough cards
+        picked_card = game.get('deck')[0]
+        game.get('deck').pop(0)
+        game.get('players').get(player).get('hand').append(picked_card)
+
+        result['move']['data']['card'] = picked_card
+        result["nextTurnState"] = "meld"
+
+        game['currentTurnState'] = 'meld'
+        for key in game.get('players'):
+            sid = game.get('players').get(key).get('sid')
+
+            if key != player and sid is not None:
+                message = {
+                    "move": {
+                        "type": "pickup",
+                        "data": {
+                            "players":
+                                player_response_builder(key,
+                                                        game.get('players')),
+                            "discard": {}
+
+                        }
+                    },
+                    "nextTurnState": game['currentTurnState']
+
+                }
+
+                if len(game.get('discardPile')) > 0:
+                    message['move']['data']['discard'] = game.get('discardPile')[
+                        0]
+                socketio.emit('played-move', message, to=sid)
 
     if move == "drawDiscard":
-        print('test')
+        if len(game.get('discardPile')) > 0:
+            picked_card = game.get('discardPile')[0]
+            game.get('discardPile').pop(0)
+            game.get('players').get(player).get('hand').append(picked_card)
+
+            result['move']['data']['card'] = picked_card
+            result["nextTurnState"] = "meld"
+            result['move']['data']["discard"] = {}
+
+            if len(game.get('discardPile')) > 0:
+                result['move']['data']['discard'] = game.get('discardPile')[0]
+
+            game['currentTurnState'] = 'meld'
+
+            for key in game.get('players'):
+                sid = game.get('players').get(key).get('sid')
+
+                if key != player and sid is not None:
+                    message = {
+                        "move": {
+                            "type": "pickup",
+                            "data": {
+                                "players":
+                                    player_response_builder(key,
+                                                            game.get('players')),
+                                "discard": result['move']['data']['discard']
+                            }
+                        },
+                        "nextTurnState": game['currentTurnState']
+                    }
+                    socketio.emit('played-move', message, to=sid)
 
     if move == "meld":
-        pass
+        meld = data.get('cards')
+        game.get('melds').append(meld)
+        for card in meld:
+            game.get('players').get(player).get('hand').remove(card)
 
-    if move == "layOff":
-        pass
+        result['move']['data']['melds'] = game.get('melds')
+        result['move']['data']['hand'] = game.get(
+            'players').get(player).get('hand', {})
+        result["nextTurnState"] = "meld"
+
+        game['currentTurnState'] = 'meld'
+        for key in game.get('players'):
+            sid = game.get('players').get(key).get('sid')
+
+            if key != player and sid is not None:
+                message = {
+                    "move": {
+                        "type": "meld",
+                        "data": {
+                            "players":
+                                player_response_builder(key,
+                                                        game.get('players')),
+                            "melds": result['move']['data']['melds']
+                        }
+                    },
+                    "nextTurnState": game['currentTurnState']
+                }
+                socketio.emit('played-move', message, to=sid)
+
+    if move == 'layoff':
+        card = data.get('card')
+        meldId = data.get('meldId')
+        game.get('melds')[meldId].append(card)
+        game.get('players').get(player).get('hand').remove(card)
+
+        result['move']['data']['melds'] = game.get('melds')
+        result['move']['data']['hand'] = game.get(
+            'players').get(player).get('hand', {})
+        result["nextTurnState"] = "meld"
+
+        game['currentTurnState'] = 'meld'
+        for key in game.get('players'):
+            sid = game.get('players').get(key).get('sid')
+
+            if key != player and sid is not None:
+                message = {
+                    "move": {
+                        "type": "meld",
+                        "data": {
+                            "players":
+                                player_response_builder(key,
+                                                        game.get('players')),
+                            "melds": result['move']['data']['melds']
+                        }
+                    },
+                    "nextTurnState": game['currentTurnState']
+                }
+                socketio.emit('played-move', message, to=sid)
 
     if move == "discard":
-        pass
+        discardedCard = data.get('card')
+        game.get('players').get(
+            player).get('hand').remove(discardedCard)
+        game.get('discardPile').insert(0, discardedCard)
+        turnCounter = game['turnCounter'] + 1
+        if turnCounter > len(game.get('players')):
+            turnCounter = 1
+
+        game['currentTurnState'] = "pickup"
+        game['turnCounter'] = turnCounter
+
+        result["nextTurnState"] = "pickup"
+        result["nextTurnCounter"] = turnCounter
+        result["hand"] = game.get('players').get(player).get('hand')
+        result['move']['data']["discard"] = game.get('discardPile')[0]
+
+        for key in game.get('players'):
+            sid = game.get('players').get(key).get('sid')
+            if key != player and sid is not None:
+                message = {
+                    'move': {
+                        'type': "discard",
+                        'data': {
+                            'players': player_response_builder(key, game.get('players')),
+                            'discard': result['move']['data']["discard"]
+                        }
+                    },
+                    'nextTurnState': game['currentTurnState'],
+                    'nextTurnCounter': game['turnCounter']
+                }
+                socketio.emit('played-move', message, to=sid)
+
+    if len(game.get('players').get(player).get('hand')) == 0:
+        for key in game.get('players'):
+            sid = game.get('players').get(key).get('sid')
+            game['gameState'] = 'ended'
+
+            if sid is not None:
+                message = {
+                    'move': {
+                        'type': "roundEnd",
+                        'data': {
+                            'players': player_response_builder(key, game.get('players')),
+                            'winner': {
+                                'displayName': game.get('players').get(player).get('displayName'),
+                                'isPlayer': key == player
+                            },
+                            'redirect': '/'
+                        }
+                    },
+                }
+                socketio.emit('played-move', message, to=sid)
+
+    redis_client.json().set(game_key, Path.root_path(), game)
+
+    return result
 
 
 def player_response_builder(current, player_dic):
@@ -188,16 +380,17 @@ def player_response_builder(current, player_dic):
         if key != current:
             players.append(
                 {
-                'displayName': player_dic[key]['displayName'],
-                'cardCount': len(player_dic[key]['hand']),
-                'playerOrder': player_dic[key].get('playerOrder', 0)
-            })
+                    'displayName': player_dic[key]['displayName'],
+                    'cardCount': len(player_dic[key]['hand']),
+                    'playerOrder': player_dic[key].get('playerOrder', 0)
+                })
     if players[-1].get('playerOrder') > player_dic[current].get('playerOrder'):
         while players[0].get('playerOrder') < player_dic[current].get('playerOrder'):
             players.append(players.pop(0))
     return players
 
-def winner_points(player_dic, winner, game): # winner = player uuid
+
+def winner_points(player_dic, winner, game):  # winner = player uuid
     """Returns points of winner"""
     sum = 0
     for player in player_dic:
@@ -210,3 +403,11 @@ def winner_points(player_dic, winner, game): # winner = player uuid
                 else:
                     sum += int(card.get('value'))
     return sum
+
+
+"""def is_valid_meld(meld):
+    if len(meld) < 3:
+        return false
+    meld.sort(key=lambda x: x.value)
+
+"""

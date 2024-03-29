@@ -34,7 +34,7 @@ export const ValueOrder = Object.values(Value)
 export interface CardType {
     suit: Suit
     value: Value
-    // rank: Rank
+    isSelected: boolean
 }
 
 export interface LobbyGame {
@@ -48,14 +48,27 @@ export interface RummyPlayer {
     playerOrder: number
     cardCount: number
 }
+
+export enum GameTurn {
+    PICKUP = 'pickup',
+    MELD = 'meld',
+    DISCARD = 'discard',
+}
+
+export interface Meld {
+    meldId: number
+    cards: CardType[]
+}
 export interface RummyGame {
     gameId: string
     players: RummyPlayer[]
     gameState: string
     hand: CardType[]
+    sortState: boolean
     discard: CardType
-    melds: CardType[]
+    melds: Meld[]
     turnCounter: number
     playerOrder: number
     isOwner: boolean
+    turnState: GameTurn
 }

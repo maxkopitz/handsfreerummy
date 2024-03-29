@@ -19,11 +19,32 @@
 
 # Installation
 ## External Requirements
-- [Docker](https://docs.docker.com/desktop/), used for Redis Stack
-    - Can be installed without docker [here](https://redis.io/docs/install/install-stack/) if desired
-- [Python-3.10.12](https://www.python.org/downloads/release/python-31012/)
+- [Docker](https://docs.docker.com/desktop/)
 - Node v21.6.1, we use [nvm](https://github.com/nvm-sh/nvm) to get correct verison
 
 ## Setup
-1. [Frontend](./frontend/README.md)
-2. [Backend](./backend/README.md)
+Clone the repository
+```sh
+git clone https://github.com/maxkopitz/handsfreerummy
+```
+## Start the flask API via ``Docker``
+1. Build the backend & frontend containers, this step is only needed the first time installing and when package.json or requirements.txt changes.
+```sh
+docker compose build
+```
+2. Run docker compose
+```sh
+docker compose up
+```
+- The UI should be running at ``http://localhost:3000/``
+- The API should be running at ``http://localhost:4000/``
+- Redis Insight should be running at ``http://localhost:8001/``
+
+> Use ``CTRL-C`` to stop docker compose or docker compose down
+<br />
+
+## Notes
+1. If you get stuck on a page, go to Redis Insight ``http://localhost:8001``.
+2. Open the [CLI](https://redis.io/docs/connect/insight/#cli)
+3. Flush the DB by entering ``FLUSHDB`` in the CLI
+

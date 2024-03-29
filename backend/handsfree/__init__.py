@@ -4,11 +4,13 @@ from flask_socketio import SocketIO
 from flask_redis import FlaskRedis
 from flask_session import Session
 from flask_cors import CORS
-
+import os
+import sys
 
 app = Flask(__name__)
 
-app.config.from_object('handsfree.config')
+env_flask_config_name = os.getenv('APP_SETTINGS')
+app.config.from_object(env_flask_config_name)
 redis_client = FlaskRedis(app)
 
 sess = Session()
@@ -27,7 +29,6 @@ socketio = SocketIO(
 # EXAMPLE:
 # $ export HANDSFREE_SETTINGS=secret_key_config.py
 # DEFINED IN COMPOSE FILE
-app.config.from_envvar('HANDSFREE_SETTINGS', silent=True)
 
 from handsfree.api import sockets  # noqa: E402  pylint: disable=wrong-import-position
 from handsfree.api import routes  # noqa: E402  pylint: disable=wrong-import-position

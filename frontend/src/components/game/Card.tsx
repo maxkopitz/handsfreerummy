@@ -7,25 +7,42 @@ interface CardProps {
     onClick?: any
     isActive: boolean
 }
+
 const Card = ({ card, onClick, isActive }: CardProps) => {
     const { profile } = useProfile()
     let classes = classNames(
-        'rounded-md text-center shadow-lg bg-white',
+        'rounded-md text-center shadow-lg bg-white flex flex-col items-center justify-center',
         {
-            'text-red-500 border-red-500  flex flex-col items-center justify-center':
-                card.suit === Suit.H || card.suit === Suit.D,
+            'text-red-500': card.suit === Suit.H || card.suit === Suit.D,
+        },
+        {
+            'border-red-500':
+                (card.suit === Suit.H || card.suit === Suit.D) &&
+                !card.isSelected,
         },
         {
             'hover:bg-red-500 hover:text-white':
                 (card.suit === Suit.H || card.suit === Suit.D) && isActive,
         },
         {
-            'text-black-500 border-slate-950 flex flex-col items-center justify-center':
-                card.suit === Suit.S || card.suit === Suit.C,
+            'text-black-500': card.suit === Suit.S || card.suit === Suit.C,
+        },
+        {
+            'border-slate-950':
+                (card.suit === Suit.S || card.suit === Suit.C) &&
+                !card.isSelected,
         },
         {
             'hover:bg-neutral-950 hover:text-white':
                 (card.suit === Suit.S || card.suit === Suit.C) && isActive,
+        },
+        {
+            'border-green-500':
+                (card.suit === Suit.H ||
+                    card.suit === Suit.D ||
+                    card.suit === Suit.S ||
+                    card.suit === Suit.C) &&
+                card.isSelected,
         },
         { 'text-2xl w-20 h-32': profile.settings.cardSize === 1 },
         { 'text-4xl w-28 h-40': profile.settings.cardSize === 2 },
@@ -47,11 +64,11 @@ const Card = ({ card, onClick, isActive }: CardProps) => {
         suitSymbol = '♦'
     }
     if (isActive) {
-
         return (
             <>
                 <div className={classes} onClick={onClick}>
                     <div>
+                        <div></div>
                         <div>{suitSymbol}</div>
                         <div>{card.value}</div>
                         <div>{suitSymbol}</div>
@@ -59,7 +76,6 @@ const Card = ({ card, onClick, isActive }: CardProps) => {
                 </div>
             </>
         )
-
     }
 
     return (
