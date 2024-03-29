@@ -45,16 +45,27 @@ const Dictaphone = () => {
         <div>
             <p>Microphone: {listening ? 'on' : 'off'}</p>
             <Button 
-                text={'start'}
+                text={'Start'}
                 onClick={
-                    console.log(0)
+                    SpeechRecognition.startListening
                 }
             
             />
-
+            <Button
+                text={'Stop'}
+                onClick={
+                    SpeechRecognition.stopListening
+                }
+            />
+            <Button 
+                text={'Reset Transript'}
+                onClick={resetTranscript}
+            />
+            <p>{ transcript }</p>
         </div>
-    )
-}
+    );
+};
+
 
 
 
@@ -109,6 +120,9 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
                             }
                         />
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
+                    </div>
+                    <div>
+                        <Dictaphone/>
                     </div>
                 </div>
                 {game.players.map((player, key) => (

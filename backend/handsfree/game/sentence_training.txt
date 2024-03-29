@@ -1,0 +1,111 @@
+# sort by suit
+sort by suit
+sort the cards by suit
+sort cards by suit
+sort by suit order
+sort the cards in order of suits
+put the hearts together
+put the spades together
+put the clubs together
+put the diamonds together
+order the cards by suit
+put the cards in suit order
+put the cards together by suit
+i want the suits together
+sort by the order of suit
+# sort by rank
+sort the cards by rank
+sort the cards by value
+put in ascending order
+put in descending order
+order the cards by value
+order the cards by rank
+put the cards in rank order
+put the cards in value order
+sort the cards in ascending order
+rearrange the cards in value order
+rearrange the cards by rank
+sort by rank
+sort by value
+# lay off
+play one card
+play a card
+lay off
+play onto a meld
+play a single card
+play that card
+play the ace of hearts onto the first meld
+play the card onto meld one
+play that card onto the second meld
+lay off one card onto meld three
+play the nine of spades
+play the jack of diamonds
+play the two of clubs
+# play meld
+play three cards
+play meld
+play the ace of hearts, ace of diamonds, ace of clubs, and ace of spades
+play the three of diamonds, four of diamonds, and five of diamonds
+play the three fives
+play four jacks
+play three tens
+play three kings
+play the queen of diamonds, queen of clubs, and queen of spades
+play a meld
+play all three nines
+play the eight, nine, and ten of hearts
+# draw discard
+draw the face up card
+draw from the discard pile
+draw from the left pile
+draw the discard
+draw discard
+draw from the left
+draw the ace
+draw the two
+draw the three
+draw the four
+pickup the five
+draw the six
+draw the seven
+pickup the eight
+draw the nine
+pickup the ten
+draw the jack
+pickup the queen
+draw the king
+pickup from the left
+pickup the face up card
+pickup from the discard pile
+# draw pickup
+draw the face down card
+draw from the right pile
+draw from the right
+pickup from the draw pile
+pickup from the deck
+draw deck
+draw from the deck
+pickup from pickup pile
+draw pickup pile
+draw normal
+draw normally
+# discard
+discard
+discard card
+discard the ace
+discard the card
+discard
+discard
+discard a card
+discard the two
+discard the three
+discard the four
+discard the five
+discard the six
+discard the seven
+discard the eight
+discard the nine
+discard the ten
+discard the jack
+discard the queen
+discard the king
