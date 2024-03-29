@@ -1,3 +1,3 @@
 export const ENV = process.env.NODE_ENV || 'development';
-export const API_URL: any = ENV === 'production' ? undefined : 'http://localhost:4000'
+export const API_URL: any = ENV === 'production' ? undefined : 'http://localhost:4000/'
 
