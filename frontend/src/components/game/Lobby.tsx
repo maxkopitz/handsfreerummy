@@ -70,16 +70,24 @@ const Lobby = ({ game }: LobbyProps) => {
         <Container>
             <div className="flex flex-col justify-center items-center h-full">
                 <h1 className="text-xl font-bold">Lobby #{game.gameId} </h1>
-               <h1>Players: {game.players.length} </h1>
+                <h1>Players: {game.players.length} </h1>
 
                 {!game.isOwner && (
-                    <Button text={'Leave Game'} onClick={handleLeaveGame} />
+                    <Button
+                        text={'Leave Game'}
+                        onClick={handleLeaveGame} />
                 )}
                 {game.isOwner && (
-                    <Button text={'Close Game'} onClick={handleCloseGame} />
+                    <Button
+                        text={'Close Game'}
+                        onClick={handleCloseGame} />
                 )}
                 {game.isOwner && (
-                    <Button text={'Start Game'} onClick={handleStartGame} />
+                    <Button
+                        text={'Start Game'}
+                        onClick={handleStartGame}
+                        disabled={game.players.length === 1}
+                        isActive={game.players.length === 1} />
                 )}
 
                 <Button
