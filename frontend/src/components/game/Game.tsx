@@ -58,6 +58,7 @@ const Game = () => {
                     const { data } = res
                     if (data.status === 'error') {
                         toast.error(data.error.message)
+                        navigate(data.error.redirect)
                         return
                     }
                     console.log(data)

@@ -2,7 +2,6 @@ from handsfree import redis_client, socketio
 from redis.commands.json.path import Path
 from flask import session
 from random import shuffle
-import sys
 
 GAME_KEY_INDEX = 'games_index'
 ACTIVE_GAMES = 'active_games'
@@ -10,6 +9,7 @@ suits = ["hearts", "diamonds", "clubs", "spades"]
 values = ["A", "2", "3", "4", "5", "6", "7", "8",
           "9", "10", "J", "Q", "K"]
 game_states = ['lobby', 'in-game', 'ended']
+turn_states = ['pickup', 'meld', 'discard']
 
 
 def get_game(game_id):
@@ -71,9 +71,20 @@ def join_game(game_id, display_name):
     game = redis_client.json().get("game:%d" % game_id)
 
     # Calling method needs to ensure game_id is not being overwrote
-    session["game_id"] = game_id
-
     uuid = str(session.get('uuid'))
+
+    if len(game.get('players')) == game.get('maxPlayers'):
+        if game.get('players').get(uuid) is None:
+            result = {
+                "status": "error",
+                "error": {
+                    "message": "Unable to join game, max players.",
+                    "redirect": "/"
+                }
+            }
+            return result
+
+    session["game_id"] = game_id
 
     if game["players"].get(uuid) is None:
         game["players"][uuid] = {
