@@ -29,7 +29,6 @@ const Game = () => {
     const navigate = useNavigate()
     const { profile } = useProfile()
     const { gameId } = useParams()
-    const { dispatch: dispatchModal } = useModal()
 
     const [game, setGame] = useState<RummyGame>({
         gameId: '0',

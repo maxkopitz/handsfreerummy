@@ -1,5 +1,5 @@
 import Board from './Board'
-import { CardType, GameTurn, RummyGame, Suit, Value } from '../../Type'
+import { CardType, GameTurn, Meld as MeldType, RummyGame, Suit, Value } from '../../Type'
 import Button from '../ui/Button'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
@@ -13,15 +13,16 @@ import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import Meld from './Meld'
+import { toast } from 'react-hot-toast'
 
 interface TableProps {
     game: RummyGame
-    handleClickPickup: any
-    handleClickDiscard: any
-    handleDiscard: any
-    handlePlayerCardClick: any
+    handleClickPickup: () => void
+    handleClickDiscard: () => void
+    handleDiscard: (card: CardType) => void
+    handlePlayerCardClick: (card: CardType) => void
     handleSortCardClick: any
-    handleClickMeld: any
+    handleClickMeld: (meld: MeldType) => void
     handleLayoff: any
 }
 
@@ -57,7 +58,7 @@ const Table = ({
                 navigate('/')
             })
             .catch(() => {
-                console.log('Error occured while leaving.')
+                toast('Unable to leave!')
             })
     }
 
