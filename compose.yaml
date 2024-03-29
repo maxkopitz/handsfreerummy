@@ -15,14 +15,14 @@ services:
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
+    restart: always
     ports:
       - '4000:4000'
     volumes:
       - ./backend:/code
     environment:
-      - REDIS_URL='redis://redis:6379'
+      - REDIS_URL=redis://redis:6379
       - MONGO_URL='mongodb://root:example@mongo:27017/'
-      - HANDSFREE_SETTINGS='secret_config.py'
       - FLASK_CONFIG=development
       - FLASK_ENV=development
       - APP_SETTINGS=handsfree.config.DevelopmentConfig
