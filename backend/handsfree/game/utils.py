@@ -10,6 +10,7 @@ suits = ["hearts", "diamonds", "clubs", "spades"]
 values = ["A", "2", "3", "4", "5", "6", "7", "8",
           "9", "10", "J", "Q", "K"]
 game_states = ['lobby', 'in-game', 'ended']
+turn_states = ['pickup', 'meld', 'discard']
 
 
 def get_game(game_id):
@@ -71,9 +72,20 @@ def join_game(game_id, display_name):
     game = redis_client.json().get("game:%d" % game_id)
 
     # Calling method needs to ensure game_id is not being overwrote
-    session["game_id"] = game_id
-
     uuid = str(session.get('uuid'))
+
+    if len(game.get('players')) == game.get('maxPlayers'):
+        if game.get('players').get(uuid) is None:
+            result = {
+                "status": "error",
+                "error": {
+                    "message": "Unable to join game, max players.",
+                    "redirect": "/"
+                }
+            }
+            return result
+
+    session["game_id"] = game_id
 
     if game["players"].get(uuid) is None:
         game["players"][uuid] = {
@@ -87,37 +99,44 @@ def join_game(game_id, display_name):
         game["players"][uuid]["displayName"] = display_name
 
     for player in game['players']:
-        if player != str(session.get('uuid')):
-            data = {
-                "action": "player-joined",
-                "data": {
-                    "player": str(session.get('uuid')),
-                    "displayName": display_name,
-                }
+        data = {
+            "action": "player-joined",
+            "data": {
+                "player": str(session.get('uuid')),
+                "displayName": display_name,
+                "players": list(game.get('players'))
             }
-            if game['players'][player]['sid'] is not None:
-                socketio.emit('player-joined',
-                              data,
-                              to=game['players'][player]['sid'],
-                              )
+        }
+        if game['players'][player]['sid'] is not None:
+            socketio.emit('player-joined',
+                          data,
+                          to=game['players'][player]['sid'],
+                          )
 
     result = {
-        "gameId": game.get("gameId"),
-        "hand": game.get("players").get(uuid).get('hand'),
-        "discard": {},
-        "gameState": game.get("gameState"),
-        "players": {},
-        "playerOrder": game["players"].get(uuid).get('playerOrder'),
-        "turnCounter": game.get('turnCounter'),
-        "turnState": game['currentTurnState'],
-        "isOwner": game.get('owner') == uuid,
-        "melds": game.get('melds')
+        "status": "success",
+        "result": {
+            "message": f"Joined game {game_id}.",
+            "game": {
+                "gameId": game.get("gameId"),
+                "hand": game.get("players").get(uuid).get('hand'),
+                "discard": {},
+                "gameState": game.get("gameState"),
+                "players": list(game.get('players')),  # Changed if in-game
+                "playerOrder": game["players"].get(uuid).get('playerOrder'),
+                "turnCounter": game.get('turnCounter'),
+                "turnState": game['currentTurnState'],
+                "isOwner": game.get('owner') == uuid,
+                "melds": game.get('melds')
+            }
+        }
     }
 
     if game.get('gameState') == "in-game":
         if len(game.get('discardPile')) > 0:
-            result['discard'] = game.get('discardPile')[0]
-        result['players'] = player_response_builder(uuid, game['players'])
+            result['result']['game']['discard'] = game.get('discardPile')[0]
+        result['result']['game']['players'] = player_response_builder(
+            uuid, game['players'])
 
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
@@ -142,8 +161,19 @@ def start_game(game_id):
     game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
 
+    if len(game.get('players')) < 2:
+        result = {
+            "status": "error",
+            "error": {
+                "message": "Not enough players!"
+            }
+        }
+        return result
+
+    handSize = 7 if len(game.get('players')) > 2 else 13
+
     for player in game["players"]:
-        for i in range(7):
+        for i in range(handSize):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
 
@@ -256,6 +286,14 @@ def make_move(game_key, player, move, data):
 
     if move == "meld":
         meld = data.get('cards')
+
+        if not is_valid_meld(meld):
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Invalid meld."
+                }
+            }
         game.get('melds').append(meld)
         for card in meld:
             game.get('players').get(player).get('hand').remove(card)
@@ -288,6 +326,14 @@ def make_move(game_key, player, move, data):
         card = data.get('card')
         meldId = data.get('meldId')
         game.get('melds')[meldId].append(card)
+        if not is_valid_meld(game.get('melds')[meldId]):
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Invalid meld."
+                }
+            }
+        print(card, file=sys.stderr)
         game.get('players').get(player).get('hand').remove(card)
 
         result['move']['data']['melds'] = game.get('melds')
@@ -405,9 +451,51 @@ def winner_points(player_dic, winner, game):  # winner = player uuid
     return sum
 
 
-"""def is_valid_meld(meld):
-    if len(meld) < 3:
-        return false
-    meld.sort(key=lambda x: x.value)
+def is_valid_meld(meld, isLayoff=False):
+    """Verify meld is valid."""
 
-"""
+    if len(meld) < 3:
+        return False
+
+    for card in meld:
+        if card.get('value') == 'J':
+            card['value'] = '11'
+        elif card.get('value') == 'Q':
+            card['value'] = '12'
+        elif card.get('value') == 'K':
+            card['value'] = '13'
+        elif card.get('value') == 'A':
+            card['value'] = '14'
+
+    meld.sort(key=lambda card: int(card['value']))
+    sequence = True
+    pair = True
+    for i in range(1, len(meld)):
+        if (int(meld[i - 1].get('value')), meld[i - 1].get('suit')) == (
+                int(meld[i].get('value')), meld[i].get('suit')):
+            raise Exception("Same Card WTF")
+
+        if pair:  # checks for 3 or 4 of a kinds
+            if meld[i].get('value') != meld[i - 1].get('value'):
+                pair = False
+
+        if sequence:  # checks for sequences of the same suit
+            if ((int(meld[i - 1].get('value')), meld[i - 1].get('suit')) != (
+                    int(meld[i].get('value')) - 1, meld[i].get('suit'))):
+                sequence = False
+
+    # This is a crime
+    for card in meld:
+        if card.get('value') == '11':
+            card['value'] = 'J'
+        elif card.get('value') == '12':
+            card['value'] = 'Q'
+        elif card.get('value') == '13':
+            card['value'] = 'K'
+        elif card.get('value') == '13':
+            card['value'] = 'A'
+
+    if sequence or pair:
+        return True
+    else:
+        return False
