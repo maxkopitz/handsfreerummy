@@ -87,37 +87,44 @@ def join_game(game_id, display_name):
         game["players"][uuid]["displayName"] = display_name
 
     for player in game['players']:
-        if player != str(session.get('uuid')):
-            data = {
-                "action": "player-joined",
-                "data": {
-                    "player": str(session.get('uuid')),
-                    "displayName": display_name,
-                }
+        data = {
+            "action": "player-joined",
+            "data": {
+                "player": str(session.get('uuid')),
+                "displayName": display_name,
+                "players": list(game.get('players'))
             }
-            if game['players'][player]['sid'] is not None:
-                socketio.emit('player-joined',
-                              data,
-                              to=game['players'][player]['sid'],
-                              )
+        }
+        if game['players'][player]['sid'] is not None:
+            socketio.emit('player-joined',
+                          data,
+                          to=game['players'][player]['sid'],
+                          )
 
     result = {
-        "gameId": game.get("gameId"),
-        "hand": game.get("players").get(uuid).get('hand'),
-        "discard": {},
-        "gameState": game.get("gameState"),
-        "players": {},
-        "playerOrder": game["players"].get(uuid).get('playerOrder'),
-        "turnCounter": game.get('turnCounter'),
-        "turnState": game['currentTurnState'],
-        "isOwner": game.get('owner') == uuid,
-        "melds": game.get('melds')
+        "status": "success",
+        "result": {
+            "message": f"Joined game {game_id}.",
+            "game": {
+                "gameId": game.get("gameId"),
+                "hand": game.get("players").get(uuid).get('hand'),
+                "discard": {},
+                "gameState": game.get("gameState"),
+                "players": list(game.get('players')),  # Changed if in-game
+                "playerOrder": game["players"].get(uuid).get('playerOrder'),
+                "turnCounter": game.get('turnCounter'),
+                "turnState": game['currentTurnState'],
+                "isOwner": game.get('owner') == uuid,
+                "melds": game.get('melds')
+            }
+        }
     }
 
     if game.get('gameState') == "in-game":
         if len(game.get('discardPile')) > 0:
             result['discard'] = game.get('discardPile')[0]
-        result['players'] = player_response_builder(uuid, game['players'])
+        result['result']['game']['players'] = player_response_builder(
+            uuid, game['players'])
 
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
@@ -142,8 +149,19 @@ def start_game(game_id):
     game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
 
+    if len(game.get('players')) < 2:
+        result = {
+            "status": "error",
+            "error": {
+                "message": "Not enough players!"
+            }
+        }
+        return result
+
+    handSize = 7 if len(game.get('players')) > 2 else 13
+
     for player in game["players"]:
-        for i in range(7):
+        for i in range(handSize):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
 

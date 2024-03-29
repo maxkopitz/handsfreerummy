@@ -44,45 +44,59 @@ const Game = () => {
         turnState: GameTurn.PICKUP,
     })
 
-    const joinGame = async () => {
-        const data = JSON.stringify({
-            action: 'join',
-            displayName: profile.displayName,
-        })
-        axiosInstance
-            .post<any>('/games/' + gameId + '/', data)
-            .then((res: any) => {
-                const { data } = res
-                console.log(data)
-                const melds = data.game.melds.map(
-                    (meld: any, index: number) => {
-                        return { meldId: index, cards: meld }
-                    }
-                )
-                setGame({
-                    gameId: data.game.gameId,
-                    players: data.game.players,
-                    gameState: data.game.gameState,
-                    hand: parseHand(data.game.hand),
-                    sortState: true,
-                    melds: melds,
-                    discard: data.game?.discard,
-                    turnCounter: data.game?.turnCounter,
-                    playerOrder: data.game?.playerOrder,
-                    isOwner: data.game?.isOwner,
-                    turnState: data.game?.turnState,
-                })
-            })
-            .catch(() => {
-                navigate('/')
-            })
-    }
+
 
     useEffect(() => {
+        const joinGame = async () => {
+            const data = JSON.stringify({
+                action: 'join',
+                displayName: profile.displayName,
+            })
+            await axiosInstance
+                .post<any>('/games/' + gameId + '/', data)
+                .then((res: any) => {
+                    const { data } = res
+                    if (data.status === 'error') {
+                        toast.error(data.error.message)
+                        return
+                    }
+                    console.log(data)
+                    const { result } = data
+                    const melds = result.game.melds.map(
+                        (meld: any, index: number) => {
+                            return { meldId: index, cards: meld }
+                        }
+                    )
+                    setGame({
+                        gameId: result.game.gameId,
+                        players: result.game.players,
+                        gameState: result.game.gameState,
+                        hand: parseHand(result.game.hand),
+                        sortState: true,
+                        melds: melds,
+                        discard: result.game?.discard,
+                        turnCounter: result.game?.turnCounter,
+                        playerOrder: result.game?.playerOrder,
+                        isOwner: result.game?.isOwner,
+                        turnState: result.game?.turnState,
+                    })
+                })
+                .catch(() => {
+                    navigate('/')
+                })
+        }
         joinGame()
+    }, [gameId, navigate, profile.displayName])
+    useEffect(() => {
 
         socket.on(SocketEvents.PLAYER_JOINED, (data: any) => {
-            toast(data.data.displayName + ' has joined.')
+            if (game.gameState === 'lobby') {
+                setGame((prevState) => ({
+                    ...prevState,
+                    players: data.data.players
+                }))
+                toast(data.data.displayName + ' has joined.')
+            }
         })
 
         socket.on(SocketEvents.PLAYER_LEFT, (data: any) => {
@@ -90,7 +104,6 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.GAME_STARTED, (data: any) => {
-            console.log('STARTED:', data)
             setGame({
                 ...game,
                 hand: parseHand(data.game.hand),
@@ -104,7 +117,6 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
-            console.log(data)
             if (data?.move.type === 'pickup') {
                 setGame((prevState) => ({
                     ...prevState,
@@ -142,7 +154,7 @@ const Game = () => {
             socket.off(SocketEvents.GAME_STARTED)
             socket.off(SocketEvents.PLAYED_MOVE)
         }
-    }, [])
+    }, [game.gameState])
 
     const handleClickPickup = () => {
         const data = JSON.stringify({
