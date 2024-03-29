@@ -2,6 +2,7 @@ from handsfree import redis_client, socketio
 from redis.commands.json.path import Path
 from flask import session
 from random import shuffle
+import sys
 
 GAME_KEY_INDEX = 'games_index'
 ACTIVE_GAMES = 'active_games'
@@ -133,7 +134,7 @@ def join_game(game_id, display_name):
 
     if game.get('gameState') == "in-game":
         if len(game.get('discardPile')) > 0:
-            result['discard'] = game.get('discardPile')[0]
+            result['result']['game']['discard'] = game.get('discardPile')[0]
         result['result']['game']['players'] = player_response_builder(
             uuid, game['players'])
 
@@ -285,6 +286,14 @@ def make_move(game_key, player, move, data):
 
     if move == "meld":
         meld = data.get('cards')
+
+        if not is_valid_meld(meld):
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Invalid meld."
+                }
+            }
         game.get('melds').append(meld)
         for card in meld:
             game.get('players').get(player).get('hand').remove(card)
@@ -317,6 +326,14 @@ def make_move(game_key, player, move, data):
         card = data.get('card')
         meldId = data.get('meldId')
         game.get('melds')[meldId].append(card)
+        if not is_valid_meld(game.get('melds')[meldId]):
+            return {
+                "status": "error",
+                "error": {
+                    "message": "Invalid meld."
+                }
+            }
+        print(card, file=sys.stderr)
         game.get('players').get(player).get('hand').remove(card)
 
         result['move']['data']['melds'] = game.get('melds')
@@ -434,9 +451,51 @@ def winner_points(player_dic, winner, game):  # winner = player uuid
     return sum
 
 
-"""def is_valid_meld(meld):
-    if len(meld) < 3:
-        return false
-    meld.sort(key=lambda x: x.value)
+def is_valid_meld(meld, isLayoff=False):
+    """Verify meld is valid."""
 
-"""
+    if len(meld) < 3:
+        return False
+
+    for card in meld:
+        if card.get('value') == 'J':
+            card['value'] = '11'
+        elif card.get('value') == 'Q':
+            card['value'] = '12'
+        elif card.get('value') == 'K':
+            card['value'] = '13'
+        elif card.get('value') == 'A':
+            card['value'] = '14'
+
+    meld.sort(key=lambda card: int(card['value']))
+    sequence = True
+    pair = True
+    for i in range(1, len(meld)):
+        if (int(meld[i - 1].get('value')), meld[i - 1].get('suit')) == (
+                int(meld[i].get('value')), meld[i].get('suit')):
+            raise Exception("Same Card WTF")
+
+        if pair:  # checks for 3 or 4 of a kinds
+            if meld[i].get('value') != meld[i - 1].get('value'):
+                pair = False
+
+        if sequence:  # checks for sequences of the same suit
+            if ((int(meld[i - 1].get('value')), meld[i - 1].get('suit')) != (
+                    int(meld[i].get('value')) - 1, meld[i].get('suit'))):
+                sequence = False
+
+    # This is a crime
+    for card in meld:
+        if card.get('value') == '11':
+            card['value'] = 'J'
+        elif card.get('value') == '12':
+            card['value'] = 'Q'
+        elif card.get('value') == '13':
+            card['value'] = 'K'
+        elif card.get('value') == '13':
+            card['value'] = 'A'
+
+    if sequence or pair:
+        return True
+    else:
+        return False

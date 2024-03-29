@@ -230,7 +230,11 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                const { data } = res;
+                if (data.status === 'error') {
+                    toast.error(data.error.message)
+                    return
+                }
                 const melds = res.data.move.data.melds.map(
                     (meld: any, index: number) => {
                         return { meldId: index, cards: meld }
@@ -270,7 +274,10 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then(({ data }: any) => {
-                console.log(data)
+                if (data.status === 'error') {
+                    toast.error(data.error.message)
+                    return
+                }
                 if (data.status === 'success') {
                     const melds = data.move.data.melds.map(
                         (meld: any, index: number) => {
