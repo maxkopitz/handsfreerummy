@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosConfig";
 import { useModal } from "../../hooks/Modal";
@@ -11,6 +12,7 @@ const CreateGame = () => {
         await axiosInstance.post('/games').then((res) => {
             const { data } = res;
             const gameId = data.game.gameId;
+            toast.success('Created game lobby!')
             navigate('/games/' + gameId);
 
             dispatch({ type: 'closeModal' })

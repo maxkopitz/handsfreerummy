@@ -7,6 +7,8 @@ import Container from '../ui/Container'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
 import Tutorial from '../tutorial/Tutorial'
+import { toast } from 'react-hot-toast'
+import { useEffect } from 'react'
 
 interface LobbyProps {
     game: RummyGame
@@ -20,12 +22,12 @@ const Lobby = ({ game }: LobbyProps) => {
         })
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
+            .then((res: any) => {
+                toast.success("Left Game!")
+                navigate('/')
+            })
             .catch((error: AxiosError) => {
                 console.log(error)
-            })
-            .then((res: any) => {
-                console.log(res)
-                navigate('/')
             })
     }
 
@@ -36,7 +38,9 @@ const Lobby = ({ game }: LobbyProps) => {
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                if (res?.data?.status === 'error') {
+                    toast.error(res.data.error.message)
+                }
             })
             .catch((error: AxiosError) => {
                 console.log(error)
@@ -49,18 +53,24 @@ const Lobby = ({ game }: LobbyProps) => {
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+
+                toast.success("Closed Game!")
                 navigate('/')
             })
             .catch((error: AxiosError) => {
                 console.log(error)
             })
     }
+
+    useEffect(() => {
+        console.log(game.players)
+
+    }, [game.players])
     return (
         <Container>
             <div className="flex flex-col justify-center items-center h-full">
                 <h1 className="text-xl font-bold">Lobby #{game.gameId} </h1>
-                {/* <h1>Players: {game.players.length} </h1> */}
+               <h1>Players: {game.players.length} </h1>
 
                 {!game.isOwner && (
                     <Button text={'Leave Game'} onClick={handleLeaveGame} />

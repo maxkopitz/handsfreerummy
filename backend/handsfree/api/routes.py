@@ -131,10 +131,7 @@ def handle_game_action(game_id):
             game_id,
             request.json.get('displayName', 'NA'))
 
-        return {
-            "status": "success",
-            "game": result
-        }
+        return result
 
     if action == 'leave':
         if session.get('game_id') is None:
