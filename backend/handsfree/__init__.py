@@ -27,7 +27,7 @@ socketio = SocketIO(
 
 
 from handsfree.api import sockets  # noqa: E402  pylint: disable=wrong-import-position
-from handsfree.api import initiate_app
+from handsfree.api import initiate_app  # noqa: E402 pylint: disable=wrong-import-position
 initiate_app(app)
 
 if __name__ == '__main__':
