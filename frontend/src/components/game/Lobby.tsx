@@ -20,15 +20,18 @@ const Lobby = ({ game }: LobbyProps) => {
         const data = JSON.stringify({
             action: 'leave',
         })
-        axiosInstance
-            .post<any>('/games/' + game.gameId + '/', data)
-            .then((res: any) => {
-                toast.success("Left Game!")
-                navigate('/')
-            })
-            .catch((error: AxiosError) => {
-                console.log(error)
-            })
+        const leaveGame = async () => {
+            await axiosInstance
+                .post<any>('/games/' + game.gameId + '/', data)
+                .then((res: any) => {
+                    toast.success("Left Game!")
+                    navigate('/')
+                })
+                .catch((error: AxiosError) => {
+                    console.log(error)
+                })
+        }
+        leaveGame();
     }
 
     const handleStartGame = () => {
@@ -62,10 +65,6 @@ const Lobby = ({ game }: LobbyProps) => {
             })
     }
 
-    useEffect(() => {
-        console.log(game.players)
-
-    }, [game.players])
     return (
         <Container>
             <div className="flex flex-col justify-center items-center h-full">

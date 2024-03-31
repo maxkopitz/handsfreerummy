@@ -3,11 +3,13 @@ FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
 
 WORKDIR /code
 
-COPY ./ /code
+COPY ./requirements.txt /code
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -e .
+    pip install -r requirements.txt
 
-CMD ["python3", "-m", "flask", "--app", "handsfree", "--debug", "run", "--host", "0.0.0.0", "--port", "4000"]
+COPY ./ /code
+
+CMD ["flask", "--app", "handsfree", "--debug", "run", "-p", "4000", "-h", "0.0.0.0"]
 
 FROM builder as dev-envs
 
@@ -24,4 +26,5 @@ EOF
 # install Docker tools (cli, buildx, compose)
 COPY --from=gloursdocker/docker / /
 
-CMD ["python3", "-m", "flask", "--app", "handsfree", "--debug", "run", "--host", "0.0.0.0", "--port", "4000"]
+CMD ["flask", "--app", "handsfree", "--debug", "run", "-p", "4000", "-h", "0.0.0.0"]
+

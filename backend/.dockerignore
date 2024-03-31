@@ -19,3 +19,5 @@ coverage.xml
 .git
 htmlcov/
 data/
+*.egg-info/
+bin/

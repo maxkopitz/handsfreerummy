@@ -59,16 +59,17 @@ const Layout = () => {
         if (!isLoading) {
             if (!isConnected) {
                 socket.connect()
-            }
-            socket.on('connect', () => {
+                socket.on('connect', () => {
 
-                console.log('Connected')
-                setIsConnected(true)
-            })
-            socket.on('disconnect', () => {
-                console.log('Disconnected')
-                setIsConnected(false)
-            })
+                    console.log('Connected')
+                    setIsConnected(true)
+                })
+                socket.on('disconnect', () => {
+                    console.log('Disconnected')
+                    setIsConnected(false)
+                })
+
+            }
         }
         return () => {
         }
@@ -90,7 +91,7 @@ const Layout = () => {
                     <ModalProvider>
                         <Modal />
                         <Toaster
-                        position='top-right'
+                            position='top-right'
                         />
                         {isConnected && !isLoading && <Outlet />}
                     </ModalProvider>

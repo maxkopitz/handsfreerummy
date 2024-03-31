@@ -8,7 +8,9 @@ from flask_socketio import disconnect
 def handle_connect(sid):
     """Handle socket connection."""
     if session.get('uuid') is None:
-        disconnect()
+        # Prevent session from being created before calling /register
+        disconnect(request.sid)
+        return False
 
     session['sid'] = request.sid
     # Update player session with socket id
