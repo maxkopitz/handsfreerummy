@@ -465,7 +465,7 @@ def is_valid_meld(meld, isLayoff=False):
         elif card.get('value') == 'K':
             card['value'] = '13'
         elif card.get('value') == 'A':
-            card['value'] = '14'
+            card['value'] = '1'
 
     meld.sort(key=lambda card: int(card['value']))
     sequence = True
@@ -492,7 +492,7 @@ def is_valid_meld(meld, isLayoff=False):
             card['value'] = 'Q'
         elif card.get('value') == '13':
             card['value'] = 'K'
-        elif card.get('value') == '13':
+        elif card.get('value') == '1':
             card['value'] = 'A'
 
     if sequence or pair:
