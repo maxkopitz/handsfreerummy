@@ -1,13 +1,29 @@
 import classNames from 'classnames'
 import { CardType, Suit } from '../../Type'
 import { useProfile } from '../../hooks/Profile'
+import { useState } from 'react'
+import './Card.css'
+import { useSpring, animated } from '@react-spring/web'
 
 interface CardProps {
     card: CardType
     onClick?: any
     isActive: boolean
 }
-const Card = ({ card, onClick, isActive }: CardProps) => {
+const Card: React.FC<CardProps> = ({ card, onClick, isActive }) => {
+
+    const [isClicked, setIsClicked] = useState(false);
+
+    const handleClick = () => {
+        setIsClicked(!isClicked);
+    };
+
+    const { y } = useSpring({
+        from: { y: 0 },
+        x: isClicked ? 1 : 0,
+        config: { duration: 1000 }
+    });
+    
     const { profile } = useProfile()
     let classes = classNames(
         'rounded-md text-center shadow-lg bg-white',
@@ -46,21 +62,26 @@ const Card = ({ card, onClick, isActive }: CardProps) => {
     } else if (card.suit === Suit.D) {
         suitSymbol = '♦'
     }
+
     if (isActive) {
 
         return (
             <>
-                <div className={classes} onClick={onClick}>
+                <animated.div className={classes} onClick={handleClick} style={{
+                    transform: y.to({range: [0, 25, 50, 75, 100]}),
+                    cursor: 'pointer',
+                }}>
                     <div>
                         <div>{suitSymbol}</div>
                         <div>{card.value}</div>
                         <div>{suitSymbol}</div>
                     </div>
-                </div>
+                </animated.div>
             </>
         )
 
     }
+
 
     return (
         <>

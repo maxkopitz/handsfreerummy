@@ -1,0 +1,4 @@
+.card {
+    transition: left 0.5s ease, top 0.5s ease;;
+    cursor: pointer;
+}

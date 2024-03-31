@@ -19,6 +19,9 @@ const PlayerHand = ({ playerId, hand, isTurn }: PlayerHandProps) => {
     const [sortedCards, setSortedCards] = useState([...hand])
     const [sortBy, setSortBy] = useState('Suit')
 
+    // const [selectedCardIndex, setSelectedCardIndex] = useState(-1);
+    // const [selectedCardPosition, setSelectedCardPosition] = useState({ x: 0, y: 0 });
+
     const sortCards = () => {
         const sorted = [...sortedCards].sort((a, b) => {
             if (sortBy === 'Suit') {
@@ -48,6 +51,44 @@ const PlayerHand = ({ playerId, hand, isTurn }: PlayerHandProps) => {
         sortCards()
         setSortBy(sortBy === 'Suit' ? 'Rank' : 'Suit')
     }
+
+    const MoveToDifferentDiv = () => {
+        const [moved, setMoved] = useState(false);
+      
+        const handleClick = () => {
+          setMoved(true);
+        };
+      
+        return (
+          <div className={`container ${moved ? 'moved' : ''}`} onClick={handleClick}>
+            {moved}
+            <div id="melds" className="col-start-2">Melds</div>
+          </div>
+        );
+    };
+
+    // const handleCardClick = (index: number, event: any) => {
+    //     setSelectedCardIndex(index);
+    //     const rect = event.target.getBoundingClientRect();
+    //     setSelectedCardPosition({ x: rect.left, y: rect.top });
+    // };
+
+    
+    // const moveUp = (item, evt) => {
+    //     const listBottom = this.topList.offsetTop + this.topList.clientHeight;
+    //     const itemTop = evt.target.offsetTop - listBottom;
+    //     const { top, bottom, transition } = this.state;
+    //     transition.item = item;
+    //     transition.startTop = itemTop;
+    //     transition.startAnim = false;
+    //     this.setState({
+    //       top: [...top, item],
+    //       bottom: bottom.filter(x => x !== item),
+    //       transition,
+    //     })
+    //     setTimeout(() => this.resetState(), 500);
+    //}
+
 
     return (
         <div className="flex flex-col justify-center item-center w-max">

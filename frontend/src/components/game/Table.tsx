@@ -104,7 +104,7 @@ const Table = ({ game, handleClickPickup, handleClickDiscard }: TableProps) => {
                 <div className="mb-20 mt-20 col-span-3">
                     <Board playedRuns={dummyRuns} discard={game.discard} />
                 </div>
-                <div className="col-start-2">
+                <div id="melds" className="col-start-2">
                     <h2 className="text-lg font-semibold">Melds</h2>
                 </div>
                 <div className="col-start-2 col-span-3">
