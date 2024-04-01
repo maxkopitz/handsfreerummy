@@ -293,11 +293,11 @@ const Game = () => {
                     }))
                 } else if (data.status === 'error') {
                     console.log(data.error?.message)
+                    toast.error('An error occured while laying off.')
                 }
             })
             .catch((error: any) => {
-                console.log(error)
-                console.log('An error occured')
+                toast.error('An error occured while laying off.')
             })
     }
 
