@@ -7,6 +7,9 @@ from flask_socketio import disconnect
 @socketio.on('connect')
 def handle_connect(sid):
     """Handle socket connection."""
+    app.logger.info('Socket Connection, SID: %s, UUID: %s',
+                    request.sid, str(session.get('uuid')))
+
     if session.get('uuid') is None:
         # Prevent session from being created before calling /register
         disconnect(request.sid)
@@ -22,14 +25,11 @@ def handle_connect(sid):
         game["players"][uuid]["sid"] = session.get("sid", None)
         redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
 
-    app.logger.info('Socket Connection, SID: %s, UUID: %s',
-                    request.sid, str(session.get('uuid')))
-
 
 @socketio.on('disconnect')
 def handle_disconnect():
     """Handle socket disconnect."""
+    app.logger.info('Socket Disconnected, SID: %s, UUID: %s',
+                    request.sid, str(session.get('uuid')))
     if session.get('uuid') is not None:
         session['sid'] = None
-        app.logger.info('Socket Disconnected, SID: %s, UUID: %s',
-                        request.sid, str(session.get('uuid')))
