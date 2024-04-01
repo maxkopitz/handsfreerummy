@@ -144,3 +144,50 @@ def make_meld(meld: list, move: str, player: str, game):
             socketio.emit('played-move', message, to=sid)
 
     return result, game
+
+
+def layoff(card: dict, player: str, meldId: str, move: str, game):
+    """Layoff."""
+    result = {
+        'status': 'success',
+        "move": {
+            "type": move,
+            "data": {}
+        },
+        "nextTurnState": "",
+        "nextTurnCounter": game['turnCounter']
+    }
+    game.get('melds')[meldId].append(card)
+    if not utils.is_valid_meld(game.get('melds')[meldId]):
+        return {
+            "status": "error",
+            "error": {
+                "message": "Invalid meld."
+            }
+        }, game
+    game.get('players').get(player).get('hand').remove(card)
+
+    result['move']['data']['melds'] = game.get('melds')
+    result['move']['data']['hand'] = game.get(
+        'players').get(player).get('hand', {})
+    result["nextTurnState"] = "meld"
+
+    game['currentTurnState'] = 'meld'
+    for key in game.get('players'):
+        sid = game.get('players').get(key).get('sid')
+
+        if key != player and sid is not None:
+            message = {
+                "move": {
+                    "type": "meld",
+                    "data": {
+                        "players":
+                            utils.player_response_builder(key,
+                                                          game.get('players')),
+                        "melds": result['move']['data']['melds']
+                    }
+                },
+                "nextTurnState": game['currentTurnState']
+            }
+            socketio.emit('played-move', message, to=sid)
+    return result, game

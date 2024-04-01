@@ -233,7 +233,6 @@ def make_move(game_key: str, player: str, move: str, data):
 
         meld = data.get('cards')
         result, game = moves.make_meld(meld, move, player, game)
-        app.logger.info('%s', result)
         if result.get('status') == 'error':
             return result
 
