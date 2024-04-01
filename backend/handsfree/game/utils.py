@@ -91,7 +91,6 @@ def join_game(game_id, display_name):
         game["players"][uuid] = {
             "sid": session.get("sid", None),
             "hand": [],
-            "playerOrder": len(game["players"]) + 1,
             "displayName": display_name
         }
     else:
@@ -172,7 +171,10 @@ def start_game(game_id):
 
     handSize = 7 if len(game.get('players')) > 2 else 13
 
+    order = 1
     for player in game["players"]:
+        game["players"][player]["playerOrder"] = order
+        order += 1
         for i in range(handSize):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
