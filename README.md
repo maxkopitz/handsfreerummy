@@ -47,4 +47,19 @@ docker compose up
 1. If you get stuck on a page, go to Redis Insight ``http://localhost:8001``.
 2. Open the [CLI](https://redis.io/docs/connect/insight/#cli)
 3. Flush the DB by entering ``FLUSHDB`` in the CLI
-
+## Trouble Shooting
+### Installing a package via ``npm``
+Issue: Installed package is not installed after running ``docker compose build`` and ``docker compose up``
+Solution:
+1. Make sure compose stack is not running
+```sh
+docker compose down
+```
+2. Remove the UI container and its volumes
+```sh
+docker container rm handsfreerummy-client-1 --volumes
+```
+3. Start containers
+```sh
+docker compose up --build
+```
