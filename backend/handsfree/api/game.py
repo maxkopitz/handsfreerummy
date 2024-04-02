@@ -2,7 +2,7 @@
 API Routes for /api/v1/games/
 """
 from handsfree import app, redis_client
-from handsfree.game import utils
+from handsfree.game import game as game_manager
 from flask import session, request, Blueprint
 from redis.commands.json.path import Path
 
@@ -16,7 +16,7 @@ def get_games():
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 
-    games = utils.get_active_games()
+    games = game_manager.get_active_games()
     return {"games": games}
 
 
@@ -32,7 +32,7 @@ def create_game():
             app.logger.info(session)
             return {"error": {"message": "Already in game"}}, 409
 
-    game = utils.create_game()
+    game = game_manager.create_game()
 
     return {"game": game}
 
@@ -105,7 +105,7 @@ def handle_game_action(game_id):
                     "message": "Game has started!"
                 }}, 403
 
-        result = utils.join_game(
+        result = game_manager.join_game(
             game_id,
             request.json.get('displayName', 'NA'))
 
@@ -119,7 +119,7 @@ def handle_game_action(game_id):
                     "message": "Not in a game"
                 }}, 404
 
-        result = utils.leave_game(game_id)
+        result = game_manager.leave_game(game_id)
 
         return result
 
@@ -137,7 +137,7 @@ def handle_game_action(game_id):
                     "message": "Not owner!"
                 }}, 403
 
-        result = utils.start_game(game_id)
+        result = game_manager.start_game(game_id)
 
         return result
 
@@ -168,7 +168,7 @@ def handle_game_action(game_id):
                     "message": "Invalid move"
                 }}
 
-        result = utils.make_move(
+        result = game_manager.make_move(
             game_key,
             uuid,
             move.get('type'),

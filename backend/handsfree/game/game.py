@@ -1,310 +1,254 @@
-from __future__ import annotations
+from handsfree import redis_client, socketio, app
+from handsfree.game import utils
+from handsfree.game import moves
+from redis.commands.json.path import Path
+from flask import session
 from random import shuffle
-import json
+
+GAME_KEY_INDEX = 'games_index'
+ACTIVE_GAMES = 'active_games'
+suits = ["hearts", "diamonds", "clubs", "spades"]
+values = ["A", "2", "3", "4", "5", "6", "7", "8",
+          "9", "10", "J", "Q", "K"]
+game_states = ['lobby', 'in-game', 'ended']
+turn_states = ['pickup', 'meld', 'discard']
 
 
-class Card:
-    def __init__(self, value: int, suit: str):
-        self.value = value
-        self.suit = suit
-
-    def retCard(self):
-        return (self.value, self.suit)
-
-    def retEnum(self) -> int:
-        enum = 0
-        match self.suit:
-            case "hearts":
-                enum += 0
-            case "diamonds":
-                enum += 13
-            case "spades":
-                enum += 26
-            case "clubs":
-                enum += 39
-        return enum + self.value - 1
-
-    def __str__(self):
-        return '(' + self.suit + ', ' + str(self.value) + ')'
+def get_game(game_id):
+    """Get a Rummy game."""
+    game_id = int(game_id)
+    game = redis_client.json().get("game:%d" % game_id)
+    return game
 
 
-class Deck:
-    def __init__(self):
+def get_active_games():
+    game_ids = redis_client.smembers(ACTIVE_GAMES)
 
-        self.hearts = []
-        self.diamonds = []
-        self.spades = []
-        self.clubs = []
-
-        # This order corresponds to the deck post-shuffle
-        self.order = list(range(52))
-        shuffle(self.order)
-
-        # initialize deck to four arrays with 13 cards corresponding to each suit
-        for num in range(1, 14):
-            self.hearts.append(Card(num, "hearts"))
-            self.diamonds.append(Card(num, "diamonds"))
-            self.spades.append(Card(num, "spades"))
-            self.clubs.append(Card(num, "clubs"))
-
-    # draw card pops the first element from order. It indexes into the corresponding
-    # array and then returns the corresponding card
-    def draw(self) -> Card:
-        nextCard = self.order.pop(0)
-        suitNum = int(nextCard / 13)
-        valueNum = nextCard % 13
-        if suitNum == 0:
-            return self.hearts[valueNum]
-        elif suitNum == 1:
-            return self.diamonds[valueNum]
-        elif suitNum == 2:
-            return self.spades[valueNum]
-        else:
-            return self.clubs[valueNum]
-
-    # if the stock pile is empty, the discard pile will be turn upside down and then it becomes the
-    # stock pile.
-    def reverseDiscard(self, discardPile: list[Card]):
-
-        while discardPile:  # while the discard pile is not empty
-            # append the enumeration of the discard pile in queue order (reverse stack)
-            card = discardPile.pop(0)
-            self.order.append(card.retEnum())
+    # Fetch each game by its ID
+    games = []
+    for game_id in game_ids:
+        game_data = redis_client.json().get(
+            f"game:{game_id.decode('utf-8')}", Path.root_path())
+        if game_data:
+            games.append(game_data)
+    return games
 
 
-class Meld:
+def create_game():
+    """Create Rummy Game."""
+    redis_client.incr(GAME_KEY_INDEX, 1)
+    index = int(redis_client.get(GAME_KEY_INDEX).decode('utf-8'))
 
-    def __init__(self, matchedSet: list[Card]):
-        self.set = matchedSet
+    deck = []
+    for suit in suits:
+        for value in values:
+            deck.append({"value": value, "suit": suit})
 
+    shuffle(deck)
 
-class Player:
-    def __init__(self, id: str):
-        self.id = id
-        self.hand = []
+    game = {
+        "gameId": index,
+        "owner": str(session.get('uuid')),
+        "maxPlayers": 4,
+        "players": {},
+        "turnCounter": 1,
+        "melds": [],
+        "discardPile": [],
+        "pickupCard": {},
+        "gameState": "lobby",
+        "deck": deck,
+        "currentTurnState": "pickup"
+    }
+    # currentTurnState: "pickup", "meld", "discard"
 
-    def discard(self, victim: Card):
-        self.hand.remove(victim)
+    redis_client.json().set("game:%d" % index, Path.root_path(), game)
+    redis_client.sadd(ACTIVE_GAMES, index)
 
-    def pickup(self, card: Card):
-        self.hand.append(card)
-
-    def sortHandValue(self):
-        self.hand.sort(key=lambda x: (x.value, x.suit))
-
-    def sortHandSuit(self):
-        self.hand.sort(key=lambda x: (x.suit, x.value))
-
-    def printHand(self):
-        for i in self.hand:
-            print(i.retCard())
-
-
-class Board:
-
-    def __init__(self, game, players):
-
-        self.stockPile = Deck()  # the pile that the players draw from
-        self.discardPile = []  # the pile that the players will discard to
-
-        # deals the cards to each player's hand
-        # When two people play, each person gets 10 cards. When three or four people play,
-        # each receives seven cards; when five or six play, each receives six cards
-        if game.numPlayers == 2:
-            for i in range(10):
-                for player in players:
-                    player.pickup(self.stockPile.draw())
-        elif game.numPlayers < 5:
-            for i in range(7):
-                for player in players:
-                    player.pickup(self.stockPile.draw())
-        else:
-            for i in range(6):
-                for player in game.players:
-                    player.pickup(self.stockPile.draw())
-# numPlayers, players, id, turnCounter, melds, gameState, board
+    return game
 
 
-class Game:
-    gameId = 1
+def join_game(game_id, display_name):
+    """Join Rummy Game."""
+    game_id = int(game_id)
+    game = redis_client.json().get("game:%d" % game_id)
 
-    def __init__(self,
-                 numPlayers=4,
-                 players=[],
-                 gameId=-1,
-                 turnCounter=0,
-                 melds=[],
-                 gameState="lobby"
-                 ):
-        self.numPlayers = numPlayers
-        self.players = players
-        if gameId == -1:
-            self.gameId = Game.gameId
-            Game.gameId += 1
-        else:
-            self.gameId = gameId
-        self.turnCounter = turnCounter
-        self.melds = melds
-        self.gameState = gameState
+    # Calling method needs to ensure game_id is not being overwrote
+    uuid = str(session.get('uuid'))
 
-    def print(self):
-        for i in self.players:
-            print(i)
+    if len(game.get('players')) == game.get('maxPlayers'):
+        if game.get('players').get(uuid) is None:
+            result = {
+                "status": "error",
+                "error": {
+                    "message": "Unable to join game, max players.",
+                    "redirect": "/"
+                }
+            }
+            return result
 
-    # join game / add players to the game function
-    def addPlayer(self, playerID: str):
-        if self.numPlayers == len(self.players):
-            # print("can't add a player")
-            self.players.pop(0)
-            self.players.append(Player(playerID))
-        else:
-            self.players.append(Player(str(playerID)))
+    session["game_id"] = game_id
 
-        # self.numPlayers += 1
-
-    # initialize the board and run through each turn until someone runs out of cards
-    def runGame(self):
-        if len(self.players) < 2:
-            print("not enough players")
-            return
-        self.numPlayers = len(self.players)
-        self.gameState = "inGame"
-        self.board = Board(self, self.players)
-        # while True:
-        #     self.takeTurn(self.players[self.turnCounter % self.numPlayers].id)
-        #     self.turnCounter += 1
-
-    def takeTurn(self, playerID: str):
-        # Send message of Player's turn
-
-        # Receive message of what pile player draws from
-        drawType = 'stock'  # or discard
-
-        # send message of what card player received / execute drawing
-        cardDrawn = self.drawCard(playerID, drawType)
-        print(cardDrawn.retCard())
-        # receive message of what cards to lay off (meld forming)
-        # send message of valid play / execute play
-        message = []
-        if isValidMeld(message):
-            self.melds.append(Meld(message))
-        else:
-            print("bad Meld")
-        # receive a message of which meld to add to and which card(s)
-        # send message of valid play / execute play
-
-        # check if player won
-
-        # receive message of which card to discard
-
-        # execute discarding of card and send message that turn is over
-
-    def drawCard(self, playerID: str, drawType: str) -> Card:
-        """player draws the card from the pile returned from the socket."""
-        if drawType == 'stock':
-            if not self.board.stockPile.order:
-                self.board.stockPile.reverseDiscard(self.board.discardPile)
-            for i in self.players:
-                if i.id == playerID:
-                    card = self.board.stockPile.draw()
-                    i.pickup(card)
-                    return card
-        elif drawType == 'discard':
-            if not self.board.discardPile:
-                raise Exception("No discard Pile")
-            for i in self.players:
-                if i.id == playerID:
-                    card = self.board.discardPile.pop()
-                    i.pickup(card)
-                    return card
-
-    def discard(self, playerID: str, victim: Card):
-        """player discards a card returned from the socket."""
-        for i in self.players:
-            if i.id == playerID:
-                i.discard(victim)
-                self.board.discardPile.append(victim)
-
-    def formMeld(self, playerID: str, matchedSet: list[Card]):
-        """meld formation"""
-        if isValidMeld(matchedSet):
-            self.melds.append(matchedSet)
-            for i in self.players:
-                if i.id == playerID:
-                    for card in matchedSet:
-                        i.discard(card)
-        else:
-            print("invalid meld")
-
-    def addToMeld(self, playerID: str, matchedSet: list[Card], meldIndex: int):
-        """player adds another card or couple of cards to a meld that has been
-        played already."""
-        tempMeld = self.melds[meldIndex] + matchedSet
-        if isValidMeld(tempMeld):
-            self.melds[meldIndex] += matchedSet
-            self.melds[meldIndex].sort(key=lambda x: (x.value, x.suit))
-            for i in self.players:
-                if i.id == playerID:
-                    for card in matchedSet:
-                        i.discard(card)
-        else:
-            print("cards cannot be added to selected meld")
-
-    @classmethod
-    def from_json(cls, json_string):
-        """Convert json to class."""
-        json_dict = json.loads(json_string)
-        return cls(**json_dict)
-
-
-def isValidMeld(matchedSet: list[Card]) -> bool:
-    """function to determine valid melds sorts the proposed set too."""
-    if len(matchedSet) < 3:
-        return False
-
-    # sort the proposed meld
-    matchedSet.sort(key=lambda x: x.value)
-
-    sequence = True
-    pair = True
-    for i in range(1, len(matchedSet)):
-        if (matchedSet[i - 1].value, matchedSet[i - 1].suit) == (matchedSet[i].value, matchedSet[i].suit):
-            raise Exception("Same Card WTF")
-
-        if pair:  # checks for 3 or 4 of a kinds
-            if matchedSet[i].value != matchedSet[i - 1].value:
-                pair = False
-
-        if sequence:  # checks for sequences of the same suit
-            if ((matchedSet[i - 1].value, matchedSet[i - 1].suit) != (matchedSet[i].value - 1, matchedSet[i].suit)):
-                sequence = False
-
-    if sequence or pair:
-        return True
+    if game["players"].get(uuid) is None:
+        game["players"][uuid] = {
+            "sid": session.get("sid", None),
+            "hand": [],
+            "displayName": display_name
+        }
     else:
-        return False
-    
-    
+        game["players"][uuid]["sid"] = session.get("sid", None)
+        game["players"][uuid]["displayName"] = display_name
 
-# Things on the board:
-# 1. player hands ✓
-# 2. stock/pickup pile ✓
-# 3. discard pile (top card faceup) (stack implementation) ✓*1/2
-# 4. melds / matched sets ✓*1/2
+    for player in game['players']:
+        data = {
+            "action": "player-joined",
+            "data": {
+                "player": str(session.get('uuid')),
+                "displayName": display_name,
+                "players": list(game.get('players'))
+            }
+        }
+        if game['players'][player]['sid'] is not None:
+            socketio.emit('player-joined',
+                          data,
+                          to=game['players'][player]['sid'],
+                          )
+
+    result = {
+        "status": "success",
+        "result": {
+            "message": f"Joined game {game_id}.",
+            "game": {
+                "gameId": game.get("gameId"),
+                "hand": game.get("players").get(uuid).get('hand'),
+                "discard": {},
+                "gameState": game.get("gameState"),
+                "players": list(game.get('players')),  # Changed if in-game
+                "playerOrder": game["players"].get(uuid).get('playerOrder'),
+                "turnCounter": game.get('turnCounter'),
+                "turnState": game['currentTurnState'],
+                "isOwner": game.get('owner') == uuid,
+                "melds": game.get('melds')
+            }
+        }
+    }
+
+    if game.get('gameState') == "in-game":
+        if len(game.get('discardPile')) > 0:
+            result['result']['game']['discard'] = game.get('discardPile')[0]
+        result['result']['game']['players'] = utils.player_response_builder(
+            uuid, game['players'])
+
+    redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
+
+    return result
 
 
-class GameEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, Card):
-            return o.retCard()
-        if isinstance(o, Deck):
-            return o.order
-        if isinstance(o, Meld):
-            return o.set
-        if isinstance(o, Player):
-            return o.__dict__
-        if isinstance(o, Game):
-            return o.__dict__
-        if isinstance(o, Board):
-            return o.__dict__
-        return json.JSONEncoder.default(self, o)
+def leave_game(game_id):
+    """Leave Rummy Game."""
+    game_id = int(game_id)
+    game = redis_client.json().get("game:%d" % game_id)
+    uuid = str(session.get('uuid'))
+
+    del session["game_id"]
+    del game["players"][uuid]
+
+    redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
+    return game
+
+
+def start_game(game_id):
+    """Start Rummy Game."""
+    game_id = int(game_id)
+    game = redis_client.json().get("game:%d" % game_id)
+
+    if len(game.get('players')) < 2:
+        result = {
+            "status": "error",
+            "error": {
+                "message": "Not enough players!"
+            }
+        }
+        return result
+
+    handSize = 7 if len(game.get('players')) > 2 else 13
+
+    order = 1
+    for player in game["players"]:
+        game["players"][player]["playerOrder"] = order
+        order += 1
+        for i in range(handSize):
+            game["players"][player]["hand"].append(game["deck"][0])
+            game["deck"].pop(0)
+
+    game['pickupCard'] = game['deck'][0]
+    game['deck'].pop(0)
+
+    game['gameState'] = 'in-game'
+
+    for player in game['players']:
+        data = {
+            "action": "started",
+            "game": {
+                "hand": game["players"][player].get("hand"),
+                "discard": {},
+                "turnCounter": 1,
+                "playerOrder": game["players"][player]["playerOrder"],
+                "players": utils.player_response_builder(player, game['players']),
+                "turnState": game["currentTurnState"],
+            }
+        }
+        if game['players'][player]['sid'] is not None:
+            socketio.emit('game-started', data,
+                          to=game['players'][player]['sid'])
+
+    redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
+
+    return game
+
+
+def make_move(game_key: str, player: str, move: str, data):
+    """Make Rummy Move."""
+    game = redis_client.json().get(game_key)
+
+    result = {
+        'status': 'success',
+        "move": {
+            "type": move,
+            "data": {}
+        },
+        "nextTurnState": "",
+        "nextTurnCounter": game['turnCounter']
+    }
+
+    if move == "drawPickup":
+        result, game = moves.drawPickup(player, move, game)
+
+    if move == "drawDiscard":
+        result, game = moves.drawDiscard(player, move, game)
+        if result.get('status') == 'error':
+            return result
+
+    if move == "meld":
+        meld = data.get('cards')
+        result, game = moves.make_meld(meld, move, player, game)
+        if result.get('status') == 'error':
+            return result
+
+    if move == 'layoff':
+        card = data.get('card')
+        meldId = int(data.get('meldId'))
+
+        result, game = moves.layoff(card, player, meldId, move, game)
+        if result.get('status') == 'error':
+            return result
+
+    if move == "discard":
+        card = data.get('card')
+        result, game = moves.discard(card, player, move, game)
+        if result.get('status' == 'error'):
+            return result
+
+    can_game_end, game = moves.can_game_end(player, game)
+    redis_client.json().set(game_key, Path.root_path(), game)
+
+    return result
