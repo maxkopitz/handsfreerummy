@@ -12,7 +12,6 @@ import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
 import Meld from './Meld'
 import { toast } from 'react-hot-toast'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 interface TableProps {
     game: RummyGame
