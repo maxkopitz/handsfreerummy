@@ -48,14 +48,18 @@ docker compose up
 2. Open the [CLI](https://redis.io/docs/connect/insight/#cli)
 3. Flush the DB by entering ``FLUSHDB`` in the CLI
 ## Trouble Shooting
-- Installing package via ``npm``
+### Installing a package via ``npm``
+Issue: Installed package is not installed after running ``docker compose build`` and ``docker compose up``
+Solution:
+1. Make sure compose stack is not running
 ```sh
-docker container inspect --format '{{json .}}' handsfreerummy-client-1 | \
-jq '.Mounts[] | select(.Destination=="/usr/src/app/node_modules") | .Name'
+docker compose down
 ```
-1. In Docker Desktop -> Container -> Select handsfreerummy -> Delete
-![image](https://github.com/maxkopitz/handsfreerummy/assets/13725664/91c39b34-4c35-4708-87c8-932bd99e6ecf)
-2. In Docker Desktop -> Volumes -> Delete the volumne containing ``node_modules``
-![image](https://github.com/maxkopitz/handsfreerummy/assets/13725664/c22192e3-d8e3-4784-b136-7d7f59cebd48)
-3. Run ``docker compose build``
-4. Run ``docker compose up``
+2. Remove the UI container and its volumes
+```sh
+docker container rm handsfreerummy-client-1 --volumes
+```
+3. Start containers
+```sh
+docker compose up --build
+```
