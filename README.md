@@ -37,7 +37,7 @@ docker compose build
 docker compose up
 ```
 - The UI should be running at ``http://localhost:3000/``
-- The API should be running at ``http://localhost:4000/``
+- The API should be running at ``http://localhost:4000/api/v1/``
 - Redis Insight should be running at ``http://localhost:8001/``
 
 > Use ``CTRL-C`` to stop docker compose or docker compose down
