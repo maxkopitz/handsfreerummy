@@ -1,11 +1,11 @@
-import { io } from 'socket.io-client'
+import { Manager } from 'socket.io-client'
 import { SOCKET_URL } from '../config'
 
-export const socket = io(SOCKET_URL,
-    {
-        withCredentials: true,
-        autoConnect: false
-    })
+export const manager = new Manager(SOCKET_URL, {
+    autoConnect: false,
+    withCredentials: true,
+});
+export const socket = manager.socket('/')
 
 export const SocketEvents = {
     GAME_CREATED: 'game-created', // recieved
