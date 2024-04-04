@@ -16,13 +16,18 @@
       alt="Repository count of stars" />
   </a>
 </div>
+<br />
 
-# Installation
-## External Requirements
+Installation
+-------
+Before installng make sure you have the following
 - [Docker](https://docs.docker.com/desktop/)
 - Node v21.6.1, we use [nvm](https://github.com/nvm-sh/nvm) to get correct verison
 
-## Setup
+<br />
+
+Setup
+--------
 Clone the repository
 ```sh
 git clone https://github.com/maxkopitz/handsfreerummy
@@ -43,7 +48,32 @@ docker compose up
 > Use ``CTRL-C`` to stop docker compose or docker compose down
 <br />
 
-## Notes
+Project layout
+-----
+
+    ├── backend/               Python Flask Backend
+    │   ├── bin/               Scripts
+    │   ├── handsfree/         Flask API
+    │   │   ├── api/           Flask Routes & Sockets
+    │   │   ├── cli/           Flask CLI
+    │   │   └── game/          Logic for managing games
+    │   └── tests/
+    ├── frontend               React UI
+    │   ├── src
+    │   │   ├── api            API Services
+    │   │   ├── components     Components
+    │   │   │   ├── game       Game Components
+    │   │   │   ├── joingame   Displaying lobby game Components
+    │   │   │   ├── settings   Settings Components
+    │   │   │   ├── tutorial   Tutorial Compoents
+    │   │   │   └── ui         Reusable UI Components
+    │   │   ├── hooks          Hook/Reducers
+    │   │   └── lib            Utility
+    └─────────────────────────
+<br />
+
+Notes
+--------
 1. If you get stuck on a page, go to Redis Insight ``http://localhost:8001``.
 2. Open the [CLI](https://redis.io/docs/connect/insight/#cli)
 3. Flush the DB by entering ``FLUSHDB`` in the CLI
