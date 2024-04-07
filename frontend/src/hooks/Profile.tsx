@@ -4,6 +4,7 @@ interface Settings {
     color: string
     cardSize: number
     cardFontWeight: number
+    voiceControl: boolean
 }
 interface Profile {
     settings: Settings
@@ -15,8 +16,9 @@ const initialState: Profile = {
         color: 'black',
         cardSize: 2,
         cardFontWeight: 1,
+        voiceControl: true,
     },
-    displayName: 'me'
+    displayName: 'me',
 }
 
 const ProfileContext = createContext<{
@@ -25,15 +27,18 @@ const ProfileContext = createContext<{
 }>({ profile: initialState, dispatch: () => null })
 
 export const initializer = (initialValue = initialState) => {
-    if (localStorage.getItem("profile") !== null) {
-
-        return JSON.parse(localStorage.getItem("profile") || '');
+    if (localStorage.getItem('profile') !== null) {
+        return JSON.parse(localStorage.getItem('profile') || '')
     }
-    return initialValue;
+    return initialValue
 }
 
 export const ProfileProvider = ({ children }: any) => {
-    const [profile, dispatch] = useReducer(profileReducer, initialState, initializer)
+    const [profile, dispatch] = useReducer(
+        profileReducer,
+        initialState,
+        initializer
+    )
     useEffect(() => {
         localStorage.setItem('profile', JSON.stringify(profile))
     }, [profile])
@@ -52,17 +57,32 @@ type Action =
     | { type: 'changeColor'; color: string }
     | { type: 'changeCardFontWeight'; size: number }
     | { type: 'setDisplayname'; value: string }
+    | { type: 'setVoiceControl'; value: boolean }
 
 const profileReducer = (state: any, action: Action) => {
     switch (action.type) {
         case 'changeCardSize':
-            return { ...state, settings: { ...state.settings, cardSize: action.size } }
+            return {
+                ...state,
+                settings: { ...state.settings, cardSize: action.size },
+            }
         case 'changeCardFontWeight':
-            return { ...state, settings: { ...state.settings, cardFontWeight: action.size } }
+            return {
+                ...state,
+                settings: { ...state.settings, cardFontWeight: action.size },
+            }
         case 'changeColor':
-            return { ...state, settings: { ...state.settings, color: action.color } }
+            return {
+                ...state,
+                settings: { ...state.settings, color: action.color },
+            }
         case 'setDisplayname':
             return { ...state, displayName: action.value }
+        case 'setVoiceControl':
+            return {
+                ...state,
+                settings: { ...state.settings, voiceControl: action.value },
+            }
         default:
             return state
     }
