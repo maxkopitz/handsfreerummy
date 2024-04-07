@@ -1,5 +1,4 @@
-import Board from './Board'
-import { CardType, GameTurn, Meld as MeldType, RummyGame, Suit, Value } from '../../Type'
+import { CardType, GameTurn, Meld as MeldType, RummyGame } from '../../Type'
 import Button from '../ui/Button'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
@@ -11,8 +10,11 @@ import CardBack from './CardBack'
 import Container from '../ui/Container'
 import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
+<<<<<<< HEAD
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { useEffect } from 'react'
+=======
+>>>>>>> main
 import Meld from './Meld'
 import { toast } from 'react-hot-toast'
 
@@ -27,6 +29,7 @@ interface TableProps {
     handleLayoff: any
 }
 
+<<<<<<< HEAD
 const dummyRuns = [
     [
         { value: Value.A, suit: Suit.C, isSelected: false },
@@ -77,6 +80,8 @@ const Dictaphone = () => {
 
 
 
+=======
+>>>>>>> main
 const Table = ({
     game,
     handleClickPickup,
@@ -179,9 +184,6 @@ const Table = ({
                     />
                 </div>
 
-                <div className="mb-20 mt-20 col-span-3">
-                    <Board playedRuns={dummyRuns} discard={game.discard} />
-                </div>
                 <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
                     {game.melds.map((meld, index) => (
                         <Meld

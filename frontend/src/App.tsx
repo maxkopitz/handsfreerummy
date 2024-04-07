@@ -15,6 +15,7 @@ import Game from './components/game/Game'
 import axiosInstance from './api/axiosConfig'
 import Modal from './components/ui/Modal'
 import { toast, Toaster } from 'react-hot-toast'
+import { AxiosError } from 'axios'
 
 const App = () => {
     const router = createBrowserRouter([
@@ -50,25 +51,29 @@ const Layout = () => {
                     navigate(res.data.redirect)
                 }
                 setIsLoading(false)
+            }).catch((err: AxiosError) => {
+                toast.error('An error occured registering.')
+                setIsLoading(true)
             })
         }
         fetch()
+        return () => {
+            setIsLoading(true)
+        }
     }, [navigate])
 
     useEffect(() => {
         if (!isLoading) {
             if (!isConnected) {
                 socket.connect()
-            }
-            socket.on('connect', () => {
+                socket.on('connect', () => {
+                    setIsConnected(true)
+                })
+                socket.on('disconnect', () => {
+                    setIsConnected(false)
+                })
 
-                console.log('Connected')
-                setIsConnected(true)
-            })
-            socket.on('disconnect', () => {
-                console.log('Disconnected')
-                setIsConnected(false)
-            })
+            }
         }
         return () => {
         }
@@ -90,7 +95,7 @@ const Layout = () => {
                     <ModalProvider>
                         <Modal />
                         <Toaster
-                        position='top-right'
+                            position='top-right'
                         />
                         {isConnected && !isLoading && <Outlet />}
                     </ModalProvider>

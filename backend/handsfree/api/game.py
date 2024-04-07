@@ -1,48 +1,26 @@
-"""Handsfree Routes."""
-from handsfree import app, redis_client, socketio
-from handsfree.game import utils
-from flask import session, request
-from uuid import uuid4
+"""
+API Routes for /api/v1/games/
+"""
+from handsfree import app, redis_client
+from handsfree.game import game as game_manager
+from flask import session, request, Blueprint
 from redis.commands.json.path import Path
-import sys
 
 
-@app.route('/', methods=['GET'])
-def api():
-    return {"response": session}
+game_blueprint = Blueprint('game',  __name__)
 
 
-@app.route('/register/', methods=['GET'])
-def register():
-    """Register a user and direct them."""
-    response = {
-        "status": "success",
-        "redirect": "/"
-    }
-    if session.get('uuid') is None:
-        session['uuid'] = uuid4()
-        return response
-
-    if session.get('game_id') is not None:
-        game_id = session.get('game_id')
-        game_key = f"game:{game_id}"
-        game = redis_client.json().get(game_key)
-        if game.get('gameState') != 'ended':
-            response["redirect"] = f"games/{game_id}/"
-    return response
-
-
-@app.route('/games/', methods=['GET'])
+@game_blueprint.route('/', methods=['GET'])
 def get_games():
     """Returns all active games"""
     if session.get('uuid') is None:
         return {"error": {"message": "You are not logged in"}}
 
-    games = utils.get_active_games()
+    games = game_manager.get_active_games()
     return {"games": games}
 
 
-@app.route('/games/', methods=['POST'])
+@game_blueprint.route('/', methods=['POST'])
 def create_game():
     """Create a rummy game."""
     if session.get('uuid') is None:
@@ -54,12 +32,12 @@ def create_game():
             app.logger.info(session)
             return {"error": {"message": "Already in game"}}, 409
 
-    game = utils.create_game()
+    game = game_manager.create_game()
 
     return {"game": game}
 
 
-@app.route('/games/<game_id>/', methods=['GET'])
+@game_blueprint.route('/<game_id>/', methods=['GET'])
 def get_game(game_id):
     """Get a rummy game."""
     if session.get('uuid') is None:
@@ -76,7 +54,7 @@ def get_game(game_id):
     return result
 
 
-@app.route('/games/<game_id>/', methods=['POST'])
+@game_blueprint.route('/<game_id>/', methods=['POST'])
 def handle_game_action(game_id):
     game_id = int(game_id)
     """Handle action for a rummy game."""
@@ -128,7 +106,7 @@ def handle_game_action(game_id):
                     "message": "Game has started!"
                 }}, 403
 
-        result = utils.join_game(
+        result = game_manager.join_game(
             game_id,
             request.json.get('displayName', 'NA'))
 
@@ -142,7 +120,7 @@ def handle_game_action(game_id):
                     "message": "Not in a game"
                 }}, 404
 
-        result = utils.leave_game(game_id)
+        result = game_manager.leave_game(game_id)
 
         return result
 
@@ -160,7 +138,7 @@ def handle_game_action(game_id):
                     "message": "Not owner!"
                 }}, 403
 
-        result = utils.start_game(game_id)
+        result = game_manager.start_game(game_id)
 
         return result
 
@@ -191,7 +169,7 @@ def handle_game_action(game_id):
                     "message": "Invalid move"
                 }}
 
-        result = utils.make_move(
+        result = game_manager.make_move(
             game_key,
             uuid,
             move.get('type'),
@@ -217,11 +195,3 @@ def handle_game_action(game_id):
         "error": {
             "message": "Unknown action"
         }}, 404
-
-
-@app.route('/users/', methods=['GET'])
-def get_user():
-    """Get user profile."""
-    if session.get('uuid') is None:
-        return {"error": {"message": "You are not logged in"}}
-    return {"uuid": session.get('uuid'), "game_id": session.get('game_id')}

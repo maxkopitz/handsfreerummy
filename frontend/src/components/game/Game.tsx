@@ -44,8 +44,6 @@ const Game = () => {
         turnState: GameTurn.PICKUP,
     })
 
-
-
     useEffect(() => {
         const joinGame = async () => {
             const data = JSON.stringify({
@@ -89,12 +87,11 @@ const Game = () => {
         joinGame()
     }, [gameId, navigate, profile.displayName])
     useEffect(() => {
-
         socket.on(SocketEvents.PLAYER_JOINED, (data: any) => {
             if (game.gameState === 'lobby') {
                 setGame((prevState) => ({
                     ...prevState,
-                    players: data.data.players
+                    players: data.data.players,
                 }))
                 toast(data.data.displayName + ' has joined.')
             }
@@ -118,7 +115,9 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
+            console.log(data)
             if (data?.move.type === 'pickup') {
+                toast.success('New turn!')
                 setGame((prevState) => ({
                     ...prevState,
                     turnState: data.nextMove,
@@ -126,6 +125,7 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'meld') {
+                toast.success('Picked up a card!')
                 const melds = data.move.data.melds.map(
                     (meld: any, index: number) => {
                         return { meldId: index, cards: meld }
@@ -146,6 +146,7 @@ const Game = () => {
                     turnState: data.nextTurnState,
                 }))
             } else if (data?.move.type === 'roundEnd') {
+                toast.success('Game ended!')
                 navigate('/')
             }
         })
@@ -222,7 +223,7 @@ const Game = () => {
             move: {
                 type: 'meld',
                 data: {
-                    cards: cards
+                    cards: cards,
                 },
             },
         })
@@ -230,7 +231,7 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                const { data } = res;
+                const { data } = res
                 if (data.status === 'error') {
                     toast.error(data.error.message)
                     return
@@ -290,15 +291,13 @@ const Game = () => {
                         turnState: data.nextTurnState,
                         melds: melds,
                     }))
-
-                }
-                else if (data.status === 'error') {
+                } else if (data.status === 'error') {
                     console.log(data.error?.message)
+                    toast.error('An error occured while laying off.')
                 }
             })
             .catch((error: any) => {
-                console.log(error)
-                console.log('An error occured')
+                toast.error('An error occured while laying off.')
             })
     }
 
