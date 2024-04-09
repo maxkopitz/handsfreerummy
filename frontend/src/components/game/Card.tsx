@@ -65,29 +65,25 @@ const Card = ({ card, onClick, isActive }: CardProps) => {
     }
     if (isActive) {
         return (
-            <>
-                <div className={classes} onClick={onClick}>
-                    <div>
-                        <div></div>
-                        <div>{suitSymbol}</div>
-                        <div>{card.value}</div>
-                        <div>{suitSymbol}</div>
-                    </div>
-                </div>
-            </>
-        )
-    }
-
-    return (
-        <>
-            <div className={classes}>
+            <div className={classes} onClick={onClick}>
                 <div>
+                    <div></div>
                     <div>{suitSymbol}</div>
                     <div>{card.value}</div>
                     <div>{suitSymbol}</div>
                 </div>
             </div>
-        </>
+        )
+    }
+
+    return (
+        <div className={classes}>
+            <div>
+                <div>{suitSymbol}</div>
+                <div>{card.value}</div>
+                <div>{suitSymbol}</div>
+            </div>
+        </div>
     )
 }
 
