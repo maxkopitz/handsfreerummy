@@ -15,8 +15,12 @@ const Settings = () => {
         dispatch({ type: 'changeCardFontWeight', size })
     }
 
-    const handleNameChange = (event : any) => {
-        dispatch({ type: 'setDisplayname', value: event.target.value})
+    const handleNameChange = (event: any) => {
+        dispatch({ type: 'setDisplayname', value: event.target.value })
+    }
+
+    const handleVoiceControl = (event: any) => {
+        dispatch({ type: 'setVoiceControl', value: event.target.value })
     }
 
     return (
@@ -24,16 +28,23 @@ const Settings = () => {
             <div className="flex flex-col justify-center items-center">
                 <div className="h-44 mb-10">
                     <Card
-                        card={{ value: Value.A, suit: Suit.C, isSelected: false }}
+                        card={{
+                            value: Value.A,
+                            suit: Suit.C,
+                            isSelected: false,
+                        }}
                         isActive={true}
                     />
                 </div>
                 <div className="justify-center">
                     <div>
-                        <label className="text-xl">
-                            Display Name
-                        </label>
-                        <input type="text" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={profile.displayName} onChange={handleNameChange} />
+                        <label className="text-xl">Display Name</label>
+                        <input
+                            type="text"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            value={profile.displayName}
+                            onChange={handleNameChange}
+                        />
                     </div>
                     <h2 className="text-xl">Change Card Size</h2>
                     <div className="flex flex-row">
@@ -85,6 +96,14 @@ const Settings = () => {
                             isActive={profile.settings.cardFontWeight === 3}
                         />
                     </div>
+                </div>
+                <div>
+                    <Button
+                        text={'Voice Control On'}
+                        onClick={() => {
+                            handleVoiceControl(true)
+                        }}
+                    />
                 </div>
             </div>
         </Container>

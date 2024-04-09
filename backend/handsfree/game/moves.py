@@ -1,6 +1,7 @@
 """Game Move."""
 from handsfree import socketio
 import handsfree.game.utils as utils
+import sys
 
 
 def drawPickup(player: str, move: str, game: dict):
@@ -11,18 +12,18 @@ def drawPickup(player: str, move: str, game: dict):
             "type": move,
             "data": {}
         },
-        "nextTurnState": "",
-        "nextTurnCounter": game['turnCounter']
+        'turnState': game.get('turnState')
     }
     # TODO verify enough cards
-    picked_card = game.get('deck')[0]
-    game.get('deck').pop(0)
-    game.get('players').get(player).get('hand').append(picked_card)
+    picked_card = game.get('deck', [])[0]
+    game.get('deck', []).pop(0)
+    game.get('players', {}).get(player).get('hand').append(picked_card)
 
     result['move']['data']['card'] = picked_card
-    result["nextTurnState"] = "meld"
 
-    game['currentTurnState'] = 'meld'
+    game['turnState']['stage'] = 'end'
+
+    result['turnState'] = game['turnState']
     for key in game.get('players'):
         sid = game.get('players').get(key).get('sid')
 
@@ -39,7 +40,7 @@ def drawPickup(player: str, move: str, game: dict):
 
                     }
                 },
-                "nextTurnState": game['currentTurnState']
+                'turnState': game['turnState']
             }
 
             if len(game.get('discardPile')) > 0:
@@ -56,8 +57,7 @@ def drawDiscard(player, move, game):
             "type": move,
             "data": {}
         },
-        "nextTurnState": "",
-        "nextTurnCounter": game['turnCounter']
+        'turnState': game['turnState']
     }
 
     if len(game.get('discardPile')) > 0:
@@ -66,13 +66,13 @@ def drawDiscard(player, move, game):
         game.get('players').get(player).get('hand').append(picked_card)
 
         result['move']['data']['card'] = picked_card
-        result["nextTurnState"] = "meld"
         result['move']['data']["discard"] = {}
 
         if len(game.get('discardPile')) > 0:
             result['move']['data']['discard'] = game.get('discardPile')[0]
 
-        game['currentTurnState'] = 'meld'
+        game['turnState']['stage'] = 'end'
+        result['turnState'] = game['turnState']
 
         for key in game.get('players'):
             sid = game.get('players').get(key).get('sid')
@@ -89,7 +89,7 @@ def drawDiscard(player, move, game):
                             "discard": result['move']['data']['discard']
                         }
                     },
-                    "nextTurnState": game['currentTurnState']
+                    "turnState": game['turnState']
                 }
                 socketio.emit('played-move', message, to=sid)
     return result, game
@@ -103,8 +103,7 @@ def make_meld(meld: list, move: str, player: str, game):
             "type": move,
             "data": {}
         },
-        "nextTurnState": "",
-        "nextTurnCounter": game['turnCounter']
+        "turnState": game['turnState']
     }
     if not utils.is_valid_meld(meld):
         return {
@@ -120,9 +119,9 @@ def make_meld(meld: list, move: str, player: str, game):
     result['move']['data']['melds'] = game.get('melds')
     result['move']['data']['hand'] = game.get(
         'players').get(player).get('hand', {})
-    result["nextTurnState"] = "meld"
 
-    game['currentTurnState'] = 'meld'
+    player_name = game.get('players').get(player).get('displayName')
+
     for key in game.get('players'):
         sid = game.get('players').get(key).get('sid')
 
@@ -138,7 +137,8 @@ def make_meld(meld: list, move: str, player: str, game):
                         "melds": result['move']['data']['melds']
                     }
                 },
-                "nextTurnState": game['currentTurnState']
+                "turnState": game['turnState'],
+                "message": f"{player_name} Played a meld "
             }
             socketio.emit('played-move', message, to=sid)
 
@@ -153,8 +153,7 @@ def layoff(card: dict, player: str, meldId: int, move: str, game):
             "type": move,
             "data": {}
         },
-        "nextTurnState": "",
-        "nextTurnCounter": game['turnCounter']
+        "turnState": game['turnState'],
     }
     game.get('melds')[meldId].append(card)
     if not utils.is_valid_meld(game.get('melds')[meldId]):
@@ -169,9 +168,9 @@ def layoff(card: dict, player: str, meldId: int, move: str, game):
     result['move']['data']['melds'] = game.get('melds')
     result['move']['data']['hand'] = game.get(
         'players').get(player).get('hand', {})
-    result["nextTurnState"] = "meld"
 
-    game['currentTurnState'] = 'meld'
+    player_name = game.get('players').get(player).get('displayName')
+
     for key in game.get('players'):
         sid = game.get('players').get(key).get('sid')
 
@@ -186,7 +185,8 @@ def layoff(card: dict, player: str, meldId: int, move: str, game):
                         "melds": result['move']['data']['melds']
                     }
                 },
-                "nextTurnState": game['currentTurnState']
+                "turnState": game['turnState'],
+                "message": f"{player_name} Played a meld "
             }
             socketio.emit('played-move', message, to=sid)
     return result, game
@@ -200,26 +200,28 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
             "type": move,
             "data": {}
         },
-        "nextTurnState": "",
-        "nextTurnCounter": game['turnCounter']
+        'turnState': game['turnState']
     }
     # TODO Verify in hand
     game.get('players').get(
         player).get('hand').remove(discardedCard)
     game.get('discardPile').insert(0, discardedCard)
-    turnCounter = game['turnCounter'] + 1
+
+    turnCounter = game['turnState']['turnCounter'] + 1
+
     if turnCounter > len(game.get('players')):
         turnCounter = 1
 
-    game['currentTurnState'] = "pickup"
-    game['turnCounter'] = turnCounter
+    game['turnState']['turnCounter'] = turnCounter
+    game['turnState']['stage'] = 'start'
 
-    result["nextTurnState"] = "pickup"
-    result["nextTurnCounter"] = turnCounter
-    result["hand"] = game.get('players').get(player).get('hand')
-    result['move']['data']["discard"] = game.get('discardPile')[0]
+    result['turnState'] = game['turnState']
+    result['hand'] = game.get('players', {}).get(player).get('hand')
+    result['move']['data']['discard'] = game.get('discardPile', [])[0]
 
-    for key in game.get('players'):
+    player_name = game.get('players').get(player).get('displayName')
+
+    for key in game.get('players', []):
         sid = game.get('players').get(key).get('sid')
         if key != player and sid is not None:
             message = {
@@ -232,8 +234,8 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
                         'discard': result['move']['data']["discard"]
                     }
                 },
-                'nextTurnState': game['currentTurnState'],
-                'nextTurnCounter': game['turnCounter']
+                'turnState': game['turnState'],
+                "message": f"{player_name} discarded a card."
             }
             socketio.emit('played-move', message, to=sid)
     return result, game
