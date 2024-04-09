@@ -25,11 +25,13 @@ import {
 import { useModal } from '../../hooks/Modal'
 import { toast } from 'react-hot-toast'
 import Settings from '../settings/Settings'
+import Points from '../roundend/Points'
 
 const Game = () => {
     const navigate = useNavigate()
     const { profile } = useProfile()
     const { gameId } = useParams()
+    const { dispatch: dispatchModal } = useModal()
 
     const [game, setGame] = useState<RummyGame>({
         gameId: '0',
@@ -148,15 +150,13 @@ const Game = () => {
                 }))
             } else if (data?.move.type === 'roundEnd') {
                 toast.success('Round ended!')
-                const { dispatch } = useModal();
-                () => dispatch({
+                dispatchModal({
                     type: 'showModal',
                     modal: {
-                        title: 'Settings',
-                        component: <Settings/>,
+                        title: 'Points',
+                        component: <Points />,
                     },
                 })
-                
             }
         })
 

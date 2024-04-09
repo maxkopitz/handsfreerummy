@@ -244,10 +244,11 @@ def can_game_end(player: str, game: dict):
     result = False
     if len(game.get('players').get(player).get('hand')) == 0:
         result = True
+        game['points'].append((player, utils.winner_points(game.get("players"), player, game)))
         for key in game.get('players'):
             sid = game.get('players').get(key).get('sid')
             game['gameState'] = 'ended'
-            game['points'].append((player, utils.winner_points(game.get("players"), player, game)))
+            
 
             if sid is not None:
                 displayName = game.get('players').get(
