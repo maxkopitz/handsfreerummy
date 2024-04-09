@@ -57,9 +57,6 @@ const GameControls = ({ game }: GameControlsProp) => {
                     }
                 />
                 <Button text={'Leave Game'} onClick={handleLeaveGame} />
-                <h1 className="text-xl font-bold">
-                    Awaiting move: {game.turnState}{' '}
-                </h1>
             </div>
         </>
     )
