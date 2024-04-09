@@ -59,6 +59,11 @@ export interface Meld {
     meldId: number
     cards: CardType[]
 }
+
+export interface TurnState {
+    turnCounter: number
+    stage: 'start' | 'end'
+}
 export interface RummyGame {
     gameId: string
     players: RummyPlayer[]
@@ -67,8 +72,7 @@ export interface RummyGame {
     sortState: boolean
     discard: CardType
     melds: Meld[]
-    turnCounter: number
     playerOrder: number
     isOwner: boolean
-    turnState: GameTurn
+    turnState: TurnState
 }

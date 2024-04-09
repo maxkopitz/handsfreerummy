@@ -6,6 +6,8 @@ import CardBack from './CardBack'
 import Container from '../ui/Container'
 import Meld from './Meld'
 import GameControls from './GameControls'
+import { toast } from 'react-hot-toast'
+import Dictaphone from './voice/Dictaphone'
 
 interface TableProps {
     game: RummyGame
@@ -26,11 +28,8 @@ const Table = ({
     handlePlayerCardClick,
     handleSortCardClick,
     handleClickMeld,
-    handleLayoff
+    handleLayoff,
 }: TableProps) => {
-
-
-
 
     return (
         <Container>
@@ -45,11 +44,13 @@ const Table = ({
                             playerId={player.playerOrder}
                             cardCount={player.cardCount}
                             playerDisplayName={player.displayName}
-                            isTurn={player.playerOrder === game.turnCounter}
+                            isTurn={
+                                player.playerOrder ===
+                                game.turnState.turnCounter
+                            }
                         />
                     </div>
                 ))}
-
 
                 <div className="col-start-5 flex flex-row justify-between">
                     <div>
@@ -58,9 +59,10 @@ const Table = ({
                             card={game.discard}
                             onClick={handleClickDiscard}
                             isActive={
-                                game.playerOrder === game.turnCounter &&
-                                game.turnState === GameTurn.PICKUP
+                                game.playerOrder === game.turnState.turnCounter &&
+                                game.turnState.stage === 'start'
                             }
+
                         />
                     </div>
 
@@ -69,9 +71,10 @@ const Table = ({
                         <CardBack
                             onClick={handleClickPickup}
                             isActive={
-                                game.playerOrder === game.turnCounter &&
-                                game.turnState === GameTurn.PICKUP
+                                game.playerOrder === game.turnState.turnCounter &&
+                                game.turnState.stage === 'start'
                             }
+
                         />
                     </div>
                 </div>
@@ -83,8 +86,9 @@ const Table = ({
                             key={index}
                             onClick={handleLayoff}
                             isActive={
-                                game.turnCounter === game.playerOrder &&
-                                game.turnState === 'meld'
+                                game.turnState.turnCounter ===
+                                game.playerOrder &&
+                                game.turnState.stage === 'end'
                             }
                         />
                     ))}
@@ -94,7 +98,7 @@ const Table = ({
                         playerId={game.playerOrder}
                         hand={game.hand}
                         melds={game.melds}
-                        isTurn={game.playerOrder === game.turnCounter}
+                        isTurn={game.playerOrder === game.turnState.turnCounter}
                         turnState={game.turnState}
                         handleDiscard={handleDiscard}
                         handleCardClick={handlePlayerCardClick}

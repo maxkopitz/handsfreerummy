@@ -1,4 +1,4 @@
-import { ValueOrder, SuitOrder, GameTurn, Meld } from '../../Type'
+import { ValueOrder, SuitOrder, GameTurn, Meld, TurnState } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
@@ -11,7 +11,7 @@ interface PlayerHandProps {
     playerId?: number
     hand: CardType[]
     isTurn: boolean
-    turnState: GameTurn
+    turnState: TurnState
     handleDiscard: any
     handleCardClick: any
     handleSortCardClick: any
@@ -28,7 +28,7 @@ const PlayerHand = ({
     handleCardClick,
     handleSortCardClick,
     handleClickMeld,
-    melds
+    melds,
 }: PlayerHandProps) => {
     const { profile } = useProfile()
 
@@ -54,15 +54,14 @@ const PlayerHand = ({
                     onClick={toggleSortBy}
                     text={'Sort Cards by ' + sortBy}
                 ></Button>
-                {(turnState === 'meld' || turnState === 'discard') && (
+                {turnState.stage === 'end' && (
                     <>
                         <Button
                             onClick={handleClickMeld}
                             text={'Create Meld'}
                             disabled={
                                 !isTurn ||
-                                (turnState !== GameTurn.MELD &&
-                                    turnState !== GameTurn.DISCARD) ||
+                                turnState.stage !== 'end' ||
                                 selectedCards(hand).length < 3
                             }
                         ></Button>
@@ -71,28 +70,23 @@ const PlayerHand = ({
                             text={'Discard'}
                             disabled={
                                 !isTurn ||
-                                (turnState !== GameTurn.MELD &&
-                                    turnState !== GameTurn.DISCARD) ||
+                                turnState.stage !== 'end' ||
                                 selectedCards(hand).length !== 1
                             }
                         ></Button>
                     </>
                 )}
-            </div>
-
-            <div className='flex flex-row flex-wrap'>
-                {hand.map((card, index) => (
-                    <Card
-                        key={index}
-                        card={card}
-                        isActive={
-                            isTurn &&
-                            (turnState === GameTurn.MELD ||
-                                turnState === GameTurn.DISCARD)
-                        }
-                        onClick={() => handleCardClick({ card: card })}
-                    />
-                ))}
+                <div className='flex flex-row flex-wrap'>
+                    {hand.map((card, index) => (
+                        <div key={index} className="m-2">
+                            <Card
+                                card={card}
+                                isActive={isTurn && turnState.stage === 'end'}
+                                onClick={() => handleCardClick({ card: card })}
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     )
