@@ -24,6 +24,7 @@ import {
 } from '../../lib/parsers'
 import { useModal } from '../../hooks/Modal'
 import { toast } from 'react-hot-toast'
+import Settings from '../settings/Settings'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -146,8 +147,16 @@ const Game = () => {
                     turnState: data.nextTurnState,
                 }))
             } else if (data?.move.type === 'roundEnd') {
-                toast.success('Game ended!')
-                navigate('/')
+                toast.success('Round ended!')
+                const { dispatch } = useModal();
+                () => dispatch({
+                    type: 'showModal',
+                    modal: {
+                        title: 'Settings',
+                        component: <Settings/>,
+                    },
+                })
+                
             }
         })
 

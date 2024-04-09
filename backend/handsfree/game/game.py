@@ -57,7 +57,8 @@ def create_game():
         "pickupCard": {},
         "gameState": "lobby",
         "deck": deck,
-        "currentTurnState": "pickup"
+        "currentTurnState": "pickup",
+        "points": []
     }
     # currentTurnState: "pickup", "meld", "discard"
 

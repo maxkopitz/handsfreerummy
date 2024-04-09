@@ -10,11 +10,8 @@ import CardBack from './CardBack'
 import Container from '../ui/Container'
 import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
-<<<<<<< HEAD
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 import { useEffect } from 'react'
-=======
->>>>>>> main
 import Meld from './Meld'
 import { toast } from 'react-hot-toast'
 
@@ -28,16 +25,6 @@ interface TableProps {
     handleClickMeld: (meld: MeldType) => void
     handleLayoff: any
 }
-
-<<<<<<< HEAD
-const dummyRuns = [
-    [
-        { value: Value.A, suit: Suit.C, isSelected: false },
-        { value: Value.A, suit: Suit.D, isSelected: false },
-    ],
-    [{ value: Value.K, suit: Suit.D, isSelected: false }],
-    [{ value: Value.J, suit: Suit.C, isSelected: false }],
-]
 
 const Dictaphone = () => {
     const {
@@ -80,8 +67,6 @@ const Dictaphone = () => {
 
 
 
-=======
->>>>>>> main
 const Table = ({
     game,
     handleClickPickup,
