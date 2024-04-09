@@ -7,9 +7,9 @@ const About = () => {
             <div className="justify-center">
                 <h1 className="font-bold text-4xl mb-3">About</h1>
                 <p className="mb-3">
-                    Hands Free Rummy is a Voice Activated Card Game for Rummy
-                    making it easy for anyone with low mobility or people living
-                    in different places to play card games with loved ones.
+                    Hands Free Rummy is a Voice Activated Card Game for Rummy<br></br>
+                    making it easy for anyone with low mobility or people living <br></br>
+                    in different places to play card games with loved ones. <br></br>
                 </p>
                 <h2 className="font-bold text-2xl mb-3">Mission</h2>
                 <p className="mb-3">
