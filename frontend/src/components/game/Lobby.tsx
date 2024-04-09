@@ -71,6 +71,8 @@ const Lobby = ({ game }: LobbyProps) => {
                 <h1 className="text-xl font-bold">Lobby #{game.gameId} </h1>
                 <h1>Players: {game.players.length} </h1>
 
+                
+
                 {!game.isOwner && (
                     <Button
                         text={'Leave Game'}

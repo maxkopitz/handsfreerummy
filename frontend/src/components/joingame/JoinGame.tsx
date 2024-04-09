@@ -3,8 +3,11 @@ import { useEffect, useState } from 'react'
 import axiosInstance from '../../api/axiosConfig'
 import { LobbyGame } from '../../Type'
 import Game from './Game'
+import PlayerHand from '../game/PlayerHand'
 
 const tableHeaders = ['ID', 'Players', 'Click Button to Join']
+
+
 
 const JoinGame = () => {
     const [games, setGames] = useState<LobbyGame[]>([])
@@ -19,7 +22,7 @@ const JoinGame = () => {
                     if (game.gameState === 'lobby') {
                         parsedGames.push({
                             id: game.gameId,
-                            players: 0,
+                            players: game.players += 1, // data.game.players.length().toString(),
                             state: game.gameState,
                         })
                     }
@@ -60,6 +63,7 @@ const JoinGame = () => {
                         const classes = isLast
                             ? 'p-4'
                             : 'p-4 border-b border-30 border-black'
+                            
                         return (
                             <Game
                                 key={item.id}
