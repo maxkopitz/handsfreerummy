@@ -97,6 +97,7 @@ const Lobby = ({ game }: LobbyProps) => {
                             modal: {
                                 title: 'Settings',
                                 component: <Settings />,
+                                isSaveButton: true,
                             },
                         })
                     }

@@ -2,7 +2,11 @@ import React from "react";
 import { useModal } from "../../hooks/Modal";
 
 const Modal = () => {
-    const { modal, dispatch } = useModal()
+    const { modal, dispatch } = useModal();
+
+    // Determine button text based on isSaveButton prop
+    const buttonText = modal.modal?.isSaveButton ? "Save" : "Close";
+
     return (
         <>
             {modal.modal ? (
@@ -38,7 +42,7 @@ const Modal = () => {
                                         type="button"
                                         onClick={() => dispatch({ type: "closeModal" })}
                                     >
-                                        Close
+                                        {buttonText}
                                     </button>
                                 </div>
                             </div>
