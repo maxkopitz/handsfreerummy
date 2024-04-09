@@ -1,5 +1,4 @@
-import Board from './Board'
-import { CardType, GameTurn, RummyGame, Suit, Value } from '../../Type'
+import { CardType, GameTurn, Meld as MeldType, RummyGame } from '../../Type'
 import Button from '../ui/Button'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
@@ -11,25 +10,20 @@ import CardBack from './CardBack'
 import Container from '../ui/Container'
 import axiosInstance from '../../api/axiosConfig'
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import Meld from './Meld'
+import { toast } from 'react-hot-toast'
+import Dictaphone from './voice/Dictaphone'
 
 interface TableProps {
     game: RummyGame
-    handleClickPickup: any
-    handleClickDiscard: any
-    handleDiscard: any
-    handlePlayerCardClick: any
+    handleClickPickup: () => void
+    handleClickDiscard: () => void
+    handleDiscard: (card: CardType) => void
+    handlePlayerCardClick: (card: CardType) => void
     handleSortCardClick: any
+    handleClickMeld: (meld: MeldType) => void
+    handleLayoff: any
 }
-
-const dummyRuns = [
-    [
-        { value: Value.A, suit: Suit.C, isSelected: false },
-        { value: Value.A, suit: Suit.D, isSelected: false },
-    ],
-    [{ value: Value.K, suit: Suit.D, isSelected: false }],
-    [{ value: Value.J, suit: Suit.C, isSelected: false }],
-]
 
 const Table = ({
     game,
@@ -38,6 +32,8 @@ const Table = ({
     handleDiscard,
     handlePlayerCardClick,
     handleSortCardClick,
+    handleClickMeld,
+    handleLayoff,
 }: TableProps) => {
     const { dispatch: dispatchModal } = useModal()
     const navigate = useNavigate()
@@ -52,7 +48,7 @@ const Table = ({
                 navigate('/')
             })
             .catch(() => {
-                console.log('Error occured while leaving.')
+                toast('Unable to leave!')
             })
     }
 
@@ -88,7 +84,9 @@ const Table = ({
                             }
                         />
                         <Button text={'Leave Game'} onClick={handleLeaveGame} />
-                        <h1>Awaiting move: {game.turnState} </h1>
+                        <h1 className="text-xl font-bold">
+                            move: {game.turnState.stage}{' '}
+                        </h1>
                     </div>
                 </div>
 
@@ -98,49 +96,62 @@ const Table = ({
                             playerId={player.playerOrder}
                             cardCount={player.cardCount}
                             playerDisplayName={player.displayName}
-                            isTurn={player.playerOrder === game.turnCounter}
+                            isTurn={
+                                player.playerOrder ===
+                                game.turnState.turnCounter
+                            }
                         />
                     </div>
                 ))}
 
                 <div className="col-start-5 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Discard</h1>
+                    <h1 className="text-xl font-bold">Discard Pile</h1>
                     <Card
                         card={game.discard}
                         onClick={handleClickDiscard}
                         isActive={
-                            game.playerOrder === game.turnCounter &&
-                            game.turnState === GameTurn.PICKUP
+                            game.playerOrder === game.turnState.turnCounter &&
+                            game.turnState.stage === 'start'
                         }
                     />
                 </div>
 
                 <div className="col-start-6 flex flex-col items-center justify-center">
-                    <h1 className="text-xl font-bold">Pickup</h1>
+                    <h1 className="text-xl font-bold">Pickup Pile</h1>
                     <CardBack
                         onClick={handleClickPickup}
                         isActive={
-                            game.playerOrder === game.turnCounter &&
-                            game.turnState === GameTurn.PICKUP
+                            game.playerOrder === game.turnState.turnCounter &&
+                            game.turnState.stage === 'start'
                         }
                     />
                 </div>
 
-                <div className="mb-20 mt-20 col-span-3">
-                    <Board playedRuns={dummyRuns} discard={game.discard} />
-                </div>
-                <div className="col-start-2">
-                    <h2 className="text-lg font-semibold">Melds</h2>
+                <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
+                    {game.melds.map((meld, index) => (
+                        <Meld
+                            meld={meld}
+                            key={index}
+                            onClick={handleLayoff}
+                            isActive={
+                                game.turnState.turnCounter ===
+                                    game.playerOrder &&
+                                game.turnState.stage === 'end'
+                            }
+                        />
+                    ))}
                 </div>
                 <div className="col-start-2 col-span-3">
                     <PlayerHand
                         playerId={game.playerOrder}
                         hand={game.hand}
-                        isTurn={game.playerOrder === game.turnCounter}
+                        melds={game.melds}
+                        isTurn={game.playerOrder === game.turnState.turnCounter}
                         turnState={game.turnState}
                         handleDiscard={handleDiscard}
                         handleCardClick={handlePlayerCardClick}
                         handleSortCardClick={handleSortCardClick}
+                        handleClickMeld={handleClickMeld}
                     />
                 </div>
             </div>

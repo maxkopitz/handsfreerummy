@@ -4,20 +4,48 @@ services:
     ports:
       - '6379:6379'
       - '8001:8001'
-  backend:
+    networks:
+      proxy:
+        aliases:
+        - redis
+  api:
     build:
       context: backend
       target: builder
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
+    restart: always
     ports:
       - '4000:4000'
     volumes:
       - ./backend:/code
     environment:
-      REDIS_URL: 'redis://redis:6379'
-      MONGO_URL: mongodb://root:example@mongo:27017/
-      HANDSFREE_SETTINGS: 'secret_config.py'
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URL='mongodb://root:example@mongo:27017/'
+      - FLASK_CONFIG=development
+      - FLASK_ENV=development
+      - APP_SETTINGS=handsfree.config.DevelopmentConfig
+    networks:
+      proxy:
     depends_on:
         - redis
+  client:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - './frontend:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_SERVICE_URL=http://localhost:3000
+    depends_on:
+      - api
+    networks:
+      proxy:
+networks:
+  proxy:

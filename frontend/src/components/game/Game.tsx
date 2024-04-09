@@ -10,6 +10,7 @@ import {
     CardType,
     ValueOrder,
     SuitOrder,
+    Meld,
 } from '../../Type'
 import Container from '../ui/Container'
 import Lobby from './Lobby'
@@ -21,6 +22,8 @@ import {
     reduceCard,
     selectedCards,
 } from '../../lib/parsers'
+import { useModal } from '../../hooks/Modal'
+import { toast } from 'react-hot-toast'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -34,56 +37,73 @@ const Game = () => {
         hand: [],
         sortState: true,
         discard: { value: Value.J, suit: Suit.C, isSelected: false },
-        // rank: Rank
         melds: [],
-        turnCounter: 0,
         playerOrder: 0,
         isOwner: false,
-        turnState: GameTurn.PICKUP,
+        turnState: {
+            turnCounter: 1,
+            stage: 'start',
+        },
     })
 
-    const joinGame = async () => {
-        const data = JSON.stringify({
-            action: 'join',
-            displayName: profile.displayName,
-        })
-        axiosInstance
-            .post<any>('/games/' + gameId + '/', data)
-            .then((res: any) => {
-                const { data } = res
-                console.log(data)
-                setGame({
-                    gameId: data.game.gameId,
-                    players: data.game.players,
-                    gameState: data.game.gameState,
-                    hand: parseHand(data.game.hand),
-                    sortState: true,
-                    melds: [],
-                    discard: data.game?.discard,
-                    turnCounter: data.game?.turnCounter,
-                    playerOrder: data.game?.playerOrder,
-                    isOwner: data.game?.isOwner,
-                    turnState: data.game?.turnState,
+    useEffect(() => {
+        const joinGame = async () => {
+            const data = JSON.stringify({
+                action: 'join',
+                displayName: profile.displayName,
+            })
+            await axiosInstance
+                .post<any>('/games/' + gameId + '/', data)
+                .then((res: any) => {
+                    const { data } = res
+                    if (data.status === 'error') {
+                        toast.error(data.error.message)
+                        navigate(data.error.redirect)
+                        return
+                    }
+                    console.log(data)
+                    const { result } = data
+                    const melds = result.game.melds.map(
+                        (meld: any, index: number) => {
+                            return { meldId: index, cards: meld }
+                        }
+                    )
+                    setGame({
+                        gameId: result.game.gameId,
+                        players: result.game.players,
+                        gameState: result.game.gameState,
+                        hand: parseHand(result.game.hand),
+                        sortState: true,
+                        melds: melds,
+                        discard: result.game?.discard,
+                        playerOrder: result.game?.playerOrder,
+                        isOwner: result.game?.isOwner,
+                        turnState: result.game?.turnState,
+                    })
                 })
-            })
-            .catch(() => {
-                navigate('/')
-            })
-    }
+                .catch(() => {
+                    navigate('/')
+                })
+        }
+        joinGame()
+    }, [gameId, navigate, profile.displayName])
 
     useEffect(() => {
-        joinGame()
-
         socket.on(SocketEvents.PLAYER_JOINED, (data: any) => {
-            console.log(data.data.displayName, 'has joined.')
+            if (game.gameState === 'lobby') {
+                setGame((prevState) => ({
+                    ...prevState,
+                    players: data.data.players,
+                }))
+                toast(data.data.displayName + ' has joined.')
+            }
         })
 
         socket.on(SocketEvents.PLAYER_LEFT, (data: any) => {
-            console.log(data.data.displayName, 'has left.')
+            toast(data.data.displayName + ' has left.')
         })
 
         socket.on(SocketEvents.GAME_STARTED, (data: any) => {
-            console.log('STARTED:', data)
             setGame({
                 ...game,
                 hand: parseHand(data.game.hand),
@@ -91,7 +111,6 @@ const Game = () => {
                 gameState: 'in-game',
                 players: data.game.players,
                 playerOrder: data.game.playerOrder,
-                turnCounter: data.game.turnCounter,
                 turnState: data.game.turnState,
             })
         })
@@ -99,26 +118,41 @@ const Game = () => {
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
             console.log(data)
             if (data?.move.type === 'pickup') {
+                toast.success('Picked up a card!')
                 setGame((prevState) => ({
                     ...prevState,
-                    turnState: data.nextMove,
+                    turnState: data.turnState,
                     discard: parseCard(data.move.data.discard),
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'meld') {
+                toast.success('Created a meld!', {
+                    duration: 6000
+                })
+                const melds = data.move.data.melds.map(
+                    (meld: any, index: number) => {
+                        return { meldId: index, cards: meld }
+                    }
+                )
                 setGame((prevState) => ({
                     ...prevState,
-                    turnState: data.nextMove,
+                    turnState: data.turnState,
+                    melds: melds,
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'discard') {
+                toast.success(data?.message, {
+                    duration: 6000
+                })
                 setGame((prevState) => ({
                     ...prevState,
                     discard: parseCard(data.move.data.discard),
                     players: data.move.data.players,
-                    turnCounter: data.nextTurnCounter,
-                    turnState: data.nextTurnState,
+                    turnState: data.turnState,
                 }))
+            } else if (data?.move.type === 'roundEnd') {
+                toast.success('Game ended!')
+                navigate('/')
             }
         })
 
@@ -127,7 +161,7 @@ const Game = () => {
             socket.off(SocketEvents.GAME_STARTED)
             socket.off(SocketEvents.PLAYED_MOVE)
         }
-    }, [])
+    }, [game.gameState])
 
     const handleClickPickup = () => {
         const data = JSON.stringify({
@@ -140,13 +174,14 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
+                console.log(res)
                 setGame((prevState) => ({
                     ...prevState,
                     hand: [
                         ...prevState.hand,
                         { ...res.data.move.data.card, isSelected: false },
                     ],
-                    turnState: res.data.nextTurnState,
+                    turnState: res.data.turnState,
                 }))
             })
             .catch(() => {
@@ -171,7 +206,7 @@ const Game = () => {
                     ...prevState,
                     hand: [...prevState.hand, res.data.move.data.card],
                     discard: res.data.move?.data.discard,
-                    turnState: res.data.nextTurnState,
+                    turnState: res.data.turnState,
                 }))
             })
             .catch(() => {
@@ -193,7 +228,6 @@ const Game = () => {
             move: {
                 type: 'meld',
                 data: {
-                    subtype: 'new',
                     cards: cards,
                 },
             },
@@ -202,12 +236,76 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                const { data } = res
+                if (data.status === 'error') {
+                    toast.error(data.error.message)
+                    return
+                }
+                const melds = res.data.move.data.melds.map(
+                    (meld: any, index: number) => {
+                        return { meldId: index, cards: meld }
+                    }
+                )
+                setGame((prevState) => ({
+                    ...prevState,
+                    hand: parseHand(res.data.move.data.hand),
+                    turnState: res.data.turnState,
+                    melds: melds,
+                }))
             })
             .catch(() => {
                 console.log('An error occured')
             })
     }
+
+    const handleLayoff = (meld: Meld) => {
+        if (selectedCards(game.hand).length !== 1) {
+            console.log('no card')
+            return
+        }
+
+        const card: any = reduceCard(selectedCards(game.hand).at(0))
+
+        const data = JSON.stringify({
+            action: 'move',
+            move: {
+                type: 'layoff',
+                data: {
+                    meldId: meld.meldId,
+                    card: card,
+                },
+            },
+        })
+
+        axiosInstance
+            .post<any>('/games/' + gameId + '/', data)
+            .then(({ data }: any) => {
+                if (data.status === 'error') {
+                    toast.error(data.error.message)
+                    return
+                }
+                if (data.status === 'success') {
+                    const melds = data.move.data.melds.map(
+                        (meld: any, index: number) => {
+                            return { meldId: index, cards: meld }
+                        }
+                    )
+                    setGame((prevState) => ({
+                        ...prevState,
+                        hand: parseHand(data.move.data.hand),
+                        turnState: data.turnState,
+                        melds: melds,
+                    }))
+                } else if (data.status === 'error') {
+                    console.log(data.error?.message)
+                    toast.error('An error occured while laying off.')
+                }
+            })
+            .catch((error: any) => {
+                toast.error('An error occured while laying off.')
+            })
+    }
+
     const handleDiscard = () => {
         if (selectedCards(game.hand).length !== 1) {
             return
@@ -232,8 +330,7 @@ const Game = () => {
                     ...prevState,
                     hand: parseHand(res.data.hand),
                     discard: res.data.move?.data.discard,
-                    turnState: res.data.nextTurnState,
-                    turnCounter: res.data.nextTurnCounter,
+                    turnState: res.data.turnState,
                 }))
             })
             .catch(() => {
@@ -323,7 +420,7 @@ const Game = () => {
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
     }
-    if (game?.gameState === 'in-game') {
+    if (game?.gameState === 'in-game' || game?.gameState === 'roundEnd') {
         return (
             <Table
                 game={game}
@@ -332,9 +429,12 @@ const Game = () => {
                 handleDiscard={handleDiscard}
                 handlePlayerCardClick={handleCardClick}
                 handleSortCardClick={handleSortCardClick}
+                handleClickMeld={handleMeld}
+                handleLayoff={handleLayoff}
             />
         )
     }
+
     return (
         <Container>
             <h1>Loading...</h1>

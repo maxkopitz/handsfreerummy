@@ -1,19 +1,22 @@
-import { ValueOrder, SuitOrder, GameTurn } from '../../Type'
+import { ValueOrder, SuitOrder, GameTurn, Meld, TurnState } from '../../Type'
 import Card from './Card'
 import { CardType } from '../../Type'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Button from '../ui/Button'
 import { selectedCards } from '../../lib/parsers'
+import { useProfile } from '../../hooks/Profile'
 
 interface PlayerHandProps {
     playerId?: number
     hand: CardType[]
     isTurn: boolean
-    turnState: GameTurn
+    turnState: TurnState
     handleDiscard: any
     handleCardClick: any
     handleSortCardClick: any
+    handleClickMeld: any
+    melds: Meld[]
 }
 
 const PlayerHand = ({
@@ -24,8 +27,11 @@ const PlayerHand = ({
     handleDiscard,
     handleCardClick,
     handleSortCardClick,
+    handleClickMeld,
+    melds,
 }: PlayerHandProps) => {
     const cardClasses = classNames('flex flex-row justify-center items-center')
+    const { profile } = useProfile()
 
     const handSize = hand.length
 
@@ -40,7 +46,7 @@ const PlayerHand = ({
         <div className="flex flex-col justify-center item-center w-max">
             <div>
                 <h1 className="text-xl font-bold">
-                    Player {playerId}: {handSize} cards{' '}
+                    {profile.displayName} {playerId}: {handSize} cards{' '}
                     {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>
@@ -52,15 +58,14 @@ const PlayerHand = ({
                     onClick={toggleSortBy}
                     text={'Sort Cards by ' + sortBy}
                 ></Button>
-                {(turnState === 'meld' || turnState === 'discard') && (
+                {turnState.stage === 'end' && (
                     <>
                         <Button
-                            onClick={toggleSortBy}
+                            onClick={handleClickMeld}
                             text={'Create Meld'}
                             disabled={
                                 !isTurn ||
-                                (turnState !== GameTurn.MELD &&
-                                    turnState !== GameTurn.DISCARD) ||
+                                turnState.stage !== 'end' ||
                                 selectedCards(hand).length < 3
                             }
                         ></Button>
@@ -69,8 +74,7 @@ const PlayerHand = ({
                             text={'Discard'}
                             disabled={
                                 !isTurn ||
-                                (turnState !== GameTurn.MELD &&
-                                    turnState !== GameTurn.DISCARD) ||
+                                turnState.stage !== 'end' ||
                                 selectedCards(hand).length !== 1
                             }
                         ></Button>
@@ -81,11 +85,7 @@ const PlayerHand = ({
                         <div key={index} className="m-2">
                             <Card
                                 card={card}
-                                isActive={
-                                    isTurn &&
-                                    (turnState === GameTurn.MELD ||
-                                        turnState === GameTurn.DISCARD)
-                                }
+                                isActive={isTurn && turnState.stage === 'end'}
                                 onClick={() => handleCardClick({ card: card })}
                             />
                         </div>

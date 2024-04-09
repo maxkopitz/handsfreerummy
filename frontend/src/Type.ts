@@ -54,6 +54,16 @@ export enum GameTurn {
     MELD = 'meld',
     DISCARD = 'discard',
 }
+
+export interface Meld {
+    meldId: number
+    cards: CardType[]
+}
+
+export interface TurnState {
+    turnCounter: number
+    stage: 'start' | 'end'
+}
 export interface RummyGame {
     gameId: string
     players: RummyPlayer[]
@@ -61,9 +71,8 @@ export interface RummyGame {
     hand: CardType[]
     sortState: boolean
     discard: CardType
-    melds: CardType[]
-    turnCounter: number
+    melds: Meld[]
     playerOrder: number
     isOwner: boolean
-    turnState: GameTurn
+    turnState: TurnState
 }

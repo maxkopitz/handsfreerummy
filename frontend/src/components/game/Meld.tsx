@@ -1,25 +1,38 @@
 import classNames from 'classnames'
-import { CardType, Suit } from '../../Type'
+import { CardType, Meld as MeldType, Suit } from '../../Type'
 import MeldCard from './MeldCard'
 
 interface MeldProps {
-    card: CardType
-    meld: CardType[]
-    num: number
+    meld: MeldType
+    isActive: boolean
+    onClick?: any
 }
-const Meld = ({card, meld, num}: MeldProps) => {
+const Meld = ({ meld, isActive = false, onClick }: MeldProps) => {
     let classes = classNames(
-        'flex justify-center items-center'
+        'flex flex-col justify-center items-center mt-2 ml-2'
     )
+    const handleClickMeld = () => {
+        onClick(meld)
+    }
     return (
-        <>
-            <div className={classes}>
-                {meld.map((card, index) => (
-                    <MeldCard card={{ value: card.value, suit: card.suit, isSelected: false }} />
+        <div className={classes} onClick={handleClickMeld}>
+            <div
+                className="flex justify-center items-center flex-row p-3 rounded shadow-lg bg-indigo-200"
+            >
+                {meld.cards.map((card, index) => (
+                    <div key={index}>
+                        <MeldCard
+                            card={{
+                                value: card.value,
+                                suit: card.suit,
+                                isSelected: false,
+                            }}
+                        />
+                    </div>
                 ))}
-                <h1>{num}</h1>
             </div>
-        </>
+            <h1 className="text-xl font-bold">Meld #{meld.meldId}</h1>
+        </div>
     )
 }
 

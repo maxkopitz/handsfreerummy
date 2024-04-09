@@ -7,6 +7,8 @@ import Container from '../ui/Container'
 import { useModal } from '../../hooks/Modal'
 import Settings from '../settings/Settings'
 import Tutorial from '../tutorial/Tutorial'
+import { toast } from 'react-hot-toast'
+import { useEffect } from 'react'
 
 interface LobbyProps {
     game: RummyGame
@@ -18,15 +20,18 @@ const Lobby = ({ game }: LobbyProps) => {
         const data = JSON.stringify({
             action: 'leave',
         })
-        axiosInstance
-            .post<any>('/games/' + game.gameId + '/', data)
-            .catch((error: AxiosError) => {
-                console.log(error)
-            })
-            .then((res: any) => {
-                console.log(res)
-                navigate('/')
-            })
+        const leaveGame = async () => {
+            await axiosInstance
+                .post<any>('/games/' + game.gameId + '/', data)
+                .then((res: any) => {
+                    toast.success("Left Game!")
+                    navigate('/')
+                })
+                .catch((error: AxiosError) => {
+                    console.log(error)
+                })
+        }
+        leaveGame();
     }
 
     const handleStartGame = () => {
@@ -36,7 +41,9 @@ const Lobby = ({ game }: LobbyProps) => {
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                if (res?.data?.status === 'error') {
+                    toast.error(res.data.error.message)
+                }
             })
             .catch((error: AxiosError) => {
                 console.log(error)
@@ -44,27 +51,44 @@ const Lobby = ({ game }: LobbyProps) => {
     }
     const handleCloseGame = () => {
         const data = JSON.stringify({
-            action: 'close',
+            action: 'end-game',
         })
         axiosInstance
             .post<any>('/games/' + game.gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+
+                toast.success("Closed Game!")
+                navigate('/')
             })
             .catch((error: AxiosError) => {
                 console.log(error)
             })
     }
+
     return (
         <Container>
-            <div className = "flex flex-col justify-center items-center h-full">
-                <h1>Lobby #{game.gameId} </h1>
+            <div className="flex flex-col justify-center items-center h-full">
+                <h1 className="text-xl font-bold">Lobby #{game.gameId} </h1>
                 <h1>Players: {game.players.length} </h1>
 
-                {!game.isOwner && <Button text={'Leave Game'} onClick={handleLeaveGame} />}
-                {game.isOwner && <Button text={'Close Game'} onClick={handleCloseGame} />}
-                {game.isOwner && <Button text={'Start Game'} onClick={handleStartGame} />}
-                
+                {!game.isOwner && (
+                    <Button
+                        text={'Leave Game'}
+                        onClick={handleLeaveGame} />
+                )}
+                {game.isOwner && (
+                    <Button
+                        text={'Close Game'}
+                        onClick={handleCloseGame} />
+                )}
+                {game.isOwner && (
+                    <Button
+                        text={'Start Game'}
+                        onClick={handleStartGame}
+                        disabled={game.players.length === 1}
+                        isActive={game.players.length === 1} />
+                )}
+
                 <Button
                     text={'Settings'}
                     onClick={() =>

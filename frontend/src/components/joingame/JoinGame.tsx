@@ -17,13 +17,11 @@ const JoinGame = () => {
                 const parsedGames: any[] = []
                 data.games.forEach((game: any) => {
                     if (game.gameState === 'lobby') {
-
                         parsedGames.push({
                             id: game.gameId,
                             players: 0,
                             state: game.gameState,
                         })
-
                     }
                 })
                 setGames(parsedGames)
@@ -35,7 +33,9 @@ const JoinGame = () => {
 
     return (
         <div className="flex flex-col w-1/2 justify-center items-center">
-            <h1 className="font-bold text-2xl">Join on a game below to get started!</h1>
+            <h1 className="font-bold text-2xl">
+                Join a game below to get started!
+            </h1>
             <table className="table-auto w-full w-min-max text-left border-30 rounded-sm justify-center items-center">
                 <thead>
                     <tr>

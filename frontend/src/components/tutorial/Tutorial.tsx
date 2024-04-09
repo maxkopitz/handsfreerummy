@@ -9,8 +9,11 @@ const Tutorial = () => {
         <Container>
             <div className="justify-center">
                 <h2 className="text-xl">Game Goal</h2>
-                <h3 className = "text-base">Get rid of all cards in hand by creating melds of cards of the same rank or 
-                increasing in rank with the same suit.</h3>
+                <h3 className="text-base">
+                    Get rid of all cards in hand by creating melds of cards of
+                    the same rank or increasing in rank with the same suit. The
+                    yellow star means it is your turn
+                </h3>
                 <h2 className="text-xl">Play Round</h2>
                 <h3 className="text-base">
                     1. Pick up a card from pickup pile or discard pile.
