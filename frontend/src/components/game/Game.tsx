@@ -141,7 +141,7 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'discard') {
-                toast.success('Discarded!', {
+                toast.success(data?.message, {
                     duration: 6000
                 })
                 setGame((prevState) => ({
