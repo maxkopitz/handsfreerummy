@@ -22,7 +22,7 @@ import {
     reduceCard,
     selectedCards,
 } from '../../lib/parsers'
-import { useModal } from '../../hooks/Modal'
+
 import { toast } from 'react-hot-toast'
 
 const Game = () => {
