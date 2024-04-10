@@ -28,7 +28,6 @@ const PlayerHand = ({
     handleCardClick,
     handleSortCardClick,
     handleClickMeld,
-    melds,
 }: PlayerHandProps) => {
     const { profile } = useProfile()
 
@@ -76,17 +75,16 @@ const PlayerHand = ({
                         ></Button>
                     </>
                 )}
-                <div className='flex flex-row flex-wrap'>
-                    {hand.map((card, index) => (
-                        <div key={index} className="m-2">
-                            <Card
-                                card={card}
-                                isActive={isTurn && turnState.stage === 'end'}
-                                onClick={() => handleCardClick({ card: card })}
-                            />
-                        </div>
-                    ))}
-                </div>
+            </div>
+            <div className='flex flex-row flex-wrap justify-center item-center gap-1'>
+                {hand.map((card, index) => (
+                    <Card
+                        key={index}
+                        card={card}
+                        isActive={isTurn && turnState.stage === 'end'}
+                        onClick={() => handleCardClick({ card: card })}
+                    />
+                ))}
             </div>
         </div>
     )

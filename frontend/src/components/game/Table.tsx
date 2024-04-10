@@ -33,8 +33,8 @@ const Table = ({
 
     return (
         <Container>
-            <div className="grid grid-cols-5 grid-rows-3">
-                <div>
+            <div className="grid grid-cols-5 grid-rows-3 size-screen">
+                <div className="col-start-1 row-span-2">
                     <GameControls game={game} />
                 </div>
 
@@ -93,7 +93,7 @@ const Table = ({
                         />
                     ))}
                 </div>
-                <div className="col-start-2 row-start-3 col-span-3">
+                <div className="col-start-1 row-start-3 col-span-5 size-screen">
                     <PlayerHand
                         playerId={game.playerOrder}
                         hand={game.hand}
