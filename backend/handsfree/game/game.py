@@ -1,4 +1,4 @@
-from handsfree import redis_client, socketio, app
+from handsfree import redis_client, socketio
 from handsfree.game import utils
 from handsfree.game import moves
 from redis.commands.json.path import Path
@@ -11,7 +11,7 @@ suits = ["hearts", "diamonds", "clubs", "spades"]
 values = ["A", "2", "3", "4", "5", "6", "7", "8",
           "9", "10", "J", "Q", "K"]
 game_states = ['lobby', 'in-game', 'ended']
-turn_states = ['pickup', 'meld', 'discard']
+turn_states = ['start', 'end']
 
 
 def get_game(game_id):
@@ -51,15 +51,18 @@ def create_game():
         "owner": str(session.get('uuid')),
         "maxPlayers": 4,
         "players": {},
-        "turnCounter": 1,
         "melds": [],
         "discardPile": [],
         "pickupCard": {},
         "gameState": "lobby",
         "deck": deck,
-        "currentTurnState": "pickup",
-        "points": []
+        "points": [],
+        "turnState": {
+            "turnCounter": 1,
+            "stage": "start"  # "start", "end"
+        }
     }
+
     # currentTurnState: "pickup", "meld", "discard"
 
     redis_client.json().set("game:%d" % index, Path.root_path(), game)
@@ -125,8 +128,7 @@ def join_game(game_id, display_name):
                 "gameState": game.get("gameState"),
                 "players": list(game.get('players')),  # Changed if in-game
                 "playerOrder": game["players"].get(uuid).get('playerOrder'),
-                "turnCounter": game.get('turnCounter'),
-                "turnState": game['currentTurnState'],
+                "turnState": game.get('turnState'),
                 "isOwner": game.get('owner') == uuid,
                 "melds": game.get('melds')
             }
@@ -195,7 +197,7 @@ def start_game(game_id):
                 "turnCounter": 1,
                 "playerOrder": game["players"][player]["playerOrder"],
                 "players": utils.player_response_builder(player, game['players']),
-                "turnState": game["currentTurnState"],
+                "turnState": game["turnState"],
             }
         }
         if game['players'][player]['sid'] is not None:
@@ -217,8 +219,7 @@ def make_move(game_key: str, player: str, move: str, data):
             "type": move,
             "data": {}
         },
-        "nextTurnState": "",
-        "nextTurnCounter": game['turnCounter']
+        "turnState": game['turnState']
     }
 
     if move == "drawPickup":

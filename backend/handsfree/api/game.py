@@ -150,7 +150,7 @@ def handle_game_action(game_id):
                     "message": "Not in game"
                 }}
         players = list(game.get('players'))
-        whos_turn = players[game.get('turnCounter') - 1]
+        whos_turn = players[game.get('turnState').get('turnCounter') - 1]
         if whos_turn != uuid:
             return {
                 "status": "error",

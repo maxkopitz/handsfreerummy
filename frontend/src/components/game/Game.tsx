@@ -41,10 +41,12 @@ const Game = () => {
         sortState: true,
         discard: { value: Value.J, suit: Suit.C, isSelected: false },
         melds: [],
-        turnCounter: 0,
         playerOrder: 0,
         isOwner: false,
-        turnState: GameTurn.PICKUP,
+        turnState: {
+            turnCounter: 1,
+            stage: 'start',
+        },
     })
 
     useEffect(() => {
@@ -77,7 +79,6 @@ const Game = () => {
                         sortState: true,
                         melds: melds,
                         discard: result.game?.discard,
-                        turnCounter: result.game?.turnCounter,
                         playerOrder: result.game?.playerOrder,
                         isOwner: result.game?.isOwner,
                         turnState: result.game?.turnState,
@@ -89,6 +90,7 @@ const Game = () => {
         }
         joinGame()
     }, [gameId, navigate, profile.displayName])
+
     useEffect(() => {
         socket.on(SocketEvents.PLAYER_JOINED, (data: any) => {
             if (game.gameState === 'lobby') {
@@ -112,7 +114,6 @@ const Game = () => {
                 gameState: 'in-game',
                 players: data.game.players,
                 playerOrder: data.game.playerOrder,
-                turnCounter: data.game.turnCounter,
                 turnState: data.game.turnState,
             })
         })
@@ -120,15 +121,17 @@ const Game = () => {
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
             console.log(data)
             if (data?.move.type === 'pickup') {
-                toast.success('New turn!')
+                toast.success('Picked up a card!')
                 setGame((prevState) => ({
                     ...prevState,
-                    turnState: data.nextMove,
+                    turnState: data.turnState,
                     discard: parseCard(data.move.data.discard),
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'meld') {
-                toast.success('Picked up a card!')
+                toast.success('Created a meld!', {
+                    duration: 6000
+                })
                 const melds = data.move.data.melds.map(
                     (meld: any, index: number) => {
                         return { meldId: index, cards: meld }
@@ -136,17 +139,19 @@ const Game = () => {
                 )
                 setGame((prevState) => ({
                     ...prevState,
-                    turnState: data.nextMove,
+                    turnState: data.turnState,
                     melds: melds,
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'discard') {
+                toast.success(data?.message, {
+                    duration: 6000
+                })
                 setGame((prevState) => ({
                     ...prevState,
                     discard: parseCard(data.move.data.discard),
                     players: data.move.data.players,
-                    turnCounter: data.nextTurnCounter,
-                    turnState: data.nextTurnState,
+                    turnState: data.turnState,
                 }))
             } else if (data?.move.type === 'roundEnd') {
                 toast.success('Round ended!')
@@ -185,7 +190,7 @@ const Game = () => {
                         ...prevState.hand,
                         { ...res.data.move.data.card, isSelected: false },
                     ],
-                    turnState: res.data.nextTurnState,
+                    turnState: res.data.turnState,
                 }))
             })
             .catch(() => {
@@ -210,7 +215,7 @@ const Game = () => {
                     ...prevState,
                     hand: [...prevState.hand, res.data.move.data.card],
                     discard: res.data.move?.data.discard,
-                    turnState: res.data.nextTurnState,
+                    turnState: res.data.turnState,
                 }))
             })
             .catch(() => {
@@ -253,11 +258,11 @@ const Game = () => {
                 setGame((prevState) => ({
                     ...prevState,
                     hand: parseHand(res.data.move.data.hand),
-                    turnState: res.data.nextTurnState,
+                    turnState: res.data.turnState,
                     melds: melds,
                 }))
             })
-            .catch((error: any) => {
+            .catch(() => {
                 console.log('An error occured')
             })
     }
@@ -297,7 +302,7 @@ const Game = () => {
                     setGame((prevState) => ({
                         ...prevState,
                         hand: parseHand(data.move.data.hand),
-                        turnState: data.nextTurnState,
+                        turnState: data.turnState,
                         melds: melds,
                     }))
                 } else if (data.status === 'error') {
@@ -334,8 +339,7 @@ const Game = () => {
                     ...prevState,
                     hand: parseHand(res.data.hand),
                     discard: res.data.move?.data.discard,
-                    turnState: res.data.nextTurnState,
-                    turnCounter: res.data.nextTurnCounter,
+                    turnState: res.data.turnState,
                 }))
             })
             .catch(() => {
