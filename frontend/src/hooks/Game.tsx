@@ -9,14 +9,15 @@ interface Game {
 const initialState: Game = {
     isTurn: false,
     lobbyGames: [
-
-    ],
+        
+    ]
 }
 
 const GameContext = createContext<{
     game: Game
     dispatch: React.Dispatch<Action>
 }>({ game: initialState, dispatch: () => null })
+
 
 export const GameProvider = ({ children }: any) => {
     const [game, dispatch] = useReducer(gameReducer, initialState)

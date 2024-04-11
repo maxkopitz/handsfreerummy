@@ -20,9 +20,10 @@ const JoinGame = () => {
                 const parsedGames: any[] = []
                 data.games.forEach((game: any) => {
                     if (game.gameState === 'lobby') {
+                        //const num_players = game.players.length()
                         parsedGames.push({
                             id: game.gameId,
-                            players: game.players += 1, // data.game.players.length().toString(),
+                            players: Object.keys(game.players).length, // data.game.players.length().toString(),
                             state: game.gameState,
                         })
                     }
@@ -63,8 +64,9 @@ const JoinGame = () => {
                         const classes = isLast
                             ? 'p-4'
                             : 'p-4 border-b border-30 border-black'
-                            
+                        
                         return (
+                            
                             <Game
                                 key={item.id}
                                 game={item}

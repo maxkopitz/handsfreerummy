@@ -12,6 +12,7 @@ const CreateGame = () => {
         await axiosInstance.post('/games').then((res) => {
             const { data } = res;
             const gameId = data.game.gameId;
+            //const players = 1;
             toast.success('Created game lobby!')
             navigate('/games/' + gameId);
 
