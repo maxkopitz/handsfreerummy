@@ -28,9 +28,7 @@ const PlayerHand = ({
     handleCardClick,
     handleSortCardClick,
     handleClickMeld,
-    melds,
 }: PlayerHandProps) => {
-    const cardClasses = classNames('flex flex-row justify-center items-center')
     const { profile } = useProfile()
 
     const handSize = hand.length
@@ -43,16 +41,13 @@ const PlayerHand = ({
     }
 
     return (
-        <div className="flex flex-col justify-center item-center w-max">
+        <div className="flex flex-col justify-center item-center w-max h-max">
             <div>
                 <h1 className="text-xl font-bold">
                     {profile.displayName} {playerId}: {handSize} cards{' '}
                     {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>
-
-            <div className="flex flex-row gap-8"></div>
-
             <div>
                 <Button
                     onClick={toggleSortBy}
@@ -80,17 +75,16 @@ const PlayerHand = ({
                         ></Button>
                     </>
                 )}
-                <div className={cardClasses}>
-                    {hand.map((card, index) => (
-                        <div key={index} className="m-2">
-                            <Card
-                                card={card}
-                                isActive={isTurn && turnState.stage === 'end'}
-                                onClick={() => handleCardClick({ card: card })}
-                            />
-                        </div>
-                    ))}
-                </div>
+            </div>
+            <div className='flex flex-row flex-wrap justify-center item-center gap-1'>
+                {hand.map((card, index) => (
+                    <Card
+                        key={index}
+                        card={card}
+                        isActive={isTurn && turnState.stage === 'end'}
+                        onClick={() => handleCardClick({ card: card })}
+                    />
+                ))}
             </div>
         </div>
     )
