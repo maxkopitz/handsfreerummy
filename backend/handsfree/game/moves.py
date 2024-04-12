@@ -266,6 +266,7 @@ def can_game_end(player: str, game: dict):
                                 'displayName': displayName,
                                 'isPlayer': key == player
                             },
+                            'points': game.get('points'),
                             'redirect': '/'
                         }
                     },

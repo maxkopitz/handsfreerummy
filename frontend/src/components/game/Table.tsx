@@ -38,7 +38,6 @@ const Table = ({
                 <div className="col-start-1 row-span-2">
                     <GameControls game={game} />
                 </div>
-
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand
