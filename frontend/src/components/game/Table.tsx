@@ -31,11 +31,10 @@ const Table = ({
     handleClickMeld,
     handleLayoff,
 }: TableProps) => {
-
     return (
         <Container>
             <div className="grid grid-cols-5 grid-rows-3 size-screen">
-                <div className="col-start-1 row-span-2">
+                <div className="col-start-1 row-span-1">
                     <GameControls game={game} />
                 </div>
                 {game.players.map((player, key) => (
@@ -59,10 +58,10 @@ const Table = ({
                             card={game.discard}
                             onClick={handleClickDiscard}
                             isActive={
-                                game.playerOrder === game.turnState.turnCounter &&
+                                game.playerOrder ===
+                                    game.turnState.turnCounter &&
                                 game.turnState.stage === 'start'
                             }
-
                         />
                     </div>
 
@@ -71,14 +70,26 @@ const Table = ({
                         <CardBack
                             onClick={handleClickPickup}
                             isActive={
-                                game.playerOrder === game.turnState.turnCounter &&
+                                game.playerOrder ===
+                                    game.turnState.turnCounter &&
                                 game.turnState.stage === 'start'
                             }
-
                         />
                     </div>
                 </div>
 
+                <Dictaphone
+                    playerId={game.playerOrder}
+                    hand={game.hand}
+                    isTurn={game.playerOrder === game.turnState.turnCounter}
+                    turnState={game.turnState}
+                    handleDiscard={handleDiscard}
+                    handleCardClick={handlePlayerCardClick}
+                    handleSortCardClick={handleSortCardClick}
+                    handleClickMeld={handleClickMeld}
+                    handlePickupPickup={handleClickPickup}
+                    handlePickupDiscard={handleClickDiscard}
+                />
                 <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
                     {game.melds.map((meld, index) => (
                         <Meld
@@ -87,7 +98,7 @@ const Table = ({
                             onClick={handleLayoff}
                             isActive={
                                 game.turnState.turnCounter ===
-                                game.playerOrder &&
+                                    game.playerOrder &&
                                 game.turnState.stage === 'end'
                             }
                         />

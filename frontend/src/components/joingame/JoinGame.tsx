@@ -19,7 +19,7 @@ const JoinGame = () => {
                     if (game.gameState === 'lobby') {
                         parsedGames.push({
                             id: game.gameId,
-                            players: 0,
+                            players: Object.keys(game.players).length,
                             state: game.gameState,
                         })
                     }

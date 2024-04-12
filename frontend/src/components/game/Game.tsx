@@ -130,7 +130,7 @@ const Game = () => {
                 }))
             } else if (data?.move.type === 'meld') {
                 toast.success('Created a meld!', {
-                    duration: 6000
+                    duration: 6000,
                 })
                 const melds = data.move.data.melds.map(
                     (meld: any, index: number) => {
@@ -145,7 +145,7 @@ const Game = () => {
                 }))
             } else if (data?.move.type === 'discard') {
                 toast.success(data?.message, {
-                    duration: 6000
+                    duration: 6000,
                 })
                 setGame((prevState) => ({
                     ...prevState,
