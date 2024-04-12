@@ -22,6 +22,7 @@ import {
     reduceCard,
     selectedCards,
 } from '../../lib/parsers'
+import { useModal } from '../../hooks/Modal'
 
 import { toast } from 'react-hot-toast'
 import Settings from '../settings/Settings'
@@ -47,6 +48,7 @@ const Game = () => {
             turnCounter: 1,
             stage: 'start',
         },
+        points: [],
     })
 
     useEffect(() => {
@@ -82,6 +84,7 @@ const Game = () => {
                         playerOrder: result.game?.playerOrder,
                         isOwner: result.game?.isOwner,
                         turnState: result.game?.turnState,
+                        points: result.game?.points
                     })
                 })
                 .catch(() => {
@@ -155,11 +158,15 @@ const Game = () => {
                 }))
             } else if (data?.move.type === 'roundEnd') {
                 toast.success('Round ended!')
+                setGame((prevState) => ({
+                    ...prevState,
+                    points: data.move.data.points
+                }))
                 dispatchModal({
                     type: 'showModal',
                     modal: {
                         title: 'Points',
-                        component: <Points myProp={data.move.data.points}/>,
+                        component: <Points points={ game.points }/>,
                     },
                 })
             }

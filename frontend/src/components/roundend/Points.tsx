@@ -5,8 +5,14 @@ import Card from '../game/Card'
 import { Suit, Value } from '../../Type'
 import { TupleType } from 'typescript'
 import { useModal } from '../../hooks/Modal'
+import { PointList } from '../../Type'
 
-const Points = (points) => {
+interface PointsProps {
+    points: PointList[]
+
+}
+
+const Points = (points :PointsProps) => {
     
     const tableHeaders = ['Player 1', 'Player 2']
     return (
@@ -27,13 +33,13 @@ const Points = (points) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {points.map((round : TupleType, index: number) => {
-                            const isLast = index === points.length - 1
+                        {points.points.map((round : PointList, index: number) => {
+                            const isLast = index === points.points.length - 1
                             const classes = isLast
                                 ? 'p-4'
                                 : 'p-4 border-b border-30 border-black'
                             return (
-                                <div>{ JSON.stringify(round) }</div>
+                                <div key={index}>{ round.points[0] }</div>
                             )
                         })}
                     </tbody>
