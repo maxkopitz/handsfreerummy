@@ -57,7 +57,7 @@ type Action =
     | { type: 'changeColor'; color: string }
     | { type: 'changeCardFontWeight'; size: number }
     | { type: 'setDisplayname'; value: string }
-    | { type: 'setVoiceControl'; value: boolean }
+    | { type: 'toggleVoiceControl' }
 
 const profileReducer = (state: any, action: Action) => {
     switch (action.type) {
@@ -78,10 +78,13 @@ const profileReducer = (state: any, action: Action) => {
             }
         case 'setDisplayname':
             return { ...state, displayName: action.value }
-        case 'setVoiceControl':
+        case 'toggleVoiceControl':
             return {
                 ...state,
-                settings: { ...state.settings, voiceControl: action.value },
+                settings: {
+                    ...state.settings,
+                    voiceControl: !state.settings.voiceControl,
+                },
             }
         default:
             return state

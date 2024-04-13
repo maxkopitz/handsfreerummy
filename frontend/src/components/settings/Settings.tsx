@@ -19,8 +19,8 @@ const Settings = () => {
         dispatch({ type: 'setDisplayname', value: event.target.value })
     }
 
-    const handleVoiceControl = (event: any) => {
-        dispatch({ type: 'setVoiceControl', value: event.target.value })
+    const handleVoiceControl = () => {
+        dispatch({ type: 'toggleVoiceControl' })
     }
 
     return (
@@ -99,9 +99,13 @@ const Settings = () => {
                 </div>
                 <div>
                     <Button
-                        text={'Voice Control On'}
+                        text={
+                            profile.settings.voiceControl
+                                ? 'Voice Control On'
+                                : 'Voice Control Off'
+                        }
                         onClick={() => {
-                            handleVoiceControl(true)
+                            handleVoiceControl()
                         }}
                     />
                 </div>

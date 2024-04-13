@@ -46,21 +46,21 @@ const Dictaphone = ({
                 },
             },
         ]
-        if (turnState.stage === 'start') {
+        if (turnState.stage === 'start' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'left'],
+                    command: ['discard', 'left', 'this card'],
                     callback: () => handlePickupDiscard(),
                 },
                 {
-                    command: ['pick up', 'right'],
+                    command: ['pick up', 'right', 'pickup'],
                     callback: () => handlePickupPickup(),
                 }
             )
-        } else if (turnState.stage === 'end') {
+        } else if (turnState.stage === 'end' && isTurn) {
             commands.push(
                 {
-                    command: ['discard'],
+                    command: ['discard', 'this card'],
                     callback: () => handleDiscard(),
                 },
                 {

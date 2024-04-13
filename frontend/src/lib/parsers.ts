@@ -38,6 +38,7 @@ export const parseVerbalNumberToNumber = (card_number: string) => {
         case 'three':
             return 3
         case '4':
+        case 'for':
         case 'four':
             return 4
         case '5':
