@@ -103,7 +103,7 @@ const Table = ({
                         handleDiscard={handleDiscard}
                         handleCardClick={handlePlayerCardClick}
                         handleSortCardClick={handleSortCardClick}
-                        handleClickMeld={handleClickMeld}
+                          handleClickMeld={handleClickMeld}
                     />
                 </div>
             </div>
