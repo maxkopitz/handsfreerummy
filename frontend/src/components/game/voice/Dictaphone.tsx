@@ -6,6 +6,19 @@ import { useEffect, useState } from 'react'
 import { CardType, TurnState } from '../../../Type'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
+// @ts-ignore
+import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
+import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
+
+const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
+    credentials: {
+        region: AZURE_TRANSCRIBE_REGION,
+        subscriptionKey: AZURE_TRANSCRIBE_SUBSCRIPTION_KEY,
+    }
+});
+
+// TODO Only apply if keys are defined
+SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
 
 interface DictaphoneProps {
     playerId?: number
@@ -19,6 +32,7 @@ interface DictaphoneProps {
     handlePickupDiscard: any
     hand: CardType[]
 }
+
 const Dictaphone = ({
     playerId,
     hand,
@@ -31,6 +45,7 @@ const Dictaphone = ({
     handlePickupPickup,
     handlePickupDiscard,
 }: DictaphoneProps) => {
+
     const getCommands = () => {
         const commands = [
             {
@@ -65,7 +80,7 @@ const Dictaphone = ({
                 },
                 {
                     command: ['lay off'],
-                    callback: () => {},
+                    callback: () => { },
                 },
                 {
                     command: ['meld'],
@@ -92,7 +107,6 @@ const Dictaphone = ({
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition({ commands: getCommands() })
 
-    const [message, setMessage] = useState('')
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
@@ -105,13 +119,12 @@ const Dictaphone = ({
                 text="Start"
                 onClick={(event: any) => {
                     event.preventDefault()
-                    SpeechRecognition.startListening({ continuous: true })
+                    SpeechRecognition.startListening({ continuous: true, language: 'en-us' })
                 }}
             />
             <Button onClick={SpeechRecognition.stopListening} text={'Stop'} />
             <Button onClick={resetTranscript} text={'Reset'} />
             <p>Transcript: {transcript}</p>
-            <p>Message: {message}</p>
         </div>
     )
 }
