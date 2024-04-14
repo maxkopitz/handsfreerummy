@@ -78,7 +78,7 @@ const PlayerHand = ({
             </div>
             <div className="flex flex-row flex-wrap justify-center item-center gap-1">
                 {hand.map((card, index) => (
-                    <div>
+                    <div key={index}>
                         <Card
                             key={index}
                             card={card}
