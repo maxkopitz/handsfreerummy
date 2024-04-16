@@ -2,7 +2,6 @@ import SpeechRecognition, {
     useSpeechRecognition,
 } from 'react-speech-recognition'
 import Button from '../../ui/Button'
-import { useEffect, useState } from 'react'
 import { CardType, TurnState } from '../../../Type'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
@@ -10,15 +9,18 @@ import { toast } from 'react-hot-toast'
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
 import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
 
-const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
-    credentials: {
-        region: AZURE_TRANSCRIBE_REGION,
-        subscriptionKey: AZURE_TRANSCRIBE_SUBSCRIPTION_KEY,
-    }
-});
 
-// TODO Only apply if keys are defined
-SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
+
+
+if (AZURE_TRANSCRIBE_REGION && AZURE_TRANSCRIBE_SUBSCRIPTION_KEY) {
+    const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
+        credentials: {
+            region: AZURE_TRANSCRIBE_REGION,
+            subscriptionKey: AZURE_TRANSCRIBE_SUBSCRIPTION_KEY,
+        }
+    });
+    SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
+}
 
 interface DictaphoneProps {
     playerId?: number
@@ -64,18 +66,18 @@ const Dictaphone = ({
         if (turnState.stage === 'start' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'left', 'this card'],
+                    command: ['discard', 'left', 'this card', 'This card.'],
                     callback: () => handlePickupDiscard(),
                 },
                 {
-                    command: ['pick up', 'right', 'pickup'],
+                    command: ['pick up', 'right', 'pickup', 'Pick up.'],
                     callback: () => handlePickupPickup(),
                 }
             )
         } else if (turnState.stage === 'end' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'this card'],
+                    command: ['discard', 'left', 'this card', 'This card.'],
                     callback: () => handleDiscard(),
                 },
                 {
