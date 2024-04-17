@@ -19,7 +19,7 @@ const Lobby = ({ game }: LobbyProps) => {
     const { dispatch } = useModal()
     
 
-    const NamesList = () => {
+/*     const NamesList = () => {
 
         const [names, setNames] = useState<string[]>([])
 
@@ -51,7 +51,7 @@ const Lobby = ({ game }: LobbyProps) => {
             </ul>
           </div>
         );
-    }
+    } */
 
     const handleLeaveGame = () => {
         const data = JSON.stringify({
@@ -111,12 +111,11 @@ const Lobby = ({ game }: LobbyProps) => {
 
                 <ul>
                 {game.players.map((item, key) => (
-                    <li key={key}>{JSON.stringify(item.displayName)}</li>
+                    <li key={key}>{item.displayName}</li>
                     ))}
                 </ul>
 
                 
-                <NamesList />
 
                 {!game.isOwner && (
                     <Button

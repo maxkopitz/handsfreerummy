@@ -98,16 +98,19 @@ def join_game(game_id, display_name):
             "displayName": display_name
         }
     else:
+        # game["players"][uuid] = utils.player_join_builder(uuid, game['players'])
         game["players"][uuid]["sid"] = session.get("sid", None)
         game["players"][uuid]["displayName"] = display_name
 
     for player in game['players']:
         data = {
             "action": "player-joined",
-            "data": {
+            "data": { 
+                # "players": utils.player_join_builder(uuid, game['players']),
+                # list(game.get('players'))
                 "player": str(session.get('uuid')),
                 "displayName": display_name,
-                "players": list(game.get('players'))
+                "players": utils.player_join_builder(player, game['players'])
             }
         }
         if game['players'][player]['sid'] is not None:
@@ -125,7 +128,7 @@ def join_game(game_id, display_name):
                 "hand": game.get("players").get(uuid).get('hand'),
                 "discard": {},
                 "gameState": game.get("gameState"),
-                "players": list(game.get('players')),  # Changed if in-game
+                "players": utils.player_join_builder(uuid, game['players']),  # Changed if in-game
                 "playerOrder": game["players"].get(uuid).get('playerOrder'),
                 "turnState": game.get('turnState'),
                 "isOwner": game.get('owner') == uuid,
