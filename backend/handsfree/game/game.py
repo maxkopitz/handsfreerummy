@@ -159,10 +159,20 @@ def leave_game(game_id):
     return game
 
 
-def start_game(game_id):
+def start_game(game_id, restart = False):
     """Start Rummy Game."""
     game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
+
+    if restart:
+        deck = []
+        for suit in suits:
+            for value in values:
+                deck.append({"value": value, "suit": suit})
+        shuffle(deck)
+        game['deck'] = deck
+
+        
 
     if len(game.get('players')) < 2:
         result = {
@@ -250,7 +260,7 @@ def make_move(game_key: str, player: str, move: str, data):
         if result.get('status' == 'error'):
             return result
 
-    can_game_end, game = moves.can_game_end(player, game)
+    can_round_end, game = moves.can_round_end(player, game)
+    can_game_end, winner = moves.can_game_end(game)
     redis_client.json().set(game_key, Path.root_path(), game)
-
     return result

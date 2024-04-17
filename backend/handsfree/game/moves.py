@@ -240,16 +240,33 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
             socketio.emit('played-move', message, to=sid)
     return result, game
 
+def can_game_end(game: dict):
+    points = {}
+    for round in game.get('points'):
+        if game.get('points').get(round).get('player') not in points:
+            points[game.get('points').get(round).get('player')] = game.get('points').get(round).get('points')
+        else:
+            points[game.get('points').get(round).get('player')] += game.get('points').get(round).get('points')
+    for key in points:
+        if points[key] > 200:
+            return True, key
+        
+    return False, None
+        
+            
 
-def can_game_end(player: str, game: dict):
+def can_round_end(player: str, game: dict):
     """Check if a game can end."""
     result = False
     if len(game.get('players').get(player).get('hand')) == 0:
         result = True
-        game['points'].append((player, utils.winner_points(game.get("players"), player, game)))
+        game['points'].append({
+            'player': player,
+            'points': utils.winner_points(game.get("players"), player, game)
+        })
         for key in game.get('players'):
             sid = game.get('players').get(key).get('sid')
-            game['gameState'] = 'ended'
+            
             
 
             if sid is not None:
@@ -272,4 +289,7 @@ def can_game_end(player: str, game: dict):
                     },
                 }
                 socketio.emit('played-move', message, to=sid)
+        gameEnd, winner = can_game_end(game)
+        if not gameEnd:
+            game = utils.manual_restart_game(game)
     return result, game

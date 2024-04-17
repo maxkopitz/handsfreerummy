@@ -6,14 +6,16 @@ import { Suit, Value } from '../../Type'
 import { TupleType } from 'typescript'
 import { useModal } from '../../hooks/Modal'
 import { PointList } from '../../Type'
+import Row from './PointMatrix'
+import Game from '../joingame/Game'
 
 interface PointsProps {
     points: PointList[]
 
 }
 
-const Points = (points :PointsProps) => {
-    
+const Points = ({points} :PointsProps) => {
+    console.log(points)
     const tableHeaders = ['Player 1', 'Player 2']
     return (
         <Container>
@@ -33,13 +35,18 @@ const Points = (points :PointsProps) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {points.points.map((round : PointList, index: number) => {
-                            const isLast = index === points.points.length - 1
+                        {points.map((round: PointList, index) => {
+                            console.log(round.points)
+                            const isLast = index === points.length - 1
                             const classes = isLast
                                 ? 'p-4'
                                 : 'p-4 border-b border-30 border-black'
                             return (
-                                <div key={index}>{ round.points[0] }</div>
+                                <Row 
+                                    key={index}
+                                    player={round.player}
+                                    pointNumber={round.points}
+                                />
                             )
                         })}
                     </tbody>

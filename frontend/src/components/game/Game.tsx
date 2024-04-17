@@ -160,13 +160,14 @@ const Game = () => {
                 toast.success('Round ended!')
                 setGame((prevState) => ({
                     ...prevState,
-                    points: data.move.data.points
+                    points: data.move.data.points,
                 }))
+                console.log(game)
                 dispatchModal({
                     type: 'showModal',
                     modal: {
                         title: 'Points',
-                        component: <Points points={ game.points }/>,
+                        component: <Points points={ data.move.data.points }/>,
                     },
                 })
             }

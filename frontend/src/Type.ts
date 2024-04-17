@@ -50,7 +50,8 @@ export interface RummyPlayer {
 }
 
 export interface PointList {
-    points: Array<number>
+    player: string
+    points: number
 }
 
 export enum GameTurn {
