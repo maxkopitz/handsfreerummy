@@ -38,6 +38,7 @@ const GameControls = ({ game }: GameControlsProp) => {
                             modal: {
                                 title: 'Settings',
                                 component: <Settings />,
+                                isSaveButton: true,
                             },
                         })
                     }

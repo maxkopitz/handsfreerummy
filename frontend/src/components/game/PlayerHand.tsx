@@ -44,7 +44,7 @@ const PlayerHand = ({
         <div className="flex flex-col justify-center item-center w-max h-max">
             <div>
                 <h1 className="text-xl font-bold">
-                    {profile.displayName} {playerId}: {handSize} cards{' '}
+                    #{playerId}: {profile.displayName} has {handSize} cards{' '}
                     {isTurn && <span className="text-amber-400">★</span>}
                 </h1>
             </div>
