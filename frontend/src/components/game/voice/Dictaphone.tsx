@@ -9,9 +9,6 @@ import { toast } from 'react-hot-toast'
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
 import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
 
-
-
-
 if (AZURE_TRANSCRIBE_REGION && AZURE_TRANSCRIBE_SUBSCRIPTION_KEY) {
     const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
         credentials: {
@@ -51,8 +48,10 @@ const Dictaphone = ({
     const getCommands = () => {
         const commands = [
             {
-                command: ['sort'],
-                callback: () => handleSortCardClick(),
+                command: ['sort', 'Sort.'],
+                callback: () => {
+                    handleSortCardClick()
+                },
             },
             {
                 command: 'select :card',
