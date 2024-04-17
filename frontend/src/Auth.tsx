@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "./api/axiosConfig";
 import { socket } from "./api/socket";
@@ -12,13 +13,14 @@ const Auth = ({ children }: any) => {
             if (data?.redirect) {
                 navigate(data?.redirect);
             }
-            console.log(data)
+        }).catch(() => {
+            toast.error('An error occured, please refresh.')
         });
     }, [navigate])
 
     useEffect(() => {
         socket.on('connect', () => {
-            console.log('Connected')
+            console.log('Socket Connected')
         });
         socket.on('disconnect', () => {
             console.log('Disconnect')

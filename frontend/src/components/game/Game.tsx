@@ -82,6 +82,7 @@ const Game = () => {
                     })
                 })
                 .catch(() => {
+                    toast.error('An error occured joining game ' + gameId)
                     navigate('/')
                 })
         }
@@ -174,7 +175,6 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
                 setGame((prevState) => ({
                     ...prevState,
                     hand: [
@@ -185,7 +185,7 @@ const Game = () => {
                 }))
             })
             .catch(() => {
-                console.log('An error occured')
+                toast.error('An error occured picking up.')
             })
     }
 
@@ -210,7 +210,7 @@ const Game = () => {
                 }))
             })
             .catch(() => {
-                console.log('An error occured')
+                toast.error('An error occured picking up.')
             })
     }
 
@@ -301,7 +301,7 @@ const Game = () => {
                     toast.error('An error occured while laying off.')
                 }
             })
-            .catch((error: any) => {
+            .catch(() => {
                 toast.error('An error occured while laying off.')
             })
     }
@@ -420,6 +420,7 @@ const Game = () => {
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
     }
+
     if (game?.gameState === 'in-game' || game?.gameState === 'roundEnd') {
         return (
             <Table
