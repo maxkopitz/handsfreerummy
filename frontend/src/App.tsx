@@ -51,7 +51,7 @@ const Layout = () => {
                     navigate(res.data.redirect)
                 }
                 setIsLoading(false)
-            }).catch((err: AxiosError) => {
+            }).catch(() => {
                 toast.error('An error occured registering.')
                 setIsLoading(true)
             })

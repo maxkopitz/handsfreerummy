@@ -2,10 +2,25 @@ import SpeechRecognition, {
     useSpeechRecognition,
 } from 'react-speech-recognition'
 import Button from '../../ui/Button'
-import { useEffect, useState } from 'react'
 import { CardType, TurnState } from '../../../Type'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
+// @ts-ignore
+import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
+import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
+
+
+
+
+if (AZURE_TRANSCRIBE_REGION && AZURE_TRANSCRIBE_SUBSCRIPTION_KEY) {
+    const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
+        credentials: {
+            region: AZURE_TRANSCRIBE_REGION,
+            subscriptionKey: AZURE_TRANSCRIBE_SUBSCRIPTION_KEY,
+        }
+    });
+    SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
+}
 
 interface DictaphoneProps {
     playerId?: number
@@ -19,6 +34,7 @@ interface DictaphoneProps {
     handlePickupDiscard: any
     hand: CardType[]
 }
+
 const Dictaphone = ({
     playerId,
     hand,
@@ -31,6 +47,7 @@ const Dictaphone = ({
     handlePickupPickup,
     handlePickupDiscard,
 }: DictaphoneProps) => {
+
     const getCommands = () => {
         const commands = [
             {
@@ -46,26 +63,26 @@ const Dictaphone = ({
                 },
             },
         ]
-        if (turnState.stage === 'start') {
+        if (turnState.stage === 'start' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'left'],
+                    command: ['discard', 'left', 'this card', 'This card.'],
                     callback: () => handlePickupDiscard(),
                 },
                 {
-                    command: ['pick up', 'right'],
+                    command: ['pick up', 'right', 'pickup', 'Pick up.'],
                     callback: () => handlePickupPickup(),
                 }
             )
-        } else if (turnState.stage === 'end') {
+        } else if (turnState.stage === 'end' && isTurn) {
             commands.push(
                 {
-                    command: ['discard'],
+                    command: ['discard', 'left', 'this card', 'This card.'],
                     callback: () => handleDiscard(),
                 },
                 {
                     command: ['lay off'],
-                    callback: () => {},
+                    callback: () => { },
                 },
                 {
                     command: ['meld'],
@@ -92,7 +109,6 @@ const Dictaphone = ({
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition({ commands: getCommands() })
 
-    const [message, setMessage] = useState('')
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
@@ -105,13 +121,12 @@ const Dictaphone = ({
                 text="Start"
                 onClick={(event: any) => {
                     event.preventDefault()
-                    SpeechRecognition.startListening({ continuous: true })
+                    SpeechRecognition.startListening({ continuous: true, language: 'en-us' })
                 }}
             />
             <Button onClick={SpeechRecognition.stopListening} text={'Stop'} />
             <Button onClick={resetTranscript} text={'Reset'} />
             <p>Transcript: {transcript}</p>
-            <p>Message: {message}</p>
         </div>
     )
 }

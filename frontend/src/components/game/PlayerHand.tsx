@@ -76,14 +76,17 @@ const PlayerHand = ({
                     </>
                 )}
             </div>
-            <div className='flex flex-row flex-wrap justify-center item-center gap-1'>
+            <div className="flex flex-row flex-wrap justify-center item-center gap-1">
                 {hand.map((card, index) => (
-                    <Card
-                        key={index}
-                        card={card}
-                        isActive={isTurn && turnState.stage === 'end'}
-                        onClick={() => handleCardClick({ card: card })}
-                    />
+                    <div key={index}>
+                        <Card
+                            key={index}
+                            card={card}
+                            isActive={isTurn && turnState.stage === 'end'}
+                            onClick={() => handleCardClick({ card: card })}
+                        />
+                        {profile.settings.voiceControl && <h2>{index + 1}</h2>}
+                    </div>
                 ))}
             </div>
         </div>
