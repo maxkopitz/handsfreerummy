@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "react-speech-recognition": "^3.10.0",
-    "web-speech-cognitive-services": "^7.1.3"
-  }
-}
