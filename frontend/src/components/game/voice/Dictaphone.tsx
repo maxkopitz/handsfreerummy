@@ -3,14 +3,12 @@ import SpeechRecognition, {
 } from 'react-speech-recognition'
 import Button from '../../ui/Button'
 import { CardType, TurnState } from '../../../Type'
+import { useEffect } from 'react'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
 // @ts-ignore
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
 import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
-
-
-
 
 if (AZURE_TRANSCRIBE_REGION && AZURE_TRANSCRIBE_SUBSCRIPTION_KEY) {
     const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
@@ -110,6 +108,17 @@ const Dictaphone = ({
     } = useSpeechRecognition({ commands: getCommands() })
 
 
+    useEffect(() => {
+        if (isTurn) {
+            SpeechRecognition.startListening({ continuous: true, language: 'en-us' });
+        } else {
+            SpeechRecognition.stopListening();
+        }
+        return () => {
+            SpeechRecognition.stopListening();
+        };
+    }, [isTurn]);
+
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
     }
@@ -132,3 +141,4 @@ const Dictaphone = ({
 }
 
 export default Dictaphone
+
