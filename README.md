@@ -32,6 +32,22 @@ Clone the repository
 ```sh
 git clone https://github.com/maxkopitz/handsfreerummy
 ```
+
+## Setup `.env`
+1. Copy `.env.example`
+```sh
+cp ./.env.example .env
+```
+
+2. Get a key from [azure](https://portal.azure.com/#home) Speach Services
+3. Populate `.env` with key
+
+```
+NODE_ENV=development
+AZURE_TRANSCRIBE_SUBSCRIPTION_KEY=xxxxxxx
+AZURE_TRANSCRIBE_REGION=useast
+```
+
 ## Start the flask API via ``Docker``
 1. Build the backend & frontend containers, this step is only needed the first time installing and when package.json or requirements.txt changes.
 ```sh

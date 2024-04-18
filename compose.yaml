@@ -39,12 +39,17 @@ services:
       - '/usr/src/app/node_modules'
     ports:
       - 3000:3000
+    env_file:
+      - .env
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_SERVICE_URL=http://localhost:3000
+      - REACT_APP_AZURE_TRANSCRIBE_SUBSCRIPTION_KEY=${AZURE_TRANSCRIBE_SUBSCRIPTION_KEY}
+      - REACT_APP_AZURE_TRANSCRIBE_REGION=${AZURE_TRANSCRIBE_REGION}
     depends_on:
       - api
+
     networks:
       proxy:
 networks:
