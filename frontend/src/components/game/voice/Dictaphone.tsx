@@ -8,9 +8,7 @@ import { toast } from 'react-hot-toast'
 // @ts-ignore
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
 import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
-
-
-
+import { useMemo } from 'react'
 
 if (AZURE_TRANSCRIBE_REGION && AZURE_TRANSCRIBE_SUBSCRIPTION_KEY) {
     const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
@@ -27,11 +25,12 @@ interface DictaphoneProps {
     isTurn: boolean
     turnState: TurnState
     handleDiscard: any
-    handleCardClick: any
-    handleSortCardClick: any
-    handleClickMeld: any
+    handleSelectCard: any
+    handleSortCards: any
+    handleCreateMeld: any
     handlePickupPickup: any
     handlePickupDiscard: any
+    handleLayoff: any
     hand: CardType[]
 }
 
@@ -41,23 +40,24 @@ const Dictaphone = ({
     isTurn,
     turnState,
     handleDiscard,
-    handleCardClick,
-    handleSortCardClick,
-    handleClickMeld,
+    handleSelectCard,
+    handleSortCards,
+    handleCreateMeld,
     handlePickupPickup,
     handlePickupDiscard,
+    handleLayoff
 }: DictaphoneProps) => {
 
-    const getCommands = () => {
+    const commands = useMemo(() => {
         const commands = [
             {
-                command: ['sort'],
-                callback: () => handleSortCardClick(),
+                command: ['sort', 'Sort.'],
+                callback: () => handleSortCards(),
             },
             {
                 command: 'select :card',
                 callback: (card: string) => {
-                    handleCardClick({
+                    handleSelectCard({
                         card: hand[parseVerbalNumberToNumber(card) - 1],
                     })
                 },
@@ -82,7 +82,13 @@ const Dictaphone = ({
                 },
                 {
                     command: ['lay off'],
-                    callback: () => { },
+                    callback: () => {
+                        if (selectedCards(hand).length !== 1) {
+                            toast.error('Please select 1 card for layoff.')
+                            return
+                        }
+                        handleLayoff()
+                    },
                 },
                 {
                     command: ['meld'],
@@ -93,22 +99,21 @@ const Dictaphone = ({
                             )
                             return
                         }
-                        handleClickMeld()
+                        handleCreateMeld()
                     },
                 }
             )
         }
 
         return commands
-    }
+    }, [turnState.stage])
 
     const {
         transcript,
         listening,
         resetTranscript,
         browserSupportsSpeechRecognition,
-    } = useSpeechRecognition({ commands: getCommands() })
-
+    } = useSpeechRecognition({ commands })
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
@@ -124,6 +129,7 @@ const Dictaphone = ({
                     SpeechRecognition.startListening({ continuous: true, language: 'en-us' })
                 }}
             />
+
             <Button onClick={SpeechRecognition.stopListening} text={'Stop'} />
             <Button onClick={resetTranscript} text={'Reset'} />
             <p>Transcript: {transcript}</p>

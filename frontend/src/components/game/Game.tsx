@@ -260,7 +260,6 @@ const Game = () => {
 
     const handleLayoff = (meld: Meld) => {
         if (selectedCards(game.hand).length !== 1) {
-            console.log('no card')
             return
         }
 
