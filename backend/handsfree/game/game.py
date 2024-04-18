@@ -168,12 +168,22 @@ def start_game(game_id, restart = False):
     game = redis_client.json().get("game:%d" % game_id)
 
     if restart:
-        deck = []
-        for suit in suits:
-            for value in values:
-                deck.append({"value": value, "suit": suit})
-        shuffle(deck)
-        game['deck'] = deck
+        for player in game['players']:
+            data = {
+                "action": "started",
+                "game": {
+                    "hand": game["players"][player].get("hand"),
+                    "discard": {},
+                    "turnCounter": 1,
+                    "playerOrder": game["players"][player]["playerOrder"],
+                    "players": utils.player_response_builder(player, game['players']),
+                    "turnState": game["turnState"],
+                }
+            }
+            if game['players'][player]['sid'] is not None:
+                socketio.emit('game-started', data,
+                            to=game['players'][player]['sid'])
+        return game
 
         
 
@@ -221,7 +231,6 @@ def start_game(game_id, restart = False):
 
     return game
 
-
 def make_move(game_key: str, player: str, move: str, data):
     """Make Rummy Move."""
     game = redis_client.json().get(game_key)
@@ -265,5 +274,7 @@ def make_move(game_key: str, player: str, move: str, data):
 
     can_round_end, game = moves.can_round_end(player, game)
     can_game_end, winner = moves.can_game_end(game)
+    if can_game_end:
+        start_game(game.get('gameID', True))
     redis_client.json().set(game_key, Path.root_path(), game)
     return result

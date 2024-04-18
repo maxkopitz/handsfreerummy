@@ -242,11 +242,13 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
 
 def can_game_end(game: dict):
     points = {}
-    for round in game.get('points'):
-        if game.get('points').get(round).get('player') not in points:
-            points[game.get('points').get(round).get('player')] = game.get('points').get(round).get('points')
+    pointList = game.get('points', [])
+    for round in pointList:
+        print(round)
+        if round['player'] in points:
+            points[round['player']] += round['points']
         else:
-            points[game.get('points').get(round).get('player')] += game.get('points').get(round).get('points')
+            points[round['player']] = round['points']
     for key in points:
         if points[key] > 200:
             return True, key

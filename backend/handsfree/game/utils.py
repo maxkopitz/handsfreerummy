@@ -107,21 +107,19 @@ def manual_restart_game(game):
             deck.append({"value": value, "suit": suit})
 
     shuffle(deck)
-    
-    game = {
-        "players": {},
-    }
     game["deck"] = deck
     game["melds"] = []
-    game['discardPile'] = []
-    game['turnState'] = {
+    game["discardPile"] = []
+    game["turnState"] = {
         "turnCounter": 1,
         "stage": "start"
     }
     handSize = 7 if len(game.get('players')) > 2 else 13
-    game["pickupCard"] = game['deck'].pop(0)
+    game["pickupCard"] = game["deck"].pop(0)
     for player in game['players']:
+        game['players'][player]['hand'] = []
         for i in range(handSize):
             game["players"][player]["hand"].append(game["deck"][0])
             game["deck"].pop(0)
+    return game
     
