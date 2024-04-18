@@ -3,6 +3,7 @@ import { useProfile } from '../../hooks/Profile'
 import Button from '../ui/Button'
 import Card from '../game/Card'
 import { Suit, Value } from '../../Type'
+import { useState } from 'react'
 
 const Settings = () => {
     const { profile, dispatch } = useProfile()
@@ -15,8 +16,19 @@ const Settings = () => {
         dispatch({ type: 'changeCardFontWeight', size })
     }
 
+    const [inputValue, setInputValue] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const MAX_CHARACTERS = 15; // Define your maximum character limit
+
     const handleNameChange = (event: any) => {
-        dispatch({ type: 'setDisplayname', value: event.target.value })
+        const value = event.target.value;
+        if (value.length <= MAX_CHARACTERS) {
+            setInputValue(value);
+            setErrorMessage('');
+            dispatch({ type: 'setDisplayname', value: event.target.value })
+        } else {
+            setErrorMessage(`Maximum character limit reached (${MAX_CHARACTERS} characters)`);
+        } 
     }
 
     const handleVoiceControl = () => {
@@ -45,6 +57,8 @@ const Settings = () => {
                             value={profile.displayName}
                             onChange={handleNameChange}
                         />
+                        {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
+                        <p>Characters remaining: {MAX_CHARACTERS - inputValue.length}</p>
                     </div>
                     <h2 className="text-xl">Change Card Size</h2>
                     <div className="flex flex-row">
