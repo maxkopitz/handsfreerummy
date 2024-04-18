@@ -4,7 +4,7 @@ import Modal from '../components/ui/Modal';
 interface ModalProperties {
     title: string
     component: React.ReactNode;
-    isSaveButton?: boolean; // optional flag to determine to dsiplay save button or close button 
+    isSaveButton?: boolean; // optional flag to determine to display save button or close button 
 }
 
 interface ModalState {
