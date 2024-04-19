@@ -57,8 +57,12 @@ const Dictaphone = ({
             {
                 command: 'select :card',
                 callback: (card: string) => {
+                    const parsedNumber : number = parseVerbalNumberToNumber(card)
+                    if (parsedNumber === -1) {
+                        toast.error('An error occured when selecting a card, please select the card again.')
+                    }
                     handleCardClick({
-                        card: hand[parseVerbalNumberToNumber(card) - 1],
+                        card: hand[parsedNumber - 1],
                     })
                 },
             },
@@ -85,7 +89,7 @@ const Dictaphone = ({
                     callback: () => { },
                 },
                 {
-                    command: ['meld'],
+                    command: ['meld', 'melts'],
                     callback: () => {
                         if (selectedCards(hand).length < 3) {
                             toast.error(

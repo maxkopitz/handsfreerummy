@@ -86,7 +86,7 @@ const PlayerHand = ({
                             onClick={() => handleCardClick({ card: card })}
                         />
                         {profile.settings.voiceControl && <h2>{index + 1}</h2>}
-                    </div>
+                    </div >
                 ))}
             </div>
         </div>
