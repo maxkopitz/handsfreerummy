@@ -105,7 +105,7 @@ def join_game(game_id, display_name):
     for player in game['players']:
         data = {
             "action": "player-joined",
-            "data": { 
+            "data": {
                 # "players": utils.player_join_builder(uuid, game['players']),
                 # list(game.get('players'))
                 "player": str(session.get('uuid')),
