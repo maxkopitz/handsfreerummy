@@ -3,12 +3,15 @@ import SpeechRecognition, {
 } from 'react-speech-recognition'
 import Button from '../../ui/Button'
 import { CardType, TurnState } from '../../../Type'
+import { useEffect } from 'react'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
 // @ts-ignore
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
 import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
+
 import { useMemo } from 'react'
+
 
 if (AZURE_TRANSCRIBE_REGION && AZURE_TRANSCRIBE_SUBSCRIPTION_KEY) {
     const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
@@ -57,8 +60,13 @@ const Dictaphone = ({
             {
                 command: 'select :card',
                 callback: (card: string) => {
-                    handleSelectCard({
-                        card: hand[parseVerbalNumberToNumber(card) - 1],
+                    const parsedNumber : number = parseVerbalNumberToNumber(card)
+                    if (parsedNumber === -1) {
+                        toast.error('An error occured when selecting a card, please select the card again.')
+                        return
+                    }
+                    handleCardClick({
+                        card: hand[parsedNumber - 1],
                     })
                 },
             },
@@ -91,7 +99,7 @@ const Dictaphone = ({
                     },
                 },
                 {
-                    command: ['meld'],
+                    command: ['meld', 'melts'],
                     callback: () => {
                         if (selectedCards(hand).length < 3) {
                             toast.error(
@@ -114,6 +122,17 @@ const Dictaphone = ({
         resetTranscript,
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition({ commands })
+
+    useEffect(() => {
+        if (isTurn) {
+            SpeechRecognition.startListening({ continuous: true, language: 'en-us' });
+        } else {
+            SpeechRecognition.stopListening();
+        }
+        return () => {
+            SpeechRecognition.stopListening();
+        };
+    }, [isTurn]);
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
@@ -138,3 +157,4 @@ const Dictaphone = ({
 }
 
 export default Dictaphone
+

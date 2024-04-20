@@ -96,7 +96,7 @@ const Game = () => {
                     ...prevState,
                     players: data.data.players,
                 }))
-                toast(data.data.displayName + ' has joined.')
+                toast.success(data.data.displayName + ' has joined.')
             }
         })
 
@@ -117,9 +117,14 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
-            console.log(data)
+            toast.success((
+                <span>
+                    <b>{data?.message.title}</b> {data?.message.body}
+                </span>),
+                {
+                    duration: 6000
+                })
             if (data?.move.type === 'pickup') {
-                toast.success('Picked up a card!')
                 setGame((prevState) => ({
                     ...prevState,
                     turnState: data.turnState,
@@ -127,9 +132,6 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'meld') {
-                toast.success('Created a meld!', {
-                    duration: 6000,
-                })
                 const melds = data.move.data.melds.map(
                     (meld: any, index: number) => {
                         return { meldId: index, cards: meld }
@@ -142,9 +144,6 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'discard') {
-                toast.success(data?.message, {
-                    duration: 6000,
-                })
                 setGame((prevState) => ({
                     ...prevState,
                     discard: parseCard(data.move.data.discard),
@@ -152,7 +151,6 @@ const Game = () => {
                     turnState: data.turnState,
                 }))
             } else if (data?.move.type === 'roundEnd') {
-                toast.success('Game ended!')
                 navigate('/')
             }
         })
