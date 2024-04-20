@@ -92,6 +92,3 @@ def is_valid_meld(meld):
         return True
     else:
         return False
-
-def deck_values_to_numbers(deck):
-    """Convert deck to numbers."""

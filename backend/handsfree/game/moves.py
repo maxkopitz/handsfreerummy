@@ -1,7 +1,6 @@
 """Game Move."""
 from handsfree import socketio
 import handsfree.game.utils as utils
-import sys
 
 
 def drawPickup(player: str, move: str, game: dict):
@@ -24,6 +23,9 @@ def drawPickup(player: str, move: str, game: dict):
     game['turnState']['stage'] = 'end'
 
     result['turnState'] = game['turnState']
+
+    player_name = game.get('players').get(player).get('displayName')
+
     for key in game.get('players'):
         sid = game.get('players').get(key).get('sid')
 
@@ -35,16 +37,19 @@ def drawPickup(player: str, move: str, game: dict):
                             "players":
                                 utils.player_response_builder(
                                     key,
-                                    game.get('players')),
+                                    game.get("players")),
                             "discard": {}
-
                     }
                 },
-                'turnState': game['turnState']
+                "turnState": game["turnState"],
+                "message": {
+                    "title": player_name,
+                    "body": "drew from the pickup pile."
+                }
             }
 
-            if len(game.get('discardPile')) > 0:
-                message['move']['data']['discard'] = game.get('discardPile')[
+            if len(game.get("discardPile")) > 0:
+                message["move"]["data"]['discard'] = game.get('discardPile')[
                     0]
             socketio.emit('played-move', message, to=sid)
     return result, game
@@ -74,6 +79,8 @@ def drawDiscard(player, move, game):
         game['turnState']['stage'] = 'end'
         result['turnState'] = game['turnState']
 
+        player_name = game.get('players').get(player).get('displayName')
+
         for key in game.get('players'):
             sid = game.get('players').get(key).get('sid')
 
@@ -89,7 +96,11 @@ def drawDiscard(player, move, game):
                             "discard": result['move']['data']['discard']
                         }
                     },
-                    "turnState": game['turnState']
+                    "turnState": game['turnState'],
+                    "message": {
+                        "title": player_name,
+                        "body": "drew from the discard pile."
+                    }
                 }
                 socketio.emit('played-move', message, to=sid)
     return result, game
@@ -138,7 +149,10 @@ def make_meld(meld: list, move: str, player: str, game):
                     }
                 },
                 "turnState": game['turnState'],
-                "message": f"{player_name} Played a meld "
+                "message": {
+                    "title": player_name,
+                    "body": "played a meld."
+                }
             }
             socketio.emit('played-move', message, to=sid)
 
@@ -186,7 +200,10 @@ def layoff(card: dict, player: str, meldId: int, move: str, game):
                     }
                 },
                 "turnState": game['turnState'],
-                "message": f"{player_name} Played a meld "
+                "message": {
+                    "title": player_name,
+                    "body": "layed off a meld."
+                }
             }
             socketio.emit('played-move', message, to=sid)
     return result, game
@@ -235,7 +252,10 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
                     }
                 },
                 'turnState': game['turnState'],
-                "message": f"{player_name} discarded a card."
+                "message": {
+                    "title": player_name,
+                    "body": "discarded a card. It is a new players turn."
+                }
             }
             socketio.emit('played-move', message, to=sid)
     return result, game
