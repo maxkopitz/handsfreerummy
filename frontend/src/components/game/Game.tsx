@@ -303,7 +303,7 @@ const Game = () => {
             })
     }
 
-    const handleDiscard = () => {
+    const handleDiscard = (): void => {
         if (selectedCards(game.hand).length !== 1) {
             return
         }
@@ -335,7 +335,7 @@ const Game = () => {
             })
     }
 
-    const handleCardClick = ({ card }: any) => {
+    const handleCardClick = (card: CardType): void => {
         setGame((prevState) => ({
             ...prevState,
             hand: prevState.hand.map((c) => {
@@ -380,7 +380,7 @@ const Game = () => {
         }))
     }
 
-    const handleSortCardClick = () => {
+    const handleSortCardClick = () : void => {
         setGame((prevState) => ({
             ...prevState,
             hand: prevState.hand.sort((a, b) => {

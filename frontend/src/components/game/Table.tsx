@@ -13,7 +13,7 @@ interface TableProps {
     game: RummyGame
     handleClickPickup: () => void
     handleClickDiscard: () => void
-    handleDiscard: (card: CardType) => void
+    handleDiscard: () => void
     handlePlayerCardClick: (card: CardType) => void
     handleSortCardClick: any
     handleClickMeld: (meld: MeldType) => void

@@ -27,8 +27,8 @@ interface DictaphoneProps {
     playerId?: number
     isTurn: boolean
     turnState: TurnState
-    handleDiscard: any
-    handleSelectCard: any
+    handleDiscard: () => void
+    handleSelectCard: (card: CardType) => void
     handleSortCards: any
     handleCreateMeld: any
     handlePickupPickup: any
@@ -60,21 +60,19 @@ const Dictaphone = ({
             {
                 command: 'select :card',
                 callback: (card: string) => {
-                    const parsedNumber : number = parseVerbalNumberToNumber(card)
+                    const parsedNumber: number = parseVerbalNumberToNumber(card)
                     if (parsedNumber === -1) {
                         toast.error('An error occured when selecting a card, please select the card again.')
                         return
                     }
-                    handleCardClick({
-                        card: hand[parsedNumber - 1],
-                    })
+                    handleSelectCard(hand[parsedNumber - 1])
                 },
             },
         ]
         if (turnState.stage === 'start' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'left', 'this card', 'This card.'],
+                    command: ['discard', 'left', 'this card', 'This card.', 'Discard.'],
                     callback: () => handlePickupDiscard(),
                 },
                 {
@@ -85,7 +83,7 @@ const Dictaphone = ({
         } else if (turnState.stage === 'end' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'left', 'this card', 'This card.'],
+                    command: ['discard', 'left', 'this card', 'This card.', 'Discard.'],
                     callback: () => handleDiscard(),
                 },
                 {
