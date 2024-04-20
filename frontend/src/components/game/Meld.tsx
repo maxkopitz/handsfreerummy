@@ -31,7 +31,7 @@ const Meld = ({ meld, isActive = false, onClick }: MeldProps) => {
                     </div>
                 ))}
             </div>
-            <h1 className="text-xl font-bold">Meld #{meld.meldId}</h1>
+            <h1 className="text-xl font-bold">Meld #{meld.meldId + 1}</h1>
         </div>
     )
 }

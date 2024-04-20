@@ -90,6 +90,7 @@ const Table = ({
                     handlePickupPickup={handleClickPickup}
                     handlePickupDiscard={handleClickDiscard}
                     handleLayoff={handleLayoff}
+                    melds={game.melds}
                 />
                 <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
                     {game.melds.map((meld, index) => (
