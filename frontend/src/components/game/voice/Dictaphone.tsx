@@ -2,7 +2,7 @@ import SpeechRecognition, {
     useSpeechRecognition,
 } from 'react-speech-recognition'
 import Button from '../../ui/Button'
-import { CardType, TurnState } from '../../../Type'
+import { CardType, Meld, TurnState } from '../../../Type'
 import { useEffect } from 'react'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
@@ -35,6 +35,7 @@ interface DictaphoneProps {
     handlePickupDiscard: any
     handleLayoff: any
     hand: CardType[]
+    melds: Meld[]
 }
 
 const Dictaphone = ({
@@ -48,7 +49,8 @@ const Dictaphone = ({
     handleCreateMeld,
     handlePickupPickup,
     handlePickupDiscard,
-    handleLayoff
+    handleLayoff,
+    melds
 }: DictaphoneProps) => {
 
     const commands = useMemo(() => {
@@ -87,17 +89,23 @@ const Dictaphone = ({
                     callback: () => handleDiscard(),
                 },
                 {
-                    command: ['lay off'],
-                    callback: () => {
+                    command: 'layoff :meldId',
+                    callback: (meldId: string) => {
+                        const parsedNumber: number = parseVerbalNumberToNumber(meldId)
+                        console.log(parsedNumber)
+                        if (parsedNumber === -1) {
+                            toast.error('An error occured when selecting a card, please select the card again.')
+                            return
+                        }
                         if (selectedCards(hand).length !== 1) {
                             toast.error('Please select 1 card for layoff.')
                             return
                         }
-                        handleLayoff()
+                        handleLayoff(melds[parsedNumber - 1])
                     },
                 },
                 {
-                    command: ['meld', 'melts'],
+                    command: ['meld', 'melts', 'Meld.'],
                     callback: () => {
                         if (selectedCards(hand).length < 3) {
                             toast.error(
@@ -112,7 +120,7 @@ const Dictaphone = ({
         }
 
         return commands
-    }, [turnState.stage])
+    }, [turnState, hand])
 
     const {
         transcript,
@@ -120,17 +128,6 @@ const Dictaphone = ({
         resetTranscript,
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition({ commands })
-
-    useEffect(() => {
-        if (isTurn) {
-            SpeechRecognition.startListening({ continuous: true, language: 'en-us' });
-        } else {
-            SpeechRecognition.stopListening();
-        }
-        return () => {
-            SpeechRecognition.stopListening();
-        };
-    }, [isTurn]);
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
@@ -147,7 +144,12 @@ const Dictaphone = ({
                 }}
             />
 
-            <Button onClick={SpeechRecognition.stopListening} text={'Stop'} />
+            <Button onClick={() => {
+                if (browserSupportsSpeechRecognition && listening) {
+                    SpeechRecognition.stopListening()
+                }
+
+            }} text={'Stop'} />
             <Button onClick={resetTranscript} text={'Reset'} />
             <p>Transcript: {transcript}</p>
         </div>

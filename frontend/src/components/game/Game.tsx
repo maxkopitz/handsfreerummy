@@ -294,7 +294,6 @@ const Game = () => {
                         melds: melds,
                     }))
                 } else if (data.status === 'error') {
-                    console.log(data.error?.message)
                     toast.error('An error occured while laying off.')
                 }
             })
@@ -304,7 +303,9 @@ const Game = () => {
     }
 
     const handleDiscard = (): void => {
-        if (selectedCards(game.hand).length !== 1) {
+        const selectedCardLength = selectedCards(game.hand).length;
+        if (selectedCardLength !== 1) {
+            toast.error('Please select one card to discard.')
             return
         }
         const card: any = reduceCard(selectedCards(game.hand).at(0))

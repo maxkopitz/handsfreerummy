@@ -93,7 +93,7 @@ const PlayerHand = ({
                             key={index}
                             card={card}
                             isActive={isTurn && turnState.stage === 'end'}
-                            onClick={() => handleCardClick({ card: card })}
+                            onClick={() => handleCardClick(card)}
                         />
                         {profile.settings.voiceControl && <h2>{index + 1}</h2>}
                     </div >
