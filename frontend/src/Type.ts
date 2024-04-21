@@ -70,7 +70,7 @@ export interface RummyGame {
     gameState: string
     hand: CardType[]
     sortState: boolean
-    discard: CardType
+    discard: CardType | null
     melds: Meld[]
     playerOrder: number
     isOwner: boolean
