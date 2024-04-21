@@ -90,6 +90,7 @@ const Table = ({
                     handleCreateMeld={handleClickMeld}
                     handlePickupPickup={handleClickPickup}
                     handlePickupDiscard={handleClickDiscard}
+                    micIsOn={game.playerOrder === game.turnState.turnCounter}
                     handleLayoff={handleLayoff}
                     melds={game.melds}
                 />
@@ -118,6 +119,7 @@ const Table = ({
                         handleCardClick={handlePlayerCardClick}
                         handleSortCardClick={handleSortCardClick}
                         handleClickMeld={handleClickMeld}
+                        micIsOn={game.playerOrder === game.turnState.turnCounter}
                     />
                 </div>
             </div>

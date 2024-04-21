@@ -17,6 +17,7 @@ interface PlayerHandProps {
     handleSortCardClick: any
     handleClickMeld: any
     melds: Meld[]
+    micIsOn: boolean
 }
 
 const PlayerHand = ({
@@ -28,6 +29,7 @@ const PlayerHand = ({
     handleCardClick,
     handleSortCardClick,
     handleClickMeld,
+    micIsOn,
 }: PlayerHandProps) => {
     const { profile } = useProfile()
 
@@ -46,6 +48,8 @@ const PlayerHand = ({
     const spacePressed = (e: KeyboardEvent) => {
         if (e.key === ' ') {
             setMicOn((prevMicOnState) => !prevMicOnState)
+            micIsOn = !micIsOn
+
         }
     }
 

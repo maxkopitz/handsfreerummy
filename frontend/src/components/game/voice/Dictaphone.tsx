@@ -38,6 +38,7 @@ interface DictaphoneProps {
     handlePickupDiscard: any
     handleLayoff: any
     hand: CardType[]
+    micIsOn: boolean
     melds: Meld[]
 }
 
@@ -52,6 +53,7 @@ const Dictaphone = ({
     handleCreateMeld,
     handlePickupPickup,
     handlePickupDiscard,
+    micIsOn,
     handleLayoff,
     melds,
 }: DictaphoneProps) => {
@@ -146,7 +148,19 @@ const Dictaphone = ({
         listening,
         resetTranscript,
         browserSupportsSpeechRecognition,
-    } = useSpeechRecognition({ commands })
+    } = useSpeechRecognition({ commands: getCommands() })
+
+    useEffect(() => {
+        if (isTurn && micIsOn) {
+            SpeechRecognition.startListening({ continuous: true, language: 'en-us' });
+        } else {
+            SpeechRecognition.stopListening();
+        }
+        return () => {
+            SpeechRecognition.stopListening();
+        };
+    }, [isTurn]);
+
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
