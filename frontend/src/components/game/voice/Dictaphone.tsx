@@ -3,7 +3,7 @@ import SpeechRecognition, {
 } from 'react-speech-recognition'
 import Button from '../../ui/Button'
 import { CardType, TurnState } from '../../../Type'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
 // @ts-ignore
@@ -31,7 +31,6 @@ interface DictaphoneProps {
     handlePickupPickup: any
     handlePickupDiscard: any
     hand: CardType[]
-    micIsOn: boolean
 }
 
 const Dictaphone = ({
@@ -45,8 +44,25 @@ const Dictaphone = ({
     handleClickMeld,
     handlePickupPickup,
     handlePickupDiscard,
-    micIsOn,
 }: DictaphoneProps) => {
+
+    const [micOn, setMicOn] = useState(false)
+
+    const spacePressed = (e: KeyboardEvent) => {
+        if (e.key === ' ') {
+            e.preventDefault()
+            setMicOn((prevMicOnState) => !prevMicOnState)
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('keydown', spacePressed)
+        return () => {
+            document.removeEventListener('keydown', spacePressed)
+        }
+    }, [])
+
+    
 
     const getCommands = () => {
         const commands = [
@@ -67,22 +83,31 @@ const Dictaphone = ({
             commands.push(
                 {
                     command: ['discard', 'left', 'this card', 'This card.'],
-                    callback: () => handlePickupDiscard(),
+                    callback: () => {
+                        handlePickupDiscard()
+                        resetTranscript()
+                    }
                 },
                 {
                     command: ['pick up', 'right', 'pickup', 'Pick up.'],
-                    callback: () => handlePickupPickup(),
+                    callback: () => {
+                        handlePickupPickup()
+                        resetTranscript()
+                    }
                 }
             )
         } else if (turnState.stage === 'end' && isTurn) {
             commands.push(
                 {
                     command: ['discard', 'left', 'this card', 'This card.'],
-                    callback: () => handleDiscard(),
+                    callback: () => {
+                        handleDiscard()
+                        resetTranscript()
+                    }
                 },
                 {
                     command: ['lay off'],
-                    callback: () => { },
+                    callback: () => {resetTranscript() },
                 },
                 {
                     command: ['meld'],
@@ -94,6 +119,7 @@ const Dictaphone = ({
                             return
                         }
                         handleClickMeld()
+                        resetTranscript()
                     },
                 }
             )
@@ -108,10 +134,15 @@ const Dictaphone = ({
         resetTranscript,
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition({ commands: getCommands() })
-
+    
+    useEffect(() => {
+        if (transcript.length > 100) {
+            resetTranscript();
+        }
+    }, [transcript, resetTranscript]);
 
     useEffect(() => {
-        if (isTurn && micIsOn) {
+        if (isTurn && micOn) {
             SpeechRecognition.startListening({ continuous: true, language: 'en-us' });
         } else {
             SpeechRecognition.stopListening();
@@ -119,7 +150,7 @@ const Dictaphone = ({
         return () => {
             SpeechRecognition.stopListening();
         };
-    }, [isTurn]);
+    }, [isTurn, micOn]);
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
@@ -127,8 +158,8 @@ const Dictaphone = ({
 
     return (
         <div>
-            <p>Microphone: {micIsOn ? 'on' : 'off'}</p>
-            <Button
+            <p>Microphone: {listening ? 'on' : 'off'}</p>
+            {/* <Button
                 text="Start"
                 onClick={(event: any) => {
                     event.preventDefault()
@@ -136,7 +167,7 @@ const Dictaphone = ({
                 }}
             />
             <Button onClick={SpeechRecognition.stopListening} text={'Stop'} />
-            <Button onClick={resetTranscript} text={'Reset'} />
+            <Button onClick={resetTranscript} text={'Reset'} /> */}
             <p>Transcript: {transcript}</p>
         </div>
     )
