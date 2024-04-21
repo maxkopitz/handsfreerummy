@@ -89,6 +89,7 @@ const Table = ({
                     handleClickMeld={handleClickMeld}
                     handlePickupPickup={handleClickPickup}
                     handlePickupDiscard={handleClickDiscard}
+                    micIsOn={game.playerOrder === game.turnState.turnCounter}
                 />
                 <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
                     {game.melds.map((meld, index) => (
@@ -115,6 +116,7 @@ const Table = ({
                         handleCardClick={handlePlayerCardClick}
                         handleSortCardClick={handleSortCardClick}
                         handleClickMeld={handleClickMeld}
+                        micIsOn={game.playerOrder === game.turnState.turnCounter}
                     />
                 </div>
             </div>

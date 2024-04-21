@@ -31,6 +31,7 @@ interface DictaphoneProps {
     handlePickupPickup: any
     handlePickupDiscard: any
     hand: CardType[]
+    micIsOn: boolean
 }
 
 const Dictaphone = ({
@@ -44,6 +45,7 @@ const Dictaphone = ({
     handleClickMeld,
     handlePickupPickup,
     handlePickupDiscard,
+    micIsOn,
 }: DictaphoneProps) => {
 
     const getCommands = () => {
@@ -109,7 +111,7 @@ const Dictaphone = ({
 
 
     useEffect(() => {
-        if (isTurn) {
+        if (isTurn && micIsOn) {
             SpeechRecognition.startListening({ continuous: true, language: 'en-us' });
         } else {
             SpeechRecognition.stopListening();
