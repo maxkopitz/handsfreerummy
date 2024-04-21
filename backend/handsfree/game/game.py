@@ -1,9 +1,10 @@
-from handsfree import redis_client, socketio
+from handsfree import redis_client, socketio, app
 from handsfree.game import utils
 from handsfree.game import moves
 from redis.commands.json.path import Path
 from flask import session
 from random import shuffle
+import time
 
 GAME_KEY_INDEX = 'games_index'
 ACTIVE_GAMES = 'active_games'
@@ -102,6 +103,7 @@ def join_game(game_id, display_name):
         game["players"][uuid]["sid"] = session.get("sid", None)
         game["players"][uuid]["displayName"] = display_name
 
+    player_name = game['players'][uuid]['displayName']
     for player in game['players']:
         data = {
             "action": "player-joined",
@@ -111,7 +113,12 @@ def join_game(game_id, display_name):
                 "player": str(session.get('uuid')),
                 "displayName": display_name,
                 "players": utils.player_join_builder(player, game['players'])
+            },
+            "message": {
+                "title": player_name,
+                "body": "has joined the game."
             }
+
         }
         if game['players'][player]['sid'] is not None:
             socketio.emit('player-joined',
@@ -156,11 +163,30 @@ def leave_game(game_id):
     if (game.get('owner') == uuid):
         game['gameState'] = 'ended'
         redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
-        return game
 
+    player_name = game['players'][uuid]['displayName']
     del session["game_id"]
     del game["players"][uuid]
+    socket_data = {
+            "action": "player-left",
+            "data": {
+                "player": str(session.get('uuid')),
+                "gameEnded": False,
+            },
+            "message": {
+                "title": player_name,
+                "body": "has left the game."
+            }
+    }
 
+    if game.get('owner') == uuid:
+        socket_data['data']['gameEnded'] = True
+    for player in game['players']:
+
+        if game['players'][player]['sid'] is not None and player != uuid:
+            socketio.emit('player-left', socket_data,
+                          to=game['players'][player]['sid'])
+        
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
     return game
 

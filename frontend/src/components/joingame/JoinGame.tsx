@@ -39,7 +39,7 @@ const JoinGame = () => {
     const handleClickRefresh = () => {
         toast.promise(fetchGames(), {
             loading: 'Loading...',
-            success: 'Games refreshed!',
+            success: 'Available games refreshed!',
             error: 'Error refreshing games',
         })
     }
