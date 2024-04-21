@@ -117,7 +117,7 @@ const PlayerHand = ({
                     </svg>
                 )}
 
-                {turnState.stage === 'end' && (
+                {isTurn && turnState.stage === 'end' && (
                     <>
                         <Button
                             onClick={handleClickMeld}
