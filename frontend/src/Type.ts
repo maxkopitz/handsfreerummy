@@ -49,6 +49,11 @@ export interface RummyPlayer {
     cardCount: number
 }
 
+export interface PointList {
+    player: number
+    points: number
+}
+
 export enum GameTurn {
     PICKUP = 'pickup',
     MELD = 'meld',
@@ -74,5 +79,6 @@ export interface RummyGame {
     melds: Meld[]
     playerOrder: number
     isOwner: boolean
-    turnState: TurnState
+    turnState: TurnState,
+    points: PointList[]
 }

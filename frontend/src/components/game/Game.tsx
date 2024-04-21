@@ -22,13 +22,18 @@ import {
     reduceCard,
     selectedCards,
 } from '../../lib/parsers'
+import { useModal } from '../../hooks/Modal'
 
 import { toast } from 'react-hot-toast'
+import Settings from '../settings/Settings'
+import Points from '../roundend/Points'
+import { Socket } from 'socket.io-client'
 
 const Game = () => {
     const navigate = useNavigate()
     const { profile } = useProfile()
     const { gameId } = useParams()
+    const { dispatch: dispatchModal } = useModal()
 
     const [game, setGame] = useState<RummyGame>({
         gameId: '0',
@@ -44,6 +49,7 @@ const Game = () => {
             turnCounter: 1,
             stage: 'start',
         },
+        points: [],
     })
 
     useEffect(() => {
@@ -78,6 +84,7 @@ const Game = () => {
                         playerOrder: result.game?.playerOrder,
                         isOwner: result.game?.isOwner,
                         turnState: result.game?.turnState,
+                        points: result.game?.points
                     })
                 })
                 .catch(() => {
@@ -153,6 +160,19 @@ const Game = () => {
             })
         })
 
+        socket.on(SocketEvents.GAME_RESTARTED, (data: any) => {
+            setGame((prevState) => ({
+                ...prevState,
+                hand: parseHand(data.game.hand),
+                discard: data.game.discard,
+                gameState: 'in-game',
+                players: data.game.players,
+                playerOrder: data.game.playerOrder,
+                turnState: data.game.turnState,
+            }))
+            console.log(data)
+        })
+
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
             toast.success(
                 <span>
@@ -198,7 +218,19 @@ const Game = () => {
                     turnState: data.turnState,
                 }))
             } else if (data?.move.type === 'roundEnd') {
-                navigate('/')
+                toast.success('Round ended!')
+                setGame((prevState) => ({
+                    ...prevState,
+                    points: data.move.data.points,
+                }))
+                console.log(game)
+                dispatchModal({
+                    type: 'showModal',
+                    modal: {
+                        title: 'Points',
+                        component: <Points points={ data.move.data.points} numPlayers={data.move.data.numPlayers} />,
+                    },
+                })
             }
         })
 
@@ -206,6 +238,7 @@ const Game = () => {
             socket.off(SocketEvents.PLAYER_JOINED)
             socket.off(SocketEvents.GAME_STARTED)
             socket.off(SocketEvents.PLAYED_MOVE)
+            socket.off(SocketEvents.GAME_RESTARTED)
             socket.off(SocketEvents.PLAYER_LEFT)
         }
     }, [game.gameState])

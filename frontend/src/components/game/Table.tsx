@@ -20,6 +20,7 @@ interface TableProps {
     handleLayoff: any
 }
 
+
 const Table = ({
     game,
     handleClickPickup,
@@ -36,7 +37,6 @@ const Table = ({
                 <div className="col-start-1 row-span-1">
                     <GameControls game={game} />
                 </div>
-
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand

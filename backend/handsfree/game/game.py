@@ -57,6 +57,7 @@ def create_game():
         "pickupCard": {},
         "gameState": "lobby",
         "deck": deck,
+        "points": [],
         "turnState": {
             "turnCounter": 1,
             "stage": "start"  # "start", "end"
@@ -191,10 +192,32 @@ def leave_game(game_id):
     return game
 
 
-def start_game(game_id):
+def start_game(game_id, restart = False):
     """Start Rummy Game."""
     game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
+
+    if restart:
+        for player in game['players']:
+            data = {
+                "action": "restarted",
+                "game": {
+                    "hand": game["players"][player].get("hand"),
+                    "discard": {},
+                    "turnCounter": game['turnState']['turnCounter'],
+                    "playerOrder": game["players"][player]["playerOrder"],
+                    "players": utils.player_response_builder(player, game['players']),
+                    "turnState": game["turnState"],
+                }
+            }
+            if game['players'][player]['sid'] is not None:
+                socketio.emit('game-restarted', data,
+                            to=game['players'][player]['sid'])
+        
+        redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
+        return game
+
+        
 
     if len(game.get('players')) < 2:
         result = {
@@ -240,7 +263,6 @@ def start_game(game_id):
 
     return game
 
-
 def make_move(game_key: str, player: str, move: str, data):
     """Make Rummy Move."""
     game = redis_client.json().get(game_key)
@@ -282,7 +304,10 @@ def make_move(game_key: str, player: str, move: str, data):
         if result.get('status' == 'error'):
             return result
 
-    can_game_end, game = moves.can_game_end(player, game)
+    can_round_end, game = moves.can_round_end(player, game)
     redis_client.json().set(game_key, Path.root_path(), game)
-
+    if can_round_end:
+        can_game_end, winner = moves.can_game_end(game)
+        if not can_game_end:
+            start_game(game.get('gameId'), True)
     return result

@@ -1,4 +1,5 @@
 """Game utils."""
+from random import shuffle, randint
 
 def player_join_builder(current, player_dic):
     """"Build player response."""
@@ -92,3 +93,33 @@ def is_valid_meld(meld):
         return True
     else:
         return False
+
+def deck_values_to_numbers(deck):
+    """Convert deck to numbers."""
+
+def manual_restart_game(game):
+    suits = ["hearts", "diamonds", "clubs", "spades"]
+    values = ["A", "2", "3", "4", "5", "6", "7", "8",
+          "9", "10", "J", "Q", "K"]
+    deck = []
+    for suit in suits:
+        for value in values:
+            deck.append({"value": value, "suit": suit})
+
+    shuffle(deck)
+    game["deck"] = deck
+    game["melds"] = []
+    game["discardPile"] = []
+    game["turnState"] = {
+        "turnCounter": randint(1, len(game['players'])),
+        "stage": "start"
+    }
+    handSize = 7 if len(game.get('players')) > 2 else 13
+    game["pickupCard"] = game["deck"].pop(0)
+    for player in game['players']:
+        game['players'][player]['hand'] = []
+        for i in range(handSize):
+            game["players"][player]["hand"].append(game["deck"][0])
+            game["deck"].pop(0)
+    return game
+    

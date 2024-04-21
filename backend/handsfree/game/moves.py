@@ -260,15 +260,36 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
             socketio.emit('played-move', message, to=sid)
     return result, game
 
+def can_game_end(game: dict):
+    points = {}
+    pointList = game.get('points', [])
+    for round in pointList:
+        print(round)
+        if round['player'] in points:
+            points[round['player']] += round['points']
+        else:
+            points[round['player']] = round['points']
+    for key in points:
+        if points[key] > 200:
+            return True, key
+        
+    return False, None
+        
+            
 
-def can_game_end(player: str, game: dict):
+def can_round_end(player: str, game: dict):
     """Check if a game can end."""
     result = False
     if len(game.get('players').get(player).get('hand')) == 0:
         result = True
+        game['points'].append({
+            'player': game.get('players').get(player).get('playerOrder'),
+            'points': utils.winner_points(game.get("players"), player, game)
+        })
         for key in game.get('players'):
             sid = game.get('players').get(key).get('sid')
-            game['gameState'] = 'ended'
+            
+            
 
             if sid is not None:
                 displayName = game.get('players').get(
@@ -277,6 +298,7 @@ def can_game_end(player: str, game: dict):
                     'move': {
                         'type': "roundEnd",
                         'data': {
+                            'numPlayers': len(game.get('players')),
                             'players': utils.player_response_builder(
                                 key,
                                 game.get('players')),
@@ -284,9 +306,17 @@ def can_game_end(player: str, game: dict):
                                 'displayName': displayName,
                                 'isPlayer': key == player
                             },
+                            'points': game.get('points'),
                             'redirect': '/'
                         }
                     },
+                    "message": {
+                    "title": "Round ",
+                    "body": "Ended!"
+                },
                 }
                 socketio.emit('played-move', message, to=sid)
+        gameEnd, winner = can_game_end(game)
+        if not gameEnd:
+            game = utils.manual_restart_game(game)
     return result, game

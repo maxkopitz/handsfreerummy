@@ -15,4 +15,5 @@ export const SocketEvents = {
     GAME_JOINED: 'game-joined', // recieved
     GAME_STARTED: 'game-started', // recieved
     PLAYED_MOVE: 'played-move', // recieved
+    GAME_RESTARTED: 'game-restarted', //received
 }
