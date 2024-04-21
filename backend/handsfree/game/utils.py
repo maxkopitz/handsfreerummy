@@ -1,5 +1,5 @@
 """Game utils."""
-from random import shuffle
+from random import shuffle, randint
 
 def player_join_builder(current, player_dic):
     """"Build player response."""
@@ -111,7 +111,7 @@ def manual_restart_game(game):
     game["melds"] = []
     game["discardPile"] = []
     game["turnState"] = {
-        "turnCounter": 1,
+        "turnCounter": randint(1, len(game['players'])),
         "stage": "start"
     }
     handSize = 7 if len(game.get('players')) > 2 else 13

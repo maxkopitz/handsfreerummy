@@ -27,6 +27,7 @@ import { useModal } from '../../hooks/Modal'
 import { toast } from 'react-hot-toast'
 import Settings from '../settings/Settings'
 import Points from '../roundend/Points'
+import { Socket } from 'socket.io-client'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -121,6 +122,19 @@ const Game = () => {
             })
         })
 
+        socket.on(SocketEvents.GAME_RESTARTED, (data: any) => {
+            setGame((prevState) => ({
+                ...prevState,
+                hand: parseHand(data.game.hand),
+                discard: data.game.discard,
+                gameState: 'in-game',
+                players: data.game.players,
+                playerOrder: data.game.playerOrder,
+                turnState: data.game.turnState,
+            }))
+            console.log(data)
+        })
+
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
             console.log(data)
             if (data?.move.type === 'pickup') {
@@ -177,6 +191,7 @@ const Game = () => {
             socket.off(SocketEvents.PLAYER_JOINED)
             socket.off(SocketEvents.GAME_STARTED)
             socket.off(SocketEvents.PLAYED_MOVE)
+            socket.off(SocketEvents.GAME_RESTARTED)
         }
     }, [game.gameState])
 

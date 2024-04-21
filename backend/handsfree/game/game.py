@@ -170,18 +170,18 @@ def start_game(game_id, restart = False):
     if restart:
         for player in game['players']:
             data = {
-                "action": "started",
+                "action": "restarted",
                 "game": {
                     "hand": game["players"][player].get("hand"),
                     "discard": {},
-                    "turnCounter": 1,
+                    "turnCounter": game['turnState']['turnCounter'],
                     "playerOrder": game["players"][player]["playerOrder"],
                     "players": utils.player_response_builder(player, game['players']),
                     "turnState": game["turnState"],
                 }
             }
             if game['players'][player]['sid'] is not None:
-                socketio.emit('game-started', data,
+                socketio.emit('game-restarted', data,
                             to=game['players'][player]['sid'])
         return game
 
@@ -273,8 +273,9 @@ def make_move(game_key: str, player: str, move: str, data):
             return result
 
     can_round_end, game = moves.can_round_end(player, game)
-    can_game_end, winner = moves.can_game_end(game)
-    if can_game_end:
-        start_game(game.get('gameID', True))
+    if can_round_end:
+        can_game_end, winner = moves.can_game_end(game)
+        if not can_game_end:
+            start_game(game.get('gameID'), True)
     redis_client.json().set(game_key, Path.root_path(), game)
     return result
