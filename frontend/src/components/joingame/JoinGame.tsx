@@ -4,6 +4,8 @@ import axiosInstance from '../../api/axiosConfig'
 import { LobbyGame } from '../../Type'
 import Game from './Game'
 
+import { toast } from 'react-hot-toast'
+
 const tableHeaders = ['ID', 'Players', 'Click Button to Join']
 
 const JoinGame = () => {
@@ -34,6 +36,13 @@ const JoinGame = () => {
         fetchGames()
     }, [])
 
+    const handleClickRefresh = () => {
+        toast.promise(fetchGames(), {
+            loading: 'Loading...',
+            success: 'Games refreshed!',
+            error: 'Error refreshing games',
+        })
+    }
     return (
         <div className="flex flex-col w-1/2 justify-center items-center">
             <h1 className="font-bold text-2xl">
@@ -51,10 +60,7 @@ const JoinGame = () => {
                             </th>
                         ))}
                         <th className="border-b border-black bg-blue-gray-50 p-4 justify-center items-center">
-                            <button
-                                className="bg-blue-gray-50 p-4"
-                                onClick={fetchGames}
-                            >
+                            <button onClick={handleClickRefresh}>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
