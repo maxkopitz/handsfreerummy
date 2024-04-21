@@ -93,7 +93,9 @@ const Table = ({
                     micIsOn={game.playerOrder === game.turnState.turnCounter}
                     handleLayoff={handleLayoff}
                     melds={game.melds}
+                    isMicOn={game.playerOrder === game.turnState.turnCounter}
                 />
+                
                 <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
                     {game.melds.map((meld, index) => (
                         <Meld
