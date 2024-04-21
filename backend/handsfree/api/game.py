@@ -17,6 +17,7 @@ def get_games():
         return {"error": {"message": "You are not logged in"}}
 
     games = game_manager.get_active_games()
+
     return {"games": games}
 
 

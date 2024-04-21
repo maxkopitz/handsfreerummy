@@ -4,4 +4,4 @@ import './index.css'
 import App from './App'
 import { StrictMode } from 'react'
 
-createRoot(document.getElementById('root') as HTMLElement).render(<StrictMode><App /></StrictMode>)
+createRoot(document.getElementById('root') as HTMLElement).render(<App />)

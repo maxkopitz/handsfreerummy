@@ -7,20 +7,23 @@ import { useEffect } from 'react'
 import { parseVerbalNumberToNumber, selectedCards } from '../../../lib/parsers'
 import { toast } from 'react-hot-toast'
 // @ts-ignore
-import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices';
-import { AZURE_TRANSCRIBE_REGION, AZURE_TRANSCRIBE_SUBSCRIPTION_KEY } from '../../../config'
+import createSpeechServicesPonyfill from 'web-speech-cognitive-services/lib/SpeechServices'
+import {
+    AZURE_TRANSCRIBE_REGION,
+    AZURE_TRANSCRIBE_SUBSCRIPTION_KEY,
+} from '../../../config'
 
 import { useMemo } from 'react'
 
-
 if (AZURE_TRANSCRIBE_REGION && AZURE_TRANSCRIBE_SUBSCRIPTION_KEY) {
-    const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
-        credentials: {
-            region: AZURE_TRANSCRIBE_REGION,
-            subscriptionKey: AZURE_TRANSCRIBE_SUBSCRIPTION_KEY,
-        }
-    });
-    SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
+    const { SpeechRecognition: AzureSpeechRecognition } =
+        createSpeechServicesPonyfill({
+            credentials: {
+                region: AZURE_TRANSCRIBE_REGION,
+                subscriptionKey: AZURE_TRANSCRIBE_SUBSCRIPTION_KEY,
+            },
+        })
+    SpeechRecognition.applyPolyfill(AzureSpeechRecognition)
 }
 
 interface DictaphoneProps {
@@ -35,6 +38,7 @@ interface DictaphoneProps {
     handlePickupDiscard: any
     handleLayoff: any
     hand: CardType[]
+    micIsOn: boolean
     melds: Meld[]
 }
 
@@ -49,10 +53,10 @@ const Dictaphone = ({
     handleCreateMeld,
     handlePickupPickup,
     handlePickupDiscard,
+    micIsOn,
     handleLayoff,
-    melds
+    melds,
 }: DictaphoneProps) => {
-
     const commands = useMemo(() => {
         const commands = [
             {
@@ -64,7 +68,9 @@ const Dictaphone = ({
                 callback: (card: string) => {
                     const parsedNumber: number = parseVerbalNumberToNumber(card)
                     if (parsedNumber === -1) {
-                        toast.error('An error occured when selecting a card, please select the card again.')
+                        toast.error(
+                            'An error occured when selecting a card, please select the card again.'
+                        )
                         return
                     }
                     handleSelectCard(hand[parsedNumber - 1])
@@ -74,7 +80,13 @@ const Dictaphone = ({
         if (turnState.stage === 'start' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'left', 'this card', 'This card.', 'Discard.'],
+                    command: [
+                        'discard',
+                        'left',
+                        'this card',
+                        'This card.',
+                        'Discard.',
+                    ],
                     callback: () => handlePickupDiscard(),
                 },
                 {
@@ -85,16 +97,25 @@ const Dictaphone = ({
         } else if (turnState.stage === 'end' && isTurn) {
             commands.push(
                 {
-                    command: ['discard', 'left', 'this card', 'This card.', 'Discard.'],
+                    command: [
+                        'discard',
+                        'left',
+                        'this card',
+                        'This card.',
+                        'Discard.',
+                    ],
                     callback: () => handleDiscard(),
                 },
                 {
                     command: 'layoff :meldId',
                     callback: (meldId: string) => {
-                        const parsedNumber: number = parseVerbalNumberToNumber(meldId)
+                        const parsedNumber: number =
+                            parseVerbalNumberToNumber(meldId)
                         console.log(parsedNumber)
                         if (parsedNumber === -1) {
-                            toast.error('An error occured when selecting a card, please select the card again.')
+                            toast.error(
+                                'An error occured when selecting a card, please select the card again.'
+                            )
                             return
                         }
                         if (selectedCards(hand).length !== 1) {
@@ -127,7 +148,7 @@ const Dictaphone = ({
         listening,
         resetTranscript,
         browserSupportsSpeechRecognition,
-    } = useSpeechRecognition({ commands })
+    } = useSpeechRecognition({ commands: commands })
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
@@ -140,16 +161,21 @@ const Dictaphone = ({
                 text="Start"
                 onClick={(event: any) => {
                     event.preventDefault()
-                    SpeechRecognition.startListening({ continuous: true, language: 'en-us' })
+                    SpeechRecognition.startListening({
+                        continuous: true,
+                        language: 'en-us',
+                    })
                 }}
             />
 
-            <Button onClick={() => {
-                if (browserSupportsSpeechRecognition && listening) {
-                    SpeechRecognition.stopListening()
-                }
-
-            }} text={'Stop'} />
+            <Button
+                onClick={() => {
+                    if (browserSupportsSpeechRecognition && listening) {
+                        SpeechRecognition.stopListening()
+                    }
+                }}
+                text={'Stop'}
+            />
             <Button onClick={resetTranscript} text={'Reset'} />
             <p>Transcript: {transcript}</p>
         </div>
@@ -157,4 +183,3 @@ const Dictaphone = ({
 }
 
 export default Dictaphone
-
