@@ -17,6 +17,7 @@ interface PlayerHandProps {
     handleSortCardClick: any
     handleClickMeld: any
     melds: Meld[]
+    micIsOn: boolean
 }
 
 const PlayerHand = ({
@@ -28,6 +29,7 @@ const PlayerHand = ({
     handleCardClick,
     handleSortCardClick,
     handleClickMeld,
+    micIsOn,
 }: PlayerHandProps) => {
     const { profile } = useProfile()
 
@@ -47,6 +49,8 @@ const PlayerHand = ({
         if (e.key === ' ') {
             e.preventDefault()
             setMicOn((prevMicOnState) => !prevMicOnState)
+            micIsOn = !micIsOn
+
         }
     }
 
@@ -119,7 +123,7 @@ const PlayerHand = ({
                     </svg>
                 )}
 
-                {turnState.stage === 'end' && (
+                {isTurn && turnState.stage === 'end' && (
                     <>
                         <Button
                             onClick={handleClickMeld}

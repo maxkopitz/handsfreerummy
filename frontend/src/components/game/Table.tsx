@@ -20,6 +20,7 @@ interface TableProps {
     handleLayoff: any
 }
 
+
 const Table = ({
     game,
     handleClickPickup,
@@ -36,7 +37,6 @@ const Table = ({
                 <div className="col-start-1 row-span-1">
                     <GameControls game={game} />
                 </div>
-
                 {game.players.map((player, key) => (
                     <div key={key}>
                         <OpponentHand
@@ -55,7 +55,8 @@ const Table = ({
                     <div>
                         <h1 className="text-xl font-bold">Discard Pile</h1>
                         <Card
-                            card={game.discard}
+                            card={{ suit: game.discard.suit, value: game.discard.value, isSelected: (game.playerOrder ===
+                                game.turnState.turnCounter && game.turnState.stage === 'start') ? true : false }}
                             onClick={handleClickDiscard}
                             isActive={
                                 game.playerOrder ===
@@ -89,6 +90,7 @@ const Table = ({
                     handleCreateMeld={handleClickMeld}
                     handlePickupPickup={handleClickPickup}
                     handlePickupDiscard={handleClickDiscard}
+                    micIsOn={game.playerOrder === game.turnState.turnCounter}
                     handleLayoff={handleLayoff}
                     melds={game.melds}
                     isMicOn={game.playerOrder === game.turnState.turnCounter}
@@ -119,6 +121,7 @@ const Table = ({
                         handleCardClick={handlePlayerCardClick}
                         handleSortCardClick={handleSortCardClick}
                         handleClickMeld={handleClickMeld}
+                        micIsOn={game.playerOrder === game.turnState.turnCounter}
                     />
                 </div>
             </div>

@@ -31,6 +31,7 @@ interface DictaphoneProps {
     handlePickupPickup: any
     handlePickupDiscard: any
     hand: CardType[]
+    melds: Meld[]
 }
 
 const Dictaphone = ({
@@ -44,6 +45,8 @@ const Dictaphone = ({
     handleClickMeld,
     handlePickupPickup,
     handlePickupDiscard,
+    handleLayoff,
+    melds,
 }: DictaphoneProps) => {
 
     const [micOn, setMicOn] = useState(false)
@@ -151,6 +154,7 @@ const Dictaphone = ({
             SpeechRecognition.stopListening();
         };
     }, [isTurn, micOn]);
+
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
