@@ -55,7 +55,8 @@ const Table = ({
                     <div>
                         <h1 className="text-xl font-bold">Discard Pile</h1>
                         <Card
-                            card={game.discard}
+                            card={{ suit: game.discard.suit, value: game.discard.value, isSelected: (game.playerOrder ===
+                                game.turnState.turnCounter && game.turnState.stage === 'start') ? true : false }}
                             onClick={handleClickDiscard}
                             isActive={
                                 game.playerOrder ===
