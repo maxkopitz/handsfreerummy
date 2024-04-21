@@ -153,6 +153,10 @@ def leave_game(game_id):
     game_id = int(game_id)
     game = redis_client.json().get("game:%d" % game_id)
     uuid = str(session.get('uuid'))
+    if (game.get('owner') == uuid):
+        game['gameState'] = 'ended'
+        redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
+        return game
 
     del session["game_id"]
     del game["players"][uuid]
