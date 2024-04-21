@@ -310,4 +310,8 @@ def make_move(game_key: str, player: str, move: str, data):
         can_game_end, winner = moves.can_game_end(game)
         if not can_game_end:
             start_game(game.get('gameId'), True)
+        else:
+            game["gameState"] = "ended" 
+            redis_client.json().set(game_key, Path.root_path(), game)
+
     return result
