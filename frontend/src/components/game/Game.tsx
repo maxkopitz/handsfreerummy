@@ -89,6 +89,7 @@ const Game = () => {
                     })
                 })
                 .catch(() => {
+                    toast.error('An error occured joining game ' + gameId)
                     navigate('/')
                 })
         }
@@ -102,7 +103,7 @@ const Game = () => {
                     ...prevState,
                     players: data.data.players,
                 }))
-                toast(data.data.displayName + ' has joined.')
+                toast.success(data.data.displayName + ' has joined.')
             }
         })
 
@@ -136,9 +137,14 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
-            console.log(data)
+            toast.success((
+                <span>
+                    <b>{data?.message.title}</b> {data?.message.body}
+                </span>),
+                {
+                    duration: 6000
+                })
             if (data?.move.type === 'pickup') {
-                toast.success('Picked up a card!')
                 setGame((prevState) => ({
                     ...prevState,
                     turnState: data.turnState,
@@ -146,9 +152,6 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'meld') {
-                toast.success('Created a meld!', {
-                    duration: 6000,
-                })
                 const melds = data.move.data.melds.map(
                     (meld: any, index: number) => {
                         return { meldId: index, cards: meld }
@@ -161,9 +164,6 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'discard') {
-                toast.success(data?.message, {
-                    duration: 6000,
-                })
                 setGame((prevState) => ({
                     ...prevState,
                     discard: parseCard(data.move.data.discard),
@@ -206,7 +206,6 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
                 setGame((prevState) => ({
                     ...prevState,
                     hand: [
@@ -217,7 +216,7 @@ const Game = () => {
                 }))
             })
             .catch(() => {
-                console.log('An error occured')
+                toast.error('An error occured picking up.')
             })
     }
 
@@ -242,7 +241,7 @@ const Game = () => {
                 }))
             })
             .catch(() => {
-                console.log('An error occured')
+                toast.error('An error occured picking up.')
             })
     }
 
@@ -292,7 +291,6 @@ const Game = () => {
 
     const handleLayoff = (meld: Meld) => {
         if (selectedCards(game.hand).length !== 1) {
-            console.log('no card')
             return
         }
 
@@ -329,17 +327,18 @@ const Game = () => {
                         melds: melds,
                     }))
                 } else if (data.status === 'error') {
-                    console.log(data.error?.message)
                     toast.error('An error occured while laying off.')
                 }
             })
-            .catch((error: any) => {
+            .catch(() => {
                 toast.error('An error occured while laying off.')
             })
     }
 
-    const handleDiscard = () => {
-        if (selectedCards(game.hand).length !== 1) {
+    const handleDiscard = (): void => {
+        const selectedCardLength = selectedCards(game.hand).length;
+        if (selectedCardLength !== 1) {
+            toast.error('Please select one card to discard.')
             return
         }
         const card: any = reduceCard(selectedCards(game.hand).at(0))
@@ -370,7 +369,7 @@ const Game = () => {
             })
     }
 
-    const handleCardClick = ({ card }: any) => {
+    const handleCardClick = (card: CardType): void => {
         setGame((prevState) => ({
             ...prevState,
             hand: prevState.hand.map((c) => {
@@ -415,7 +414,7 @@ const Game = () => {
         }))
     }
 
-    const handleSortCardClick = () => {
+    const handleSortCardClick = () : void => {
         setGame((prevState) => ({
             ...prevState,
             hand: prevState.hand.sort((a, b) => {
@@ -452,6 +451,7 @@ const Game = () => {
     if (game?.gameState === 'lobby') {
         return <Lobby game={game} />
     }
+
     if (game?.gameState === 'in-game' || game?.gameState === 'roundEnd') {
         return (
             <Table

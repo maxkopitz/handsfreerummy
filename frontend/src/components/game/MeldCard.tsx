@@ -7,7 +7,6 @@ interface MeldCardProps {
    card: CardType
 }
 
-
 // width and height of card need to be 12 away from each other
 // widths and heights need to be 8 away from each other with size 1, 2, and 3
 const Card = ({ card }: MeldCardProps) => {

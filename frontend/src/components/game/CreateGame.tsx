@@ -16,6 +16,8 @@ const CreateGame = () => {
             navigate('/games/' + gameId);
 
             dispatch({ type: 'closeModal' })
+        }).catch(() => {
+            toast.error('An error occured, please refresh.')
         })
     }
     return (

@@ -25,18 +25,22 @@ export const reduceCard = (card: any) => {
         }, {})
 }
 
-export const parseVerbalNumberToNumber = (card_number: string) => {
+export const parseVerbalNumberToNumber = (card_number: string): number => {
     // Azure adds periods and upper cases
     card_number = card_number.replaceAll(".","").toLowerCase()
     switch (card_number) {
         case '1':
         case 'one':
+        case 'won':
             return 1
         case '2':
         case 'two':
+        case 'to':
+        case 'too':
             return 2
         case '3':
         case 'three':
+        case 'tree':
             return 3
         case '4':
         case 'for':
@@ -72,6 +76,7 @@ export const parseVerbalNumberToNumber = (card_number: string) => {
         case '14':
         case 'fourteen':
             return 14
+        default:
+            return -1
     }
-    return 1
 }

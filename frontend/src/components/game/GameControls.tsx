@@ -38,6 +38,7 @@ const GameControls = ({ game }: GameControlsProp) => {
                             modal: {
                                 title: 'Settings',
                                 component: <Settings />,
+                                isSaveButton: true,
                             },
                         })
                     }
@@ -56,7 +57,7 @@ const GameControls = ({ game }: GameControlsProp) => {
                         })
                     }
                 />
-                <Button text={'Leave Game'} onClick={handleLeaveGame} />
+                <Button text={game.isOwner ? 'End Game' : 'Leave Game'} onClick={handleLeaveGame} />
             </div>
         </>
     )
