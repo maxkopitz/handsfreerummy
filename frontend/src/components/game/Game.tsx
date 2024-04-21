@@ -117,13 +117,14 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
-            toast.success((
+            toast.success(
                 <span>
                     <b>{data?.message.title}</b> {data?.message.body}
-                </span>),
+                </span>,
                 {
-                    duration: 6000
-                })
+                    duration: 6000,
+                }
+            )
             if (data?.move.type === 'pickup') {
                 setGame((prevState) => ({
                     ...prevState,
@@ -188,6 +189,10 @@ const Game = () => {
     }
 
     const handleClickPickupDiscard = () => {
+        if (JSON.stringify(game.discard) === '{}') {
+            toast.error('No card to pick up from the discard pile.')
+            return
+        }
         const data = JSON.stringify({
             action: 'move',
             move: {
@@ -303,7 +308,7 @@ const Game = () => {
     }
 
     const handleDiscard = (): void => {
-        const selectedCardLength = selectedCards(game.hand).length;
+        const selectedCardLength = selectedCards(game.hand).length
         if (selectedCardLength !== 1) {
             toast.error('Please select one card to discard.')
             return
@@ -381,7 +386,7 @@ const Game = () => {
         }))
     }
 
-    const handleSortCardClick = () : void => {
+    const handleSortCardClick = (): void => {
         setGame((prevState) => ({
             ...prevState,
             hand: prevState.hand.sort((a, b) => {
