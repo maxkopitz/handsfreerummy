@@ -50,7 +50,7 @@ export interface RummyPlayer {
 }
 
 export interface PointList {
-    player: string
+    player: number
     points: number
 }
 

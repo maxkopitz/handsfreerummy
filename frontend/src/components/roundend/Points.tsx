@@ -11,17 +11,32 @@ import Game from '../joingame/Game'
 
 interface PointsProps {
     points: PointList[]
+    numPlayers: number
 
 }
 
-const Points = ({points} :PointsProps) => {
+const Points = ({points, numPlayers} :PointsProps) => {
     console.log(points)
-    const tableHeaders = ['Player 1', 'Player 2']
+    var tableHeaders = []
+    var totals = [0]
+    if(numPlayers < 3){
+        tableHeaders = ['Player 1', 'Player 2']
+        totals = [0, 0]
+
+    }else if(numPlayers < 4){
+        tableHeaders = ['Player 1', 'Player 2', 'Player 3']
+        totals = [0, 0, 0]
+    }else {
+        tableHeaders = ['Player 1', 'Player 2', 'Player 3', 'Player 4']
+        totals = [0, 0, 0, 0]
+    }
+    points.forEach((round:PointList) => totals[round.player - 1] = totals[round.player - 1] + round.points)
+    
     return (
         <Container>
 
-            <div className="flex flex-col w-1/2 justify-center items-center">
-                <table className="table-auto w-full w-min-max text-left border-30 rounded-sm justify-center items-center">
+            <div className="flex flex-col justify-center items-center">
+                <table className="table-auto w-full w-min-max text-center border-30 rounded-sm justify-center items-center">
                     <thead>
                         <tr>
                             {tableHeaders.map((header, index) => (
@@ -46,9 +61,18 @@ const Points = ({points} :PointsProps) => {
                                     key={index}
                                     player={round.player}
                                     pointNumber={round.points}
+                                    numPlayers={numPlayers}
+                                    sum={[0]}
                                 />
                             )
                         })}
+                        <Row
+                            player={0}
+                            pointNumber={0}
+                            numPlayers={numPlayers}
+                            sum={totals}
+                        />
+                        
                     </tbody>
                 </table>
             </div>

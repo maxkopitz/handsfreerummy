@@ -183,6 +183,8 @@ def start_game(game_id, restart = False):
             if game['players'][player]['sid'] is not None:
                 socketio.emit('game-restarted', data,
                             to=game['players'][player]['sid'])
+        
+        redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
         return game
 
         
@@ -273,9 +275,9 @@ def make_move(game_key: str, player: str, move: str, data):
             return result
 
     can_round_end, game = moves.can_round_end(player, game)
+    redis_client.json().set(game_key, Path.root_path(), game)
     if can_round_end:
         can_game_end, winner = moves.can_game_end(game)
         if not can_game_end:
-            start_game(game.get('gameID'), True)
-    redis_client.json().set(game_key, Path.root_path(), game)
+            start_game(game.get('gameId'), True)
     return result

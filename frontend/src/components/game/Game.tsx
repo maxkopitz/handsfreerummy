@@ -181,7 +181,7 @@ const Game = () => {
                     type: 'showModal',
                     modal: {
                         title: 'Points',
-                        component: <Points points={ data.move.data.points }/>,
+                        component: <Points points={ data.move.data.points} numPlayers={data.move.data.numPlayers} />,
                     },
                 })
             }
