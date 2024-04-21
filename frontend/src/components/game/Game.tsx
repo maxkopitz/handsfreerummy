@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { redirect, useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
 import {
@@ -61,7 +61,6 @@ const Game = () => {
                         navigate(data.error.redirect)
                         return
                     }
-                    console.log(data)
                     const { result } = data
                     const melds = result.game.melds.map(
                         (meld: any, index: number) => {
@@ -96,15 +95,53 @@ const Game = () => {
                     ...prevState,
                     players: data.data.players,
                 }))
-                toast.success(data.data.displayName + ' has joined.')
+                toast.success(
+                    <span>
+                        <b>{data?.message.title}</b> {data?.message.body}
+                    </span>,
+                    {
+                        duration: 3000,
+                    }
+                )
             }
         })
 
         socket.on(SocketEvents.PLAYER_LEFT, (data: any) => {
-            toast(data.data.displayName + ' has left.')
+            if (data?.data?.gameEnded === true) {
+                toast.error('Game ended!', {
+                    duration: 3000,
+                })
+                navigate('/')
+                return
+            }
+
+            toast.error(
+                <span>
+                    <b>{data?.message.title}</b> {data?.message.body}
+                </span>,
+                {
+                    duration: 3000,
+                }
+            )
         })
 
         socket.on(SocketEvents.GAME_STARTED, (data: any) => {
+            toast(
+                <div className="text-center">
+                    <span>Game has started!</span>
+                    <br />
+                    <span> It is player ones turn.</span>
+                    <br />
+                    <span>
+                        To view how to play please click the <b>Tutorial</b>{' '}
+                        button on the upper left side of the screen.
+                    </span>
+                </div>,
+                {
+                    duration: 5000,
+                    position: 'top-center',
+                }
+            )
             setGame({
                 ...game,
                 hand: parseHand(data.game.hand),
@@ -117,13 +154,14 @@ const Game = () => {
         })
 
         socket.on(SocketEvents.PLAYED_MOVE, (data: any) => {
-            toast.success((
+            toast.success(
                 <span>
                     <b>{data?.message.title}</b> {data?.message.body}
-                </span>),
+                </span>,
                 {
-                    duration: 6000
-                })
+                    duration: 6000,
+                }
+            )
             if (data?.move.type === 'pickup') {
                 setGame((prevState) => ({
                     ...prevState,
@@ -144,6 +182,15 @@ const Game = () => {
                     players: data.move.data.players,
                 }))
             } else if (data?.move.type === 'discard') {
+                if (data.turnState.turnCounter === game.playerOrder) {
+                    toast.success('It is your turn.')
+                } else {
+                    toast.success(
+                        'It is player ' +
+                            data.turnState.turnCounter +
+                            "'s turn."
+                    )
+                }
                 setGame((prevState) => ({
                     ...prevState,
                     discard: parseCard(data.move.data.discard),
@@ -159,6 +206,7 @@ const Game = () => {
             socket.off(SocketEvents.PLAYER_JOINED)
             socket.off(SocketEvents.GAME_STARTED)
             socket.off(SocketEvents.PLAYED_MOVE)
+            socket.off(SocketEvents.PLAYER_LEFT)
         }
     }, [game.gameState])
 
@@ -173,6 +221,7 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
+                toast.success('You picked up a card.')
                 setGame((prevState) => ({
                     ...prevState,
                     hand: [
@@ -188,6 +237,10 @@ const Game = () => {
     }
 
     const handleClickPickupDiscard = () => {
+        if (JSON.stringify(game.discard) === '{}') {
+            toast.error('No card to pick up from the discard pile.')
+            return
+        }
         const data = JSON.stringify({
             action: 'move',
             move: {
@@ -200,6 +253,7 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
+                toast.success('You picked up a card.')
                 setGame((prevState) => ({
                     ...prevState,
                     hand: [...prevState.hand, res.data.move.data.card],
@@ -244,6 +298,7 @@ const Game = () => {
                         return { meldId: index, cards: meld }
                     }
                 )
+                toast.success('You created a meld card!')
                 setGame((prevState) => ({
                     ...prevState,
                     hand: parseHand(res.data.move.data.hand),
@@ -287,6 +342,7 @@ const Game = () => {
                             return { meldId: index, cards: meld }
                         }
                     )
+                    toast.success('You layed off a card!')
                     setGame((prevState) => ({
                         ...prevState,
                         hand: parseHand(data.move.data.hand),
@@ -303,7 +359,7 @@ const Game = () => {
     }
 
     const handleDiscard = (): void => {
-        const selectedCardLength = selectedCards(game.hand).length;
+        const selectedCardLength = selectedCards(game.hand).length
         if (selectedCardLength !== 1) {
             toast.error('Please select one card to discard.')
             return
@@ -323,7 +379,7 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
-                console.log(res)
+                toast.success('You discarded a card. Your turn is over.')
                 setGame((prevState) => ({
                     ...prevState,
                     hand: parseHand(res.data.hand),
@@ -381,7 +437,7 @@ const Game = () => {
         }))
     }
 
-    const handleSortCardClick = () : void => {
+    const handleSortCardClick = (): void => {
         setGame((prevState) => ({
             ...prevState,
             hand: prevState.hand.sort((a, b) => {
