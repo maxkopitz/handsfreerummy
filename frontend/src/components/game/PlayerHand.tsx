@@ -17,7 +17,7 @@ interface PlayerHandProps {
     handleSortCardClick: any
     handleClickMeld: any
     melds: Meld[]
-    micIsOn: boolean
+    isMicOn: boolean
 }
 
 const PlayerHand = ({
@@ -29,7 +29,7 @@ const PlayerHand = ({
     handleCardClick,
     handleSortCardClick,
     handleClickMeld,
-    micIsOn,
+    isMicOn,
 }: PlayerHandProps) => {
     const { profile } = useProfile()
 
@@ -41,25 +41,6 @@ const PlayerHand = ({
         handleSortCardClick()
         setSortBy(sortBy === 'Suit' ? 'Rank' : 'Suit')
     }
-
-    // turning on/off microphone by hitting the space button
-    const [micOn, setMicOn] = useState(false)
-
-    const spacePressed = (e: KeyboardEvent) => {
-        if (e.key === ' ') {
-            setMicOn((prevMicOnState) => !prevMicOnState)
-            micIsOn = !micIsOn
-
-        }
-    }
-
-    useEffect(() => {
-        document.addEventListener('keydown', spacePressed)
-        console.log('in eventListener')
-        return () => {
-            document.removeEventListener('keydown', spacePressed)
-        }
-    }, [])
 
     return (
         <div className="flex flex-col justify-center item-center w-max h-max">
@@ -92,7 +73,7 @@ const PlayerHand = ({
                     </svg>
                 )}
 
-                {isTurn && micOn && (
+                {isTurn && isMicOn && profile.settings.voiceControl && (
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -104,7 +85,7 @@ const PlayerHand = ({
                     </svg>
                 )}
 
-                {isTurn && !micOn && (
+                {isTurn && !isMicOn && profile.settings.voiceControl && (
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

@@ -39,6 +39,7 @@ interface DictaphoneProps {
     handleLayoff: any
     hand: CardType[]
     micIsOn: boolean
+    setIsMicOn: (isMicOn: boolean) => void
     melds: Meld[]
 }
 
@@ -54,6 +55,7 @@ const Dictaphone = ({
     handlePickupPickup,
     handlePickupDiscard,
     micIsOn,
+    setIsMicOn,
     handleLayoff,
     melds,
 }: DictaphoneProps) => {
@@ -150,6 +152,12 @@ const Dictaphone = ({
         browserSupportsSpeechRecognition,
     } = useSpeechRecognition({ commands: commands })
 
+    useEffect(() => {
+        if (transcript.length > 99) {
+            resetTranscript()
+        }
+    }, [transcript, resetTranscript])
+
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
     }
@@ -160,11 +168,11 @@ const Dictaphone = ({
             <Button
                 text="Start"
                 onClick={(event: any) => {
-                    event.preventDefault()
                     SpeechRecognition.startListening({
                         continuous: true,
                         language: 'en-us',
                     })
+                    setIsMicOn(true)
                 }}
             />
 
@@ -172,11 +180,11 @@ const Dictaphone = ({
                 onClick={() => {
                     if (browserSupportsSpeechRecognition && listening) {
                         SpeechRecognition.stopListening()
+                        setIsMicOn(false)
                     }
                 }}
                 text={'Stop'}
             />
-            <Button onClick={resetTranscript} text={'Reset'} />
             <p>Transcript: {transcript}</p>
         </div>
     )
