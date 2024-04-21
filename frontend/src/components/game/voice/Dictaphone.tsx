@@ -148,19 +148,7 @@ const Dictaphone = ({
         listening,
         resetTranscript,
         browserSupportsSpeechRecognition,
-    } = useSpeechRecognition({ commands: getCommands() })
-
-    useEffect(() => {
-        if (isTurn && micIsOn) {
-            SpeechRecognition.startListening({ continuous: true, language: 'en-us' });
-        } else {
-            SpeechRecognition.stopListening();
-        }
-        return () => {
-            SpeechRecognition.stopListening();
-        };
-    }, [isTurn]);
-
+    } = useSpeechRecognition({ commands: commands })
 
     if (!browserSupportsSpeechRecognition) {
         return <span>Browser doesn't support speech recognition.</span>
