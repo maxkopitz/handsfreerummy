@@ -13,7 +13,7 @@ interface TableProps {
     game: RummyGame
     handleClickPickup: () => void
     handleClickDiscard: () => void
-    handleDiscard: (card: CardType) => void
+    handleDiscard: () => void
     handlePlayerCardClick: (card: CardType) => void
     handleSortCardClick: any
     handleClickMeld: (meld: MeldType) => void
@@ -84,12 +84,14 @@ const Table = ({
                     isTurn={game.playerOrder === game.turnState.turnCounter}
                     turnState={game.turnState}
                     handleDiscard={handleDiscard}
-                    handleCardClick={handlePlayerCardClick}
-                    handleSortCardClick={handleSortCardClick}
-                    handleClickMeld={handleClickMeld}
+                    handleSelectCard={handlePlayerCardClick}
+                    handleSortCards={handleSortCardClick}
+                    handleCreateMeld={handleClickMeld}
                     handlePickupPickup={handleClickPickup}
                     handlePickupDiscard={handleClickDiscard}
                     micIsOn={game.playerOrder === game.turnState.turnCounter}
+                    handleLayoff={handleLayoff}
+                    melds={game.melds}
                 />
                 <div className="row-start-2 col-start-2 col-span-3 flex flex-auto">
                     {game.melds.map((meld, index) => (

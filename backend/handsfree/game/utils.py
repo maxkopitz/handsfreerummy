@@ -1,5 +1,16 @@
 """Game utils."""
 
+def player_join_builder(current, player_dic):
+    """"Build player response."""
+    players = []
+    for key in player_dic:
+        players.append(
+            {
+                'displayName': player_dic[key]['displayName'],
+                'cardCount': len(player_dic[key]['hand']),
+                'playerOrder': player_dic[key].get('playerOrder', 0)
+            })
+    return players
 
 def player_response_builder(current, player_dic):
     """"Build player response."""
@@ -81,6 +92,3 @@ def is_valid_meld(meld):
         return True
     else:
         return False
-
-def deck_values_to_numbers(deck):
-    """Convert deck to numbers."""

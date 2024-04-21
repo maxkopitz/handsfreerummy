@@ -9,8 +9,9 @@ const CardBack = ({ onClick, isActive = false }: CardBackProps) => {
     const { profile } = useProfile()
     let classes = classNames(
         'w-20 h-32 border-2 rounded-md text-3xl text-center',
-        'border-green-700 bg-green-700',
-        { 'hover:bg-green-800': isActive },
+        { 'border-blue-500 bg-blue-500 hover:bg-blue-700': isActive },
+        { 'border-green-700 bg-green-700': !isActive },
+        //{ 'hover:bg-green-800': isActive },
         { 'text-2xl w-20 h-32': profile.settings.cardSize === 1 },
         { 'text-4xl w-28 h-40': profile.settings.cardSize === 2 },
         { 'text-6xl w-36 h-48': profile.settings.cardSize === 3 },

@@ -57,7 +57,7 @@ const GameControls = ({ game }: GameControlsProp) => {
                         })
                     }
                 />
-                <Button text={'Leave Game'} onClick={handleLeaveGame} />
+                <Button text={game.isOwner ? 'End Game' : 'Leave Game'} onClick={handleLeaveGame} />
             </div>
         </>
     )
