@@ -187,7 +187,7 @@ def leave_game(game_id):
         if game['players'][player]['sid'] is not None and player != uuid:
             socketio.emit('player-left', socket_data,
                           to=game['players'][player]['sid'])
-        
+
     redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
     return game
 
@@ -213,11 +213,11 @@ def start_game(game_id, restart = False):
             if game['players'][player]['sid'] is not None:
                 socketio.emit('game-restarted', data,
                             to=game['players'][player]['sid'])
-        
+
         redis_client.json().set("game:%d" % game_id, Path.root_path(), game)
         return game
 
-        
+
 
     if len(game.get('players')) < 2:
         result = {
@@ -311,7 +311,7 @@ def make_move(game_key: str, player: str, move: str, data):
         if not can_game_end:
             start_game(game.get('gameId'), True)
         else:
-            game["gameState"] = "ended" 
+            game["gameState"] = "ended"
             redis_client.json().set(game_key, Path.root_path(), game)
 
     return result

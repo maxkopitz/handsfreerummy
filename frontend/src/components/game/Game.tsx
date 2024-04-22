@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { redirect, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axiosInstance from '../../api/axiosConfig'
 import { socket, SocketEvents } from '../../api/socket'
 import {
     RummyGame,
     Value,
     Suit,
-    GameTurn,
     CardType,
     ValueOrder,
     SuitOrder,
@@ -25,9 +24,7 @@ import {
 import { useModal } from '../../hooks/Modal'
 
 import { toast } from 'react-hot-toast'
-import Settings from '../settings/Settings'
 import Points from '../roundend/Points'
-import { Socket } from 'socket.io-client'
 
 const Game = () => {
     const navigate = useNavigate()
@@ -163,6 +160,11 @@ const Game = () => {
         socket.on(SocketEvents.GAME_RESTARTED, (data: any) => {
             setGame((prevState) => ({
                 ...prevState,
+                gameId: prevState.gameId,
+                sortState: prevState.sortState,
+                melds: [],
+                //playerOrder: result.game?.playerOrder,
+                // points: result.game?.points
                 hand: parseHand(data.game.hand),
                 discard: data.game.discard,
                 gameState: 'in-game',
@@ -223,7 +225,6 @@ const Game = () => {
                     ...prevState,
                     points: data.move.data.points,
                 }))
-                console.log(game)
                 dispatchModal({
                     type: 'showModal',
                     modal: {
