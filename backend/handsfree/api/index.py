@@ -9,7 +9,7 @@ index_blueprint = Blueprint('index',  __name__)
 
 @index_blueprint.route('/', methods=['GET'])
 def index():
-    return {"version": "v1.0.0-beta"}
+    return {"version": "v1.0.0-omega"}
 
 
 @index_blueprint.route('/register/', methods=['GET'])
