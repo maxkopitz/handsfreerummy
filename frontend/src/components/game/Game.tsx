@@ -209,8 +209,8 @@ const Game = () => {
                 } else {
                     toast.success(
                         'It is player ' +
-                            data.turnState.turnCounter +
-                            "'s turn."
+                        data.turnState.turnCounter +
+                        "'s turn."
                     )
                 }
                 setGame((prevState) => ({
@@ -428,6 +428,17 @@ const Game = () => {
         axiosInstance
             .post<any>('/games/' + gameId + '/', data)
             .then((res: any) => {
+                if (res?.data.status === 'error') {
+                    toast.error(
+                        <span>
+                            <b>{res.data?.message.title}</b> {res.data?.message.body}
+                        </span>,
+                        {
+                            duration: 3000,
+                        }
+                    )
+                    return
+                }
                 toast.success('You discarded a card. Your turn is over.')
                 setGame((prevState) => ({
                     ...prevState,
@@ -436,7 +447,8 @@ const Game = () => {
                     turnState: res.data.turnState,
                 }))
             })
-            .catch(() => {
+            .catch((err: any) => {
+                console.log(err)
                 console.log('An error occured')
             })
     }

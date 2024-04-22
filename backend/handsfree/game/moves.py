@@ -77,6 +77,7 @@ def drawDiscard(player, move, game):
             result['move']['data']['discard'] = game.get('discardPile')[0]
 
         game['turnState']['stage'] = 'end'
+        game['turnState']['discardedCard'] = picked_card
         result['turnState'] = game['turnState']
 
         player_name = game.get('players').get(player).get('displayName')
@@ -220,6 +221,15 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
         'turnState': game['turnState']
     }
     # TODO Verify in hand
+    if discardedCard == game.get('turnState').get('discardedCard', {}):
+        result = {
+            'status': 'error',
+            'message': {
+                'title': 'Error discarding.',
+                'body': 'You can not discard the card you picked up.'
+                }
+        }
+        return result, game
     game.get('players').get(
         player).get('hand').remove(discardedCard)
     game.get('discardPile').insert(0, discardedCard)
@@ -231,6 +241,7 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
 
     game['turnState']['turnCounter'] = turnCounter
     game['turnState']['stage'] = 'start'
+    game['turnState']['discardedCard'] = {}
 
     result['turnState'] = game['turnState']
     result['hand'] = game.get('players', {}).get(player).get('hand')
@@ -260,6 +271,7 @@ def discard(discardedCard: dict, player: str, move: str, game: dict):
             socketio.emit('played-move', message, to=sid)
     return result, game
 
+
 def can_game_end(game: dict):
     points = {}
     pointList = game.get('points', [])
@@ -272,10 +284,9 @@ def can_game_end(game: dict):
     for key in points:
         if points[key] > 200:
             return True, key
-        
+
     return False, None
-        
-            
+
 
 def can_round_end(player: str, game: dict):
     """Check if a game can end."""
@@ -289,8 +300,6 @@ def can_round_end(player: str, game: dict):
         gameEnd, winner = can_game_end(game)
         for key in game.get('players'):
             sid = game.get('players').get(key).get('sid')
-            
-            
 
             if sid is not None:
                 displayName = game.get('players').get(
@@ -313,9 +322,9 @@ def can_round_end(player: str, game: dict):
                         }
                     },
                     "message": {
-                    "title": "Round ",
-                    "body": "Ended!"
-                },
+                        "title": "Round ",
+                        "body": "Ended!"
+                    },
                 }
                 if gameEnd:
                     message['move']['data']['gameEnd'] = True
