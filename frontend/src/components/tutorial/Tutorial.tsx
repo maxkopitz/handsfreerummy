@@ -1,20 +1,20 @@
 import Container from '../ui/Container'
-import { useProfile } from '../../hooks/Profile'
-import Button from '../ui/Button'
-import Card from '../game/Card'
-import { Suit, Value } from '../../Type'
 
 const Tutorial = () => {
     return (
         <Container>
             <div className="justify-center">
-                <h2 className="text-xl">Game Goal</h2>
+                <div className="border-b border-solid border-blueGray-200 rounded-t">
+                    <h2 className="text-xl font-bold">Game Goal</h2>
+                </div>
                 <h3 className="text-base">
                     Get rid of all cards in hand by creating melds of cards of
                     the same rank or increasing in rank with the same suit. The
                     yellow star means it is your turn
                 </h3>
-                <h2 className="text-xl">Play Round</h2>
+                <div className="border-b border-solid border-blueGray-200 rounded-t">
+                    <h2 className="text-xl font-bold">Play Round</h2>
+                </div>
                 <h3 className="text-base">
                     1. Pick up a card from pickup pile or discard pile.
                 </h3>
@@ -28,16 +28,19 @@ const Tutorial = () => {
                     3. Discard a card into the discard pile. Note: cannot
                     discard card picked up from discard pile on the same turn!
                 </h3>
-                <h2 className="text-xl">Commands</h2>
+
+                <div className="border-b border-solid border-blueGray-200 rounded-t">
+                    <h2 className="text-xl font-bold">Voice Commands</h2>
+                </div>
                 <h3 className="text-base">
-                    1. "Pickup" to pickup from the pickup pile or "Discard" to pickup from the disacrd Pile
+                    1. <b>Starting your turn:</b> <span className="italic">"Pickup"</span> to pickup from the pickup pile or <span className="italic">"Discard"</span> to pickup from the disacrd Pile
                 </h3>
                 <h3 className="text-base">
-                    2. "Select 1, 2, 3" to select cards from your hand and then "Meld" to create Meld
-                    <br></br>
-                    "Select 1" to select card and then "Layoff 1" to add to a Layoff 
-                    3. "Discard 1" to discard card from your hand and end your turn
-                    
+                    2. <b>Creating a meld:</b> <span className="italic">"Select 1, 2, 3"</span> to select cards from your hand and then "Meld" to create Meld
+                    <br />
+                    3. <b>Laying off:</b> <span className="italic">"Select 1"</span> to select card 1 and then <span className="italic">"Layoff 1"</span> to add to Layoff 1
+                    <br />
+                    4. <b>Ending your turn:</b> <span className="italic">"Select 1"</span> to select card 1 and then <span className='italic'>"Discard"</span> to discard card from your hand and end your turn
                 </h3>
             </div>
         </Container>

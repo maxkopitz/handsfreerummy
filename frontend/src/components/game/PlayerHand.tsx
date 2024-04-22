@@ -134,7 +134,7 @@ const PlayerHand = ({
                             isActive={isTurn && turnState.stage === 'end'}
                             onClick={() => handleCardClick(card)}
                         />
-                        {profile.settings.voiceControl && <h2>{index + 1}</h2>}
+                        {profile.settings.voiceControl && <h2 className="text-xl font-bold">#{index + 1}</h2>}
                     </div>
                 ))}
             </div>
