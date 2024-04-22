@@ -225,13 +225,28 @@ const Game = () => {
                     ...prevState,
                     points: data.move.data.points,
                 }))
-                dispatchModal({
-                    type: 'showModal',
-                    modal: {
-                        title: 'Points',
-                        component: <Points points={ data.move.data.points} numPlayers={data.move.data.numPlayers} />,
-                    },
-                })
+                if (data.move.data.gameEnd){
+                    dispatchModal({
+                        type: 'showModal',
+                        modal: {
+                            title: data.move.data.winner.displayName + " won!",
+                            component: <Points points={ data.move.data.points } numPlayers={data.move.data.numPlayers} />,
+                        },
+                    })
+                    setGame((prevState) => ({
+                        ...prevState,
+                        gameState: 'ended',
+                    }))
+                }
+                else{
+                    dispatchModal({
+                        type: 'showModal',
+                        modal: {
+                            title: 'Points',
+                            component: <Points points={ data.move.data.points } numPlayers={data.move.data.numPlayers} />,
+                        },
+                    })
+                }
             }
         })
 
@@ -505,7 +520,7 @@ const Game = () => {
         }))
     }
 
-    if (game?.gameState === 'lobby') {
+    if (game?.gameState === 'lobby' || game?.gameState === 'ended') {
         return <Lobby game={game} />
     }
 
