@@ -30,12 +30,14 @@ const Tutorial = () => {
                 </h3>
                 <h2 className="text-xl">Commands</h2>
                 <h3 className="text-base">
-                    1. "Pickup from Discard Pile" or "Pickup from Pickup Pile"
+                    1. "Pickup" to pickup from the pickup pile or "Discard" to pickup from the disacrd Pile
                 </h3>
                 <h3 className="text-base">
-                    2. "Play 9 of hearts on meld 5", "Create meld with 9 of
-                    hearts, 9 or spades, and 9 of clubs", or "Discard 10 of
-                    hearts"
+                    2. "Select 1, 2, 3" to select cards from your hand and then "Meld" to create Meld
+                    <br></br>
+                    "Select 1" to select card and then "Layoff 1" to add to a Layoff 
+                    3. "Discard 1" to discard card from your hand and end your turn
+                    
                 </h3>
             </div>
         </Container>
