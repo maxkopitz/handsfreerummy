@@ -297,6 +297,7 @@ def can_round_end(player: str, game: dict):
             'player': game.get('players').get(player).get('playerOrder'),
             'points': utils.winner_points(game.get("players"), player, game)
         })
+        gameEnd, winner = can_game_end(game)
         for key in game.get('players'):
             sid = game.get('players').get(key).get('sid')
 
@@ -316,7 +317,8 @@ def can_round_end(player: str, game: dict):
                                 'isPlayer': key == player
                             },
                             'points': game.get('points'),
-                            'redirect': '/'
+                            'redirect': '/',
+                            'gameEnd': False
                         }
                     },
                     "message": {
@@ -324,8 +326,9 @@ def can_round_end(player: str, game: dict):
                         "body": "Ended!"
                     },
                 }
+                if gameEnd:
+                    message['move']['data']['gameEnd'] = True
                 socketio.emit('played-move', message, to=sid)
-        gameEnd, winner = can_game_end(game)
         if not gameEnd:
             game = utils.manual_restart_game(game)
     return result, game
