@@ -6,7 +6,7 @@ import Settings from './settings/Settings'
 import CreateGame from './game/CreateGame'
 
 const MainMenu = () => {
-    const { dispatch } = useModal();
+    const { dispatch } = useModal()
     return (
         <Container>
             <div className="flex flex-col justify-center items-center">
@@ -19,12 +19,18 @@ const MainMenu = () => {
                 <br></br>
                 <br></br>
                 <div>
-                    <Button text={'Create Game'} onClick={() => dispatch(
-                        {
-                            type: 'showModal', modal:
-                                { title: "Create Game", component: <CreateGame /> }
-                        })} />
-
+                    <Button
+                        text={'Create Game'}
+                        onClick={() =>
+                            dispatch({
+                                type: 'showModal',
+                                modal: {
+                                    title: 'Create Game',
+                                    component: <CreateGame />,
+                                },
+                            })
+                        }
+                    />
                 </div>
                 <div>
                     <Button
@@ -35,6 +41,7 @@ const MainMenu = () => {
                                 modal: {
                                     title: 'Settings',
                                     component: <Settings />,
+                                    isSaveButton: true,
                                 },
                             })
                         }
