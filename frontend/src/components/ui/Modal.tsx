@@ -1,15 +1,22 @@
+import { type ElementRef, useEffect, useRef } from "react";
 import { useModal } from "../../hooks/Modal";
 
 const Modal = () => {
     const { modal, dispatch } = useModal();
+    const dialogRef = useRef<ElementRef<"dialog">>(null);
 
     // Determine button text based on isSaveButton prop
     const buttonText = modal.modal?.isSaveButton ? "Save" : "Close";
+    useEffect(() => {
+        if (!dialogRef.current?.open) {
+            dialogRef.current?.showModal();
+        }
+    }, []);
 
     return (
         <>
             {modal.modal ? (
-                <>
+                <dialog ref={dialogRef} open>
                     <div
                         className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
                     >
@@ -40,7 +47,7 @@ const Modal = () => {
                         </div>
                     </div>
                     <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
-                </>
+                </dialog>
             ) : null}
         </>
     );
